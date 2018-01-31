@@ -1,0 +1,36 @@
+{
+  "name": "@schematics/angular",
+  "version": "0.2.0",
+  "description": "Schematics specific to Angular",
+  "keywords": [
+    "angular",
+    "devkit",
+    "sdk",
+    "Angular DevKit",
+    "blueprints",
+    "code generation",
+    "schematics"
+  ],
+  "schematics": "./collection.json",
+  "dependencies": {
+    "typescript": "~2.6.2"
+  },
+  "peerDependencies": {
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#e804ce6",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#e804ce6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/devkit.git"
+  },
+  "engines": {
+    "node": ">= 6.9.0",
+    "npm": ">= 3.0.0"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/devkit/issues"
+  },
+  "homepage": "https://github.com/angular/devkit"
+}
