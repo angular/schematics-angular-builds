@@ -16,8 +16,8 @@
     "typescript": "~2.6.2"
   },
   "peerDependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#96d0be2",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#96d0be2"
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b6336a0",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#b6336a0"
   },
   "repository": {
     "type": "git",
