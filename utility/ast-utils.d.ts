@@ -38,6 +38,13 @@ export declare function findNode(node: ts.Node, kind: ts.SyntaxKind, text: strin
 export declare function insertAfterLastOccurrence(nodes: ts.Node[], toInsert: string, file: string, fallbackPos: number, syntaxKind?: ts.SyntaxKind): Change;
 export declare function getContentOfKeyLiteral(_source: ts.SourceFile, node: ts.Node): string | null;
 export declare function getDecoratorMetadata(source: ts.SourceFile, identifier: string, module: string): ts.Node[];
+/**
+ * Given a source file with @NgModule class(es), find the name of the first @NgModule class.
+ *
+ * @param source source file containing one or more @NgModule
+ * @returns the name of the first @NgModule, or `undefined` if none is found
+ */
+export declare function getFirstNgModuleName(source: ts.SourceFile): string | undefined;
 export declare function addSymbolToNgModuleMetadata(source: ts.SourceFile, ngModulePath: string, metadataField: string, symbolName: string, importPath?: string | null): Change[];
 /**
  * Custom function to insert a declaration (component, pipe, directive)
