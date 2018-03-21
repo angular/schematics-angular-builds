@@ -5,5 +5,5 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Tree } from '@angular-devkit/schematics';
-export declare function createAppModule(tree: Tree, path?: string): Tree;
+import { UnitTestTree } from '@angular-devkit/schematics/testing';
+export declare function createAppModule(tree: UnitTestTree, path?: string): UnitTestTree;

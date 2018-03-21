@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { experimental } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 export interface AppConfig {
     /**
@@ -433,6 +434,9 @@ export interface CliConfig {
         typescriptMismatch?: boolean;
     };
 }
+export declare type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
+export declare function getWorkspacePath(host: Tree): string;
+export declare function getWorkspace(host: Tree): WorkspaceSchema;
 export declare const configPath = "/.angular-cli.json";
 export declare function getConfig(host: Tree): CliConfig;
 export declare function getAppFromConfig(config: CliConfig, appIndexOrName: string): AppConfig | null;
