@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { experimental } from '@angular-devkit/core';
-import { Tree } from '@angular-devkit/schematics';
+import { Rule, Tree } from '@angular-devkit/schematics';
 export interface AppConfig {
     /**
      * Name of the app.
@@ -435,8 +435,10 @@ export interface CliConfig {
     };
 }
 export declare type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
+export declare type WorkspaceProject = experimental.workspace.WorkspaceProject;
 export declare function getWorkspacePath(host: Tree): string;
 export declare function getWorkspace(host: Tree): WorkspaceSchema;
+export declare function addProjectToWorkspace(workspace: WorkspaceSchema, name: string, project: WorkspaceProject): Rule;
 export declare const configPath = "/.angular-cli.json";
 export declare function getConfig(host: Tree): CliConfig;
 export declare function getAppFromConfig(config: CliConfig, appIndexOrName: string): AppConfig | null;
