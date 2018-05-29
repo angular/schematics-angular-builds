@@ -13,8 +13,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b2c3752",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#b2c3752",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#67181f5",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#67181f5",
     "typescript": ">=2.6.2 <2.8"
   },
   "repository": {
