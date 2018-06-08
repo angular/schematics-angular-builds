@@ -4,6 +4,7 @@
   "description": "Schematics specific to Angular",
   "keywords": [
     "angular",
+    "Angular CLI",
     "devkit",
     "sdk",
     "Angular DevKit",
@@ -13,13 +14,13 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#139a4fd",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#139a4fd",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#dc62ecb",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#dc62ecb",
     "typescript": ">=2.6.2 <2.8"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/devkit.git"
+    "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
     "node": ">= 8.9.0",
@@ -28,7 +29,7 @@
   "author": "Angular Authors",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/angular/devkit/issues"
+    "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/devkit"
+  "homepage": "https://github.com/angular/angular-cli"
 }
