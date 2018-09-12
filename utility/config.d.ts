@@ -1,12 +1,5 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-import { experimental } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
+import { ProjectType, WorkspaceProject, WorkspaceSchema } from './workspace-models';
 export interface AppConfig {
     /**
      * Name of the app.
@@ -472,11 +465,10 @@ export interface CliConfig {
         typescriptMismatch?: boolean;
     };
 }
-export declare type WorkspaceSchema = experimental.workspace.WorkspaceSchema;
-export declare type WorkspaceProject = experimental.workspace.WorkspaceProject;
 export declare function getWorkspacePath(host: Tree): string;
 export declare function getWorkspace(host: Tree): WorkspaceSchema;
-export declare function addProjectToWorkspace(workspace: WorkspaceSchema, name: string, project: WorkspaceProject): Rule;
+export declare function addProjectToWorkspace<TProjectType extends ProjectType = ProjectType.Application>(workspace: WorkspaceSchema, name: string, project: WorkspaceProject<TProjectType>): Rule;
+export declare function updateWorkspace(workspace: WorkspaceSchema): Rule;
 export declare const configPath = "/.angular-cli.json";
 export declare function getConfig(host: Tree): CliConfig;
 export declare function getAppFromConfig(config: CliConfig, appIndexOrName: string): AppConfig | null;
