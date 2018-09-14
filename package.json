@@ -1,6 +1,6 @@
 {
   "name": "@schematics/angular",
-  "version": "0.9.0-beta.2",
+  "version": "0.9.0-beta.3",
   "description": "Schematics specific to Angular",
   "keywords": [
     "angular",
@@ -14,8 +14,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#c63b4d8",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#c63b4d8",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b6793bd",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#b6793bd",
     "typescript": "3.0.1"
   },
   "repository": {
@@ -23,8 +23,8 @@
     "url": "https://github.com/angular/angular-cli.git"
   },
   "engines": {
-    "node": ">=10.9.0 <11.0.0",
-    "yarn": ">=1.9.0 <2.0.0"
+    "node": ">= 8.9.0",
+    "npm": ">= 5.5.1"
   },
   "author": "Angular Authors",
   "license": "MIT",
