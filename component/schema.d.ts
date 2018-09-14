@@ -1,24 +1,20 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-
 export interface Schema {
     /**
-     * The path to create the component.
+     * Specifies the change detection strategy.
      */
-    path?: string;
+    changeDetection?: ChangeDetection;
     /**
-     * The name of the project.
+     * Specifies if the component is an entry component of declaring module.
      */
-    project?: string;
+    entryComponent?: boolean;
     /**
-     * The name of the component.
+     * Specifies if declaring module exports the component.
      */
-    name: string;
+    export?: boolean;
+    /**
+     * Flag to indicate if a dir is created.
+     */
+    flat?: boolean;
     /**
      * Specifies if the style will be in the ts file.
      */
@@ -28,51 +24,62 @@ export interface Schema {
      */
     inlineTemplate?: boolean;
     /**
-     * Specifies the view encapsulation strategy.
+     * Specifies whether to apply lint fixes after generating the component.
      */
-    viewEncapsulation?: ('Emulated' | 'Native' | 'None');
-    /**
-     * Specifies the change detection strategy.
-     */
-    changeDetection?: ('Default' | 'OnPush');
-    /**
-     * The prefix to apply to generated selectors.
-     */
-    prefix?: string;
-    /**
-     * The file extension to be used for style files.
-     */
-    styleext?: string;
-    /**
-     * Specifies if a spec file is generated.
-     */
-    spec?: boolean;
-    /**
-     * Flag to indicate if a dir is created.
-     */
-    flat?: boolean;
-    /**
-     * Flag to skip the module import.
-     */
-    skipImport?: boolean;
-    /**
-     * The selector to use for the component.
-     */
-    selector?: string;
+    lintFix?: boolean;
     /**
      * Allows specification of the declaring module.
      */
     module?: string;
     /**
-     * Specifies if declaring module exports the component.
+     * The name of the component.
      */
-    export?: boolean;
-  /**
-   * Specifies if the component is an entry component of declaring module.
-   */
-    entryComponent?: boolean;
+    name: string;
     /**
-     * Specifies whether to apply lint fixes after generating the component.
+     * The path to create the component.
      */
-    lintFix?: boolean;
+    path?: string;
+    /**
+     * The prefix to apply to generated selectors.
+     */
+    prefix?: string;
+    /**
+     * The name of the project.
+     */
+    project?: string;
+    /**
+     * The selector to use for the component.
+     */
+    selector?: string;
+    /**
+     * Flag to skip the module import.
+     */
+    skipImport?: boolean;
+    /**
+     * Specifies if a spec file is generated.
+     */
+    spec?: boolean;
+    /**
+     * The file extension to be used for style files.
+     */
+    styleext?: string;
+    /**
+     * Specifies the view encapsulation strategy.
+     */
+    viewEncapsulation?: ViewEncapsulation;
+}
+/**
+ * Specifies the change detection strategy.
+ */
+export declare enum ChangeDetection {
+    Default = "Default",
+    OnPush = "OnPush"
+}
+/**
+ * Specifies the view encapsulation strategy.
+ */
+export declare enum ViewEncapsulation {
+    Emulated = "Emulated",
+    Native = "Native",
+    None = "None"
 }

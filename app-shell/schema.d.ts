@@ -1,40 +1,16 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-
 export interface Schema {
     /**
-     * Name of related client app.
+     * The name of the application directory.
      */
-    clientProject: string;
-    /**
-     * Name of related universal app.
-     */
-    universalProject: string;
-    /**
-     * Route path used to produce the app shell.
-     */
-    route?: string;
-    /**
-     * Name of the universal app
-     */
-    name?: string;
+    appDir?: string;
     /**
      * The appId to use withServerTransition.
      */
     appId?: string;
     /**
-     * The output directory for build results.
+     * Name of related client app.
      */
-    outDir?: string;
-    /**
-     * The root directory of the app.
-     */
-    root?: string;
+    clientProject: string;
     /**
      * Name of the index file
      */
@@ -44,28 +20,47 @@ export interface Schema {
      */
     main?: string;
     /**
-     * The name of the test entry-point file.
+     * Name of the universal app
      */
-    test?: string;
+    name?: string;
     /**
-     * The name of the TypeScript configuration file.
+     * The output directory for build results.
      */
-    tsconfigFileName?: string;
+    outDir?: string;
     /**
-     * The name of the TypeScript configuration file for tests.
+     * The root directory of the app.
      */
-    testTsconfigFileName?: string;
+    root?: string;
     /**
-     * The name of the application directory.
+     * The name of the root module class.
      */
-    appDir?: string;
+    rootModuleClassName?: string;
     /**
      * The name of the root module file
      */
     rootModuleFileName?: string;
     /**
-     * The name of the root module class.
+     * Route path used to produce the app shell.
      */
-    rootModuleClassName?: string;
+    route?: string;
+    /**
+     * The path of the source directory.
+     */
     sourceDir?: string;
+    /**
+     * The name of the test entry-point file.
+     */
+    test?: string;
+    /**
+     * The name of the TypeScript configuration file for tests.
+     */
+    testTsconfigFileName?: string;
+    /**
+     * The name of the TypeScript configuration file.
+     */
+    tsconfigFileName?: string;
+    /**
+     * Name of related universal app.
+     */
+    universalProject: string;
 }

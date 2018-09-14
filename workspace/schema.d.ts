@@ -1,42 +1,39 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-
 export interface Schema {
     /**
-     * The name of the workspace.
+     * Initial repository commit information.
      */
-    name: string;
+    commit?: null | Commit;
     /**
-     * Uses the next version of Angular.
+     * Use the next version of Angular (@next dist-tag).
      */
     experimentalAngularNext?: boolean;
-    /**
-     * The path where new projects will be created.
-     */
-    newProjectRoot?: string;
-    /**
-     * Skip installing dependency packages.
-     */
-    skipInstall?: boolean;
     /**
      * Link CLI to global version (internal development only).
      */
     linkCli?: boolean;
     /**
+     * The name of the workspace.
+     */
+    name: string;
+    /**
+     * The path where new projects will be created.
+     */
+    newProjectRoot?: string;
+    /**
      * Skip initializing a git repository.
      */
     skipGit?: boolean;
     /**
-     * Initial repository commit information.
+     * Skip installing dependency packages.
      */
-    commit?: { name: string, email: string, message?: string };
+    skipInstall?: boolean;
     /**
      * The version of the Angular CLI to use.
      */
-    version?: string;
+    version: string;
+}
+export interface Commit {
+    email: string;
+    message?: string;
+    name: string;
 }
