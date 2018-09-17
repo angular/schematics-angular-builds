@@ -13,5 +13,5 @@ import { ProjectType, WorkspaceProject, WorkspaceSchema } from '../utility/works
  */
 export declare function buildDefaultPath(project: WorkspaceProject): string;
 export declare function getProject<TProjectType extends ProjectType = ProjectType.Application>(workspaceOrHost: WorkspaceSchema | Tree, projectName: string): WorkspaceProject<TProjectType>;
-export declare function isWorkspaceSchema(workspace: unknown): workspace is WorkspaceSchema;
-export declare function isWorkspaceProject(project: unknown): project is WorkspaceProject;
+export declare function isWorkspaceSchema(workspace: any): workspace is WorkspaceSchema;
+export declare function isWorkspaceProject(project: any): project is WorkspaceProject;

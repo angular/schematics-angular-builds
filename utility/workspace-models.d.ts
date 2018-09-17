@@ -125,5 +125,5 @@ export interface WorkspaceTargets<TProjectType extends ProjectType = ProjectType
     e2e?: E2EBuilderTarget;
     'app-shell'?: AppShellBuilderTarget;
     'extract-i18n'?: ExtractI18nBuilderTarget;
-    [key: string]: unknown;
+    [key: string]: any;
 }
