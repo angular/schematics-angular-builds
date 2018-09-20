@@ -31,10 +31,6 @@ export interface Schema {
      * The scope for the generated routing.
      */
     routingScope?: RoutingScope;
-    /**
-     * Specifies if a spec file is generated.
-     */
-    spec?: boolean;
 }
 /**
  * The scope for the generated routing.
