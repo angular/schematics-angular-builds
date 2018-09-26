@@ -51,5 +51,6 @@ export interface Schema {
 export declare enum ViewEncapsulation {
     Emulated = "Emulated",
     Native = "Native",
-    None = "None"
+    None = "None",
+    ShadowDOM = "ShadowDom"
 }

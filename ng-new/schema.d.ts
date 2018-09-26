@@ -80,5 +80,6 @@ export interface CommitObject {
 export declare enum ViewEncapsulation {
     Emulated = "Emulated",
     Native = "Native",
-    None = "None"
+    None = "None",
+    ShadowDOM = "ShadowDom"
 }
