@@ -4,6 +4,10 @@ export interface Schema {
      */
     commit?: CommitUnion;
     /**
+     * Flag to toggle creation of an application in the new workspace.
+     */
+    createApplication?: boolean;
+    /**
      * The directory name to create the workspace in.
      */
     directory?: string;
