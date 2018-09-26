@@ -47,6 +47,11 @@ export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
     extractLicenses?: boolean;
     vendorChunk?: boolean;
     buildOptimizer?: boolean;
+    budgets?: {
+        type: string;
+        maximumWarning?: string;
+        maximumError?: string;
+    }[];
 }
 export interface ServeBuilderOptions {
     browserTarget: string;
