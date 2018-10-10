@@ -73,11 +73,6 @@
       "$default": {
         "$source": "ng-cli-version"
       }
-    },
-    "minimal": {
-      "description": "Create a barebones project without any testing frameworks",
-      "type": "boolean",
-      "default": false
     }
   },
   "required": [
