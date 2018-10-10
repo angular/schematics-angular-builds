@@ -12,6 +12,10 @@ export interface Schema {
      */
     linkCli?: boolean;
     /**
+     * Create a barebones project without any testing frameworks
+     */
+    minimal?: boolean;
+    /**
      * The name of the workspace.
      */
     name: string;
