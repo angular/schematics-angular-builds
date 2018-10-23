@@ -10,7 +10,6 @@ export declare const latestVersions: {
     RxJs: string;
     ZoneJs: string;
     TypeScript: string;
-    TsLib: string;
     DevkitBuildAngular: string;
     DevkitBuildNgPackagr: string;
 };

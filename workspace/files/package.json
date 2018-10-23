@@ -16,12 +16,12 @@
     "@angular/compiler": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
     "@angular/core": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
     "@angular/forms": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
+    "@angular/http": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
     "@angular/platform-browser": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
     "@angular/platform-browser-dynamic": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
     "@angular/router": "<%= experimentalAngularNext ? 'next' : latestVersions.Angular %>",
     "core-js": "^2.5.4",
     "rxjs": "<%= latestVersions.RxJs %>",
-    "tslib": "<%= latestVersions.TsLib %>",
     "zone.js": "<%= latestVersions.ZoneJs %>"
   },
   "devDependencies": {
