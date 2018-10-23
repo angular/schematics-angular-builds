@@ -7,5 +7,4 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 export { polyfillMetadataRule } from './polyfill-metadata';
-export { typeScriptHelpersRule } from './typescript-helpers';
 export default function (): Rule;
