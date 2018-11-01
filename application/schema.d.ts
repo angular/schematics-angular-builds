@@ -33,6 +33,10 @@ export interface Schema {
      */
     routing?: boolean;
     /**
+     * Skip installing dependency packages.
+     */
+    skipInstall?: boolean;
+    /**
      * Do not add dependencies to package.json.
      */
     skipPackageJson?: boolean;
