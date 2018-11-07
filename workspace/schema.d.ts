@@ -4,10 +4,6 @@ export interface Schema {
      */
     commit?: null | Commit;
     /**
-     * Use the next version of Angular (@next dist-tag).
-     */
-    experimentalAngularNext?: boolean;
-    /**
      * Link CLI to global version (internal development only).
      */
     linkCli?: boolean;
