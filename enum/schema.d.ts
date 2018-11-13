@@ -1,6 +1,9 @@
+/**
+ * Generates a new, generic enum definition for the given or default project.
+ */
 export interface Schema {
     /**
-     * Specifies whether to apply lint fixes after generating the enum.
+     * When true, applies lint fixes after generating the enum.
      */
     lintFix?: boolean;
     /**
@@ -8,11 +11,12 @@ export interface Schema {
      */
     name: string;
     /**
-     * The path to create the enum.
+     * The path at which to create the enum definition, relative to the current workspace.
      */
     path?: string;
     /**
-     * The name of the project.
+     * The name of the project in which to create the enum. Default is the configured default
+     * project for the workspace.
      */
     project?: string;
 }

@@ -1,35 +1,41 @@
+/**
+ * Generates a new basic app definition in the "projects" subfolder of the workspace.
+ */
 export interface Schema {
     /**
-     * EXPERIMENTAL: Specifies whether to create a new application which uses the Ivy rendering
-     * engine.
+     * EXPERIMENTAL: True to create a new app that uses the Ivy rendering engine.
      */
     experimentalIvy?: boolean;
     /**
-     * Specifies if the style will be in the ts file.
+     * When true, includes styles inline in the root component.ts file. Only CSS styles can be
+     * included inline. Default is false, meaning that an external styles file is created and
+     * referenced in the root component.ts file.
      */
     inlineStyle?: boolean;
     /**
-     * Specifies if the template will be in the ts file.
+     * When true, includes template inline in the root component.ts file. Default is false,
+     * meaning that an external template file is created and referenced in the root component.ts
+     * file.
      */
     inlineTemplate?: boolean;
     /**
-     * Create a barebones project without any testing frameworks
+     * When true, creates a bare-bones project without any testing frameworks.
      */
     minimal?: boolean;
     /**
-     * The name of the application.
+     * The name of the new app.
      */
     name: string;
     /**
-     * The prefix to apply to generated selectors.
+     * A prefix to apply to generated selectors.
      */
     prefix?: string;
     /**
-     * The root directory of the new application.
+     * The root directory of the new app.
      */
     projectRoot?: string;
     /**
-     * Generates a routing module.
+     * When true, creates a routing NgModule.
      */
     routing?: boolean;
     /**
@@ -37,24 +43,24 @@ export interface Schema {
      */
     skipInstall?: boolean;
     /**
-     * Do not add dependencies to package.json.
+     * When true, does not add dependencies to the "package.json" file.
      */
     skipPackageJson?: boolean;
     /**
-     * Skip creating spec files.
+     * When true, does not create "spec.ts" test files for the app.
      */
     skipTests?: boolean;
     /**
-     * The file extension to be used for style files.
+     * The file extension to use for style files.
      */
     style?: string;
     /**
-     * Specifies the view encapsulation strategy.
+     * The view encapsulation strategy to use in the new app.
      */
     viewEncapsulation?: ViewEncapsulation;
 }
 /**
- * Specifies the view encapsulation strategy.
+ * The view encapsulation strategy to use in the new app.
  */
 export declare enum ViewEncapsulation {
     Emulated = "Emulated",

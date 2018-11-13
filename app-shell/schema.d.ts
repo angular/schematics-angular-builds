@@ -1,18 +1,21 @@
+/**
+ * Generates an app shell for running a server-side version of an app.
+ */
 export interface Schema {
     /**
      * The name of the application directory.
      */
     appDir?: string;
     /**
-     * The appId to use withServerTransition.
+     * The app ID to use in withServerTransition().
      */
     appId?: string;
     /**
-     * Name of related client app.
+     * The name of the related client app.
      */
     clientProject: string;
     /**
-     * Name of the index file
+     * The name of the index file
      */
     index?: string;
     /**
@@ -20,7 +23,7 @@ export interface Schema {
      */
     main?: string;
     /**
-     * Name of the universal app
+     * The HTML selector of the Universal app
      */
     name?: string;
     /**
@@ -60,7 +63,7 @@ export interface Schema {
      */
     tsconfigFileName?: string;
     /**
-     * Name of related universal app.
+     * The name of related Universal app.
      */
     universalProject: string;
 }

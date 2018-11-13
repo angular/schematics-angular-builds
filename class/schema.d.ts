@@ -1,10 +1,13 @@
+/**
+ * Creates a new generic class definition in the given or default project.
+ */
 export interface Schema {
     /**
-     * The name of the class.
+     * The name of the new class.
      */
     name: string;
     /**
-     * The path to create the class.
+     * The path at which to create the class, relative to the workspace root.
      */
     path?: string;
     /**
@@ -12,11 +15,11 @@ export interface Schema {
      */
     project: string;
     /**
-     * Specifies if a spec file is generated.
+     * When true, generates a "spec.ts" test file for the new class.
      */
     spec?: boolean;
     /**
-     * Specifies the type of class.
+     * Adds a developer-defined type to the filename, in the format "name.type.ts".
      */
     type?: string;
 }

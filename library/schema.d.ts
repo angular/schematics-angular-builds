@@ -1,6 +1,9 @@
+/**
+ * Creates a new generic library project in the current workspace.
+ */
 export interface Schema {
     /**
-     * The path to create the library's public API file.
+     * The path at which to create the library's public API file, relative to the workspace root.
      */
     entryFile?: string;
     /**
@@ -8,19 +11,21 @@ export interface Schema {
      */
     name?: string;
     /**
-     * The prefix to apply to generated selectors.
+     * A prefix to apply to generated selectors.
      */
     prefix?: string;
     /**
-     * Skip installing dependency packages.
+     * When true, does not install dependency packages.
      */
     skipInstall?: boolean;
     /**
-     * Do not add dependencies to package.json.
+     * When true, does not add dependencies to the "package.json" file.
      */
     skipPackageJson?: boolean;
     /**
-     * Do not update tsconfig.json for development experience.
+     * When true, does not update "tsconfig.json" to add a path mapping for the new library. The
+     * path mapping is needed to use the library in an app, but can be disabled here to simplify
+     * development.
      */
     skipTsConfig?: boolean;
 }

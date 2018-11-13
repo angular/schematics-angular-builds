@@ -1,18 +1,21 @@
+/**
+ * Creates a new generic pipe definition in the given or default project.
+ */
 export interface Schema {
     /**
-     * Specifies if declaring module exports the pipe.
+     * When true, the declaring NgModule exports this pipe.
      */
     export?: boolean;
     /**
-     * Flag to indicate if a directory is created.
+     * When true (the default) creates files at the top level of the project.
      */
     flat?: boolean;
     /**
-     * Specifies whether to apply lint fixes after generating the pipe.
+     * When true, applies lint fixes after generating the pipe.
      */
     lintFix?: boolean;
     /**
-     * Allows specification of the declaring module.
+     * The declaring NgModule.
      */
     module?: string;
     /**
@@ -20,7 +23,7 @@ export interface Schema {
      */
     name: string;
     /**
-     * The path to create the pipe.
+     * The path at which to create the pipe, relative to the workspace root.
      */
     path?: string;
     /**
@@ -28,11 +31,11 @@ export interface Schema {
      */
     project?: string;
     /**
-     * Allows for skipping the module import.
+     * When true, does not import this pipe into the owning NgModule.
      */
     skipImport?: boolean;
     /**
-     * Specifies if a spec file is generated.
+     * When true (the default), generates a  "spec.ts" test file for the new pipe.
      */
     spec?: boolean;
 }

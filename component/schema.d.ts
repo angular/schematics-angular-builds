@@ -1,34 +1,40 @@
+/**
+ * Creates a new generic component definition in the given or default project.
+ */
 export interface Schema {
     /**
-     * Specifies the change detection strategy.
+     * The change detection strategy to use in the new component.
      */
     changeDetection?: ChangeDetection;
     /**
-     * Specifies if the component is an entry component of declaring module.
+     * When true, the new component is the entry component of the declaring NgModule.
      */
     entryComponent?: boolean;
     /**
-     * Specifies if declaring module exports the component.
+     * When true, the declaring NgModule exports this component.
      */
     export?: boolean;
     /**
-     * Flag to indicate if a directory is created.
+     * When true, creates the new files at the top level of the current project.
      */
     flat?: boolean;
     /**
-     * Specifies if the style will be in the ts file.
+     * When true, includes styles inline in the component.ts file. Only CSS styles can be
+     * included inline. By default, an external styles file is created and referenced in the
+     * component.ts file.
      */
     inlineStyle?: boolean;
     /**
-     * Specifies if the template will be in the ts file.
+     * When true, includes template inline in the component.ts file. By default, an external
+     * template file is created and referenced in the component.ts file.
      */
     inlineTemplate?: boolean;
     /**
-     * Specifies whether to apply lint fixes after generating the component.
+     * When true, applies lint fixes after generating the component.
      */
     lintFix?: boolean;
     /**
-     * Allows specification of the declaring module.
+     * The declaring NgModule.
      */
     module?: string;
     /**
@@ -36,11 +42,12 @@ export interface Schema {
      */
     name: string;
     /**
-     * The path to create the component.
+     * The path at which to create the component file, relative to the current workspace.
+     * Default is a folder with the same name as the component in the project root.
      */
     path?: string;
     /**
-     * The prefix to apply to generated selectors.
+     * The prefix to apply to the generated component selector.
      */
     prefix?: string;
     /**
@@ -48,35 +55,35 @@ export interface Schema {
      */
     project?: string;
     /**
-     * The selector to use for the component.
+     * The HTML selector to use for this component.
      */
     selector?: string;
     /**
-     * Flag to skip the module import.
+     * When true, does not import this component into the owning NgModule.
      */
     skipImport?: boolean;
     /**
-     * Specifies if a spec file is generated.
+     * When true (the default), generates a  "spec.ts" test file for the new component.
      */
     spec?: boolean;
     /**
-     * The file extension to be used for style files.
+     * The file extension to use for style files.
      */
     styleext?: string;
     /**
-     * Specifies the view encapsulation strategy.
+     * The view encapsulation strategy to use in the new component.
      */
     viewEncapsulation?: ViewEncapsulation;
 }
 /**
- * Specifies the change detection strategy.
+ * The change detection strategy to use in the new component.
  */
 export declare enum ChangeDetection {
     Default = "Default",
     OnPush = "OnPush"
 }
 /**
- * Specifies the view encapsulation strategy.
+ * The view encapsulation strategy to use in the new component.
  */
 export declare enum ViewEncapsulation {
     Emulated = "Emulated",

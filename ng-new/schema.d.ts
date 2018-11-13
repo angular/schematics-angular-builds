@@ -1,10 +1,10 @@
 export interface Schema {
     /**
-     * Initial repository commit information.
+     * Initial git repository commit information.
      */
     commit?: CommitUnion;
     /**
-     * Flag to toggle creation of an application in the new workspace.
+     * When true (the default), creates a new initial app project in the new workspace.
      */
     createApplication?: boolean;
     /**
@@ -12,56 +12,57 @@ export interface Schema {
      */
     directory?: string;
     /**
-     * EXPERIMENTAL: Specifies whether to create a new application which uses the Ivy rendering
-     * engine.
+     * EXPERIMENTAL: When true, creates a new app that uses the Ivy rendering engine.
      */
     experimentalIvy?: boolean;
     /**
-     * Specifies if the style will be in the ts file.
+     * When true, includes styles inline in the component TS file. By default, an external
+     * styles file is created and referenced in the component TS file.
      */
     inlineStyle?: boolean;
     /**
-     * Specifies if the template will be in the ts file.
+     * When true, includes template inline in the component TS file. By default, an external
+     * template file is created and referenced in the component TS file.
      */
     inlineTemplate?: boolean;
     /**
-     * Link CLI to global version (internal development only).
+     * When true, links the CLI to the global version (internal development only).
      */
     linkCli?: boolean;
     /**
-     * Create a barebones project without any testing frameworks
+     * When true, creates a project without any testing frameworks.
      */
     minimal?: boolean;
     /**
-     * The name of the workspace.
+     * The name of the new workspace and initial project.
      */
     name: string;
     /**
-     * The path where new projects will be created.
+     * The path where new projects will be created, relative to the new workspace root.
      */
     newProjectRoot?: string;
     /**
-     * The prefix to apply to generated selectors.
+     * The prefix to apply to generated selectors for the initial project.
      */
     prefix?: string;
     /**
-     * Generates a routing module.
+     * When true, generates a routing module for the initial project.
      */
     routing?: boolean;
     /**
-     * Skip initializing a git repository.
+     * When true, does not initialize a git repository.
      */
     skipGit?: boolean;
     /**
-     * Skip installing dependency packages.
+     * When true, does not install dependency packages.
      */
     skipInstall?: boolean;
     /**
-     * Skip creating spec files.
+     * When true, does not generate "spec.ts" test files for the new project.
      */
     skipTests?: boolean;
     /**
-     * The file extension to be used for style files.
+     * The file extension to use for style files.
      */
     style?: string;
     /**
@@ -69,12 +70,12 @@ export interface Schema {
      */
     version: string;
     /**
-     * Specifies the view encapsulation strategy.
+     * The view encapsulation strategy to use in the initial project.
      */
     viewEncapsulation?: ViewEncapsulation;
 }
 /**
- * Initial repository commit information.
+ * Initial git repository commit information.
  */
 export declare type CommitUnion = boolean | CommitObject;
 export interface CommitObject {
@@ -83,7 +84,7 @@ export interface CommitObject {
     name: string;
 }
 /**
- * Specifies the view encapsulation strategy.
+ * The view encapsulation strategy to use in the initial project.
  */
 export declare enum ViewEncapsulation {
     Emulated = "Emulated",

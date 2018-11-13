@@ -1,10 +1,13 @@
+/**
+ * Generates a new, generic end-to-end test definition for the given or default project.
+ */
 export interface Schema {
     /**
-     * The name of the e2e application.
+     * The name of the new e2e app.
      */
     name: string;
     /**
-     * The root directory of the new application.
+     * The root folder for the new test app.
      */
     projectRoot?: string;
     /**
@@ -12,7 +15,7 @@ export interface Schema {
      */
     relatedAppName: string;
     /**
-     * HTML selector for the root component.
+     * The HTML selector for the root component of the test app.
      */
     rootSelector?: string;
 }

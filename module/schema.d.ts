@@ -1,22 +1,25 @@
+/**
+ * Creates a new generic NgModule definition in the given or default project.
+ */
 export interface Schema {
     /**
-     * Flag to control whether the CommonModule is imported.
+     * When true, the new NgModule imports "CommonModule".
      */
     commonModule?: boolean;
     /**
-     * Flag to indicate if a directory is created.
+     * When true, creates the new files at the top level of the current project root.
      */
     flat?: boolean;
     /**
-     * Allows specification of the declaring module.
+     * The declaring NgModule.
      */
     module?: string;
     /**
-     * The name of the module.
+     * The name of the NgModule.
      */
     name: string;
     /**
-     * The path to create the module.
+     * The path at which to create the NgModule, relative to the workspace root.
      */
     path?: string;
     /**
@@ -24,16 +27,16 @@ export interface Schema {
      */
     project?: string;
     /**
-     * Generates a routing module.
+     * When true, creates a routing module.
      */
     routing?: boolean;
     /**
-     * The scope for the generated routing.
+     * The scope for the new routing module.
      */
     routingScope?: RoutingScope;
 }
 /**
- * The scope for the generated routing.
+ * The scope for the new routing module.
  */
 export declare enum RoutingScope {
     Child = "Child",

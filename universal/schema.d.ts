@@ -1,14 +1,17 @@
+/**
+ * Pass this schematic to the "run" command to set up server-side rendering for an app.
+ */
 export interface Schema {
     /**
-     * The name of the application directory.
+     * The name of the application folder.
      */
     appDir?: string;
     /**
-     * The appId to use withServerTransition.
+     * The app identifier to use for transition.
      */
     appId?: string;
     /**
-     * Name of related client app.
+     * The name of the related client app. Required in place of "project".
      */
     clientProject: string;
     /**
@@ -16,15 +19,15 @@ export interface Schema {
      */
     main?: string;
     /**
-     * The name of the root module class.
+     * The name of the root NgModule class.
      */
     rootModuleClassName?: string;
     /**
-     * The name of the root module file
+     * The name of the root NgModule file.
      */
     rootModuleFileName?: string;
     /**
-     * Skip installing dependency packages.
+     * When true, does not install packages for dependencies.
      */
     skipInstall?: boolean;
     /**

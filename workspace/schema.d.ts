@@ -4,11 +4,11 @@ export interface Schema {
      */
     commit?: null | Commit;
     /**
-     * Link CLI to global version (internal development only).
+     * When true, links the CLI to the global version (internal development only).
      */
     linkCli?: boolean;
     /**
-     * Create a barebones project without any testing frameworks
+     * When true, creates a project without any testing frameworks
      */
     minimal?: boolean;
     /**
@@ -20,11 +20,11 @@ export interface Schema {
      */
     newProjectRoot?: string;
     /**
-     * Skip initializing a git repository.
+     * When true, does not initialize a git repository.
      */
     skipGit?: boolean;
     /**
-     * Skip installing dependency packages.
+     * When true, does not install packages for dependencies.
      */
     skipInstall?: boolean;
     /**

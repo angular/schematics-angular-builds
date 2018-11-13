@@ -1,18 +1,22 @@
+/**
+ * Generates a new, generic route guard definition in the given or default project.
+ */
 export interface Schema {
     /**
-     * Flag to indicate if a directory is created.
+     * When true (the default), creates the new files at the top level of the current project.
      */
     flat?: boolean;
     /**
-     * Specifies whether to apply lint fixes after generating the guard.
+     * When true, applies lint fixes after generating the guard.
      */
     lintFix?: boolean;
     /**
-     * The name of the guard.
+     * The name of the new route guard.
      */
     name: string;
     /**
-     * The path to create the interface.
+     * The path at which to create the interface that defines the guard, relative to the current
+     * workspace.
      */
     path?: string;
     /**
@@ -20,7 +24,7 @@ export interface Schema {
      */
     project: string;
     /**
-     * Specifies if a spec file is generated.
+     * When true (the default), generates a  "spec.ts" test file for the new guard.
      */
     spec?: boolean;
 }

@@ -1,6 +1,9 @@
+/**
+ * Creates a new generic interface definition in the given or default project.
+ */
 export interface Schema {
     /**
-     * Specifies whether to apply lint fixes after generating the directive.
+     * When true, applies lint fixes after generating the interface.
      */
     lintFix?: boolean;
     /**
@@ -8,11 +11,11 @@ export interface Schema {
      */
     name: string;
     /**
-     * The path to create the interface.
+     * The path at which to create the interface, relative to the workspace root.
      */
     path?: string;
     /**
-     * Specifies the prefix to use.
+     * A prefix to apply to generated selectors.
      */
     prefix?: string;
     /**
@@ -20,7 +23,7 @@ export interface Schema {
      */
     project?: string;
     /**
-     * Specifies the type of interface.
+     * Adds a developer-defined type to the filename, in the format "name.type.ts".
      */
     type?: string;
 }

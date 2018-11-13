@@ -1,30 +1,34 @@
+/**
+ * Creates a new generic directive definition in the given or default project.
+ */
 export interface Schema {
     /**
-     * Specifies if declaring module exports the directive.
+     * When true, the declaring NgModule exports this directive.
      */
     export?: boolean;
     /**
-     * Flag to indicate if a directory is created.
+     * When true (the default), creates the new files at the top level of the current project.
      */
     flat?: boolean;
     /**
-     * Specifies whether to apply lint fixes after generating the directive.
+     * When true, applies lint fixes after generating the directive.
      */
     lintFix?: boolean;
     /**
-     * Allows specification of the declaring module.
+     * The declaring NgModule.
      */
     module?: string;
     /**
-     * The name of the directive.
+     * The name of the new directive.
      */
     name: string;
     /**
-     * The path to create the interface.
+     * The path at which to create the interface that defines the directive, relative to the
+     * workspace root.
      */
     path?: string;
     /**
-     * The prefix to apply to generated selectors.
+     * A prefix to apply to generated selectors.
      */
     prefix?: string;
     /**
@@ -32,15 +36,15 @@ export interface Schema {
      */
     project?: string;
     /**
-     * The selector to use for the directive.
+     * The HTML selector to use for this directive.
      */
     selector?: string;
     /**
-     * Flag to skip the module import.
+     * When true, does not import this directive into the owning NgModule.
      */
     skipImport?: boolean;
     /**
-     * Specifies if a spec file is generated.
+     * When true (the default), generates a  "spec.ts" test file for the new directive.
      */
     spec?: boolean;
 }

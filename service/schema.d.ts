@@ -1,10 +1,13 @@
+/**
+ * Creates a new, generic service definition in the given or default project.
+ */
 export interface Schema {
     /**
-     * Flag to indicate if a directory is created.
+     * When true (the default), creates files at the top level of the project.
      */
     flat?: boolean;
     /**
-     * Specifies whether to apply lint fixes after generating the pipe.
+     * When true, applies lint fixes after generating the pipe.
      */
     lintFix?: boolean;
     /**
@@ -12,7 +15,7 @@ export interface Schema {
      */
     name: string;
     /**
-     * The path to create the service.
+     * The path at which to create the service, relative to the workspace root.
      */
     path?: string;
     /**
@@ -20,7 +23,7 @@ export interface Schema {
      */
     project?: string;
     /**
-     * Specifies if a spec file is generated.
+     * When true (the default), generates a  "spec.ts" test file for the new service.
      */
     spec?: boolean;
 }
