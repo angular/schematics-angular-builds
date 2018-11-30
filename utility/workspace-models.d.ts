@@ -41,6 +41,7 @@ export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
     serviceWorker?: boolean;
     optimization?: boolean;
     outputHashing?: 'all';
+    resourcesOutputPath?: string;
     extractCss?: boolean;
     namedChunks?: boolean;
     aot?: boolean;
