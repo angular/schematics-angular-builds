@@ -18,8 +18,7 @@
       "updateMode": "prefetch",
       "resources": {
         "files": [
-          "/assets/**",
-          "<%= resourcesOutputPath %>/*.(eot|svg|cur|jpg|png|webp|gif|otf|ttf|woff|woff2|ani)"
+          "/assets/**"
         ]
       }
     }
