@@ -15,7 +15,12 @@ export interface Schema {
      */
     project: string;
     /**
-     * When true, generates a "spec.ts" test file for the new class.
+     * When true, does not create "spec.ts" test files for the new class.
+     */
+    skipTests?: boolean;
+    /**
+     * When true (the default), generates a  "spec.ts" test file for the new class.
+     * @deprecated Use "skipTests" instead.
      */
     spec?: boolean;
     /**

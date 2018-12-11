@@ -44,7 +44,12 @@ export interface Schema {
      */
     skipImport?: boolean;
     /**
+     * When true, does not create "spec.ts" test files for the new class.
+     */
+    skipTests?: boolean;
+    /**
      * When true (the default), generates a  "spec.ts" test file for the new directive.
+     * @deprecated Use "skipTests" instead.
      */
     spec?: boolean;
 }

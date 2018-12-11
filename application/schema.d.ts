@@ -66,5 +66,5 @@ export declare enum ViewEncapsulation {
     Emulated = "Emulated",
     Native = "Native",
     None = "None",
-    ShadowDOM = "ShadowDom"
+    ShadowDom = "ShadowDom"
 }

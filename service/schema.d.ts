@@ -23,7 +23,12 @@ export interface Schema {
      */
     project?: string;
     /**
+     * When true, does not create "spec.ts" test files for the new service.
+     */
+    skipTests?: boolean;
+    /**
      * When true (the default), generates a  "spec.ts" test file for the new service.
+     * @deprecated Use "skipTests" instead.
      */
     spec?: boolean;
 }

@@ -63,11 +63,21 @@ export interface Schema {
      */
     skipImport?: boolean;
     /**
+     * When true, does not create "spec.ts" test files for the new component.
+     */
+    skipTests?: boolean;
+    /**
      * When true (the default), generates a  "spec.ts" test file for the new component.
+     * @deprecated Use "skipTests" instead.
      */
     spec?: boolean;
     /**
      * The file extension to use for style files.
+     */
+    style?: string;
+    /**
+     * The file extension to use for style files.
+     * @deprecated Use "style" instead.
      */
     styleext?: string;
     /**
@@ -89,5 +99,5 @@ export declare enum ViewEncapsulation {
     Emulated = "Emulated",
     Native = "Native",
     None = "None",
-    ShadowDOM = "ShadowDom"
+    ShadowDom = "ShadowDom"
 }
