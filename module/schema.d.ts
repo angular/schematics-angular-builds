@@ -11,6 +11,10 @@ export interface Schema {
      */
     flat?: boolean;
     /**
+     * When true, applies lint fixes after generating the module.
+     */
+    lintFix?: boolean;
+    /**
      * The declaring NgModule.
      */
     module?: string;

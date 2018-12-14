@@ -3,6 +3,10 @@
  */
 export interface Schema {
     /**
+     * When true, applies lint fixes after generating the class.
+     */
+    lintFix?: boolean;
+    /**
      * The name of the new class.
      */
     name: string;

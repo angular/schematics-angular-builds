@@ -19,6 +19,10 @@ export interface Schema {
      */
     inlineTemplate?: boolean;
     /**
+     * When true, applies lint fixes after generating the application.
+     */
+    lintFix?: boolean;
+    /**
      * When true, creates a bare-bones project without any testing frameworks.
      */
     minimal?: boolean;

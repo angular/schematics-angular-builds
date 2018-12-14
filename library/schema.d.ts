@@ -7,6 +7,10 @@ export interface Schema {
      */
     entryFile?: string;
     /**
+     * When true, applies lint fixes after generating the library.
+     */
+    lintFix?: boolean;
+    /**
      * The name of the library.
      */
     name?: string;
