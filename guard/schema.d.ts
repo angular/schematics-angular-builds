@@ -7,6 +7,10 @@ export interface Schema {
      */
     flat?: boolean;
     /**
+     * Specifies which interfaces to implement.
+     */
+    implements?: string[];
+    /**
      * When true, applies lint fixes after generating the guard.
      */
     lintFix?: boolean;
