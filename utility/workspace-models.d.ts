@@ -54,6 +54,7 @@ export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
         maximumWarning?: string;
         maximumError?: string;
     }[];
+    es5BrowserSupport?: boolean;
 }
 export interface ServeBuilderOptions {
     browserTarget: string;
