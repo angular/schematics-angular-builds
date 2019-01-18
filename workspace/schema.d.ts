@@ -8,8 +8,8 @@ export interface Schema {
      */
     linkCli?: boolean;
     /**
-     * When true, creates a workspace without any testing frameworks and should be used for
-     * learning.
+     * When true, creates a workspace without any testing frameworks. (Use for learning purposes
+     * only.)
      */
     minimal?: boolean;
     /**

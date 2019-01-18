@@ -23,8 +23,8 @@ export interface Schema {
      */
     lintFix?: boolean;
     /**
-     * When true, creates a bare-bones project without any testing frameworks and should be used
-     * for learning purposes.
+     * When true, creates a bare-bones project without any testing frameworks. (Use for learning
+     * purposes only.)
      */
     minimal?: boolean;
     /**

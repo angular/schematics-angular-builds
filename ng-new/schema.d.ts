@@ -4,7 +4,9 @@ export interface Schema {
      */
     commit?: CommitUnion;
     /**
-     * When true (the default), creates a new initial app project in the new workspace.
+     * When true (the default), creates a new initial app project in the src folder of the new
+     * workspace. When false, creates an empty workspace with no initial app. You can then use
+     * the generate application command so that all apps are created in the projects folder.
      */
     createApplication?: boolean;
     /**
@@ -30,8 +32,8 @@ export interface Schema {
      */
     linkCli?: boolean;
     /**
-     * When true, creates a project without any testing frameworks and should be used for
-     * learning purposes only.
+     * When true, creates a project without any testing frameworks. (Use for learning purposes
+     * only.)
      */
     minimal?: boolean;
     /**
