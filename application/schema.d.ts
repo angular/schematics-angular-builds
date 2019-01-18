@@ -56,13 +56,23 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * The file extension to use for style files.
+     * The file extension or preprocessor to use for style files.
      */
-    style?: string;
+    style?: Style;
     /**
      * The view encapsulation strategy to use in the new app.
      */
     viewEncapsulation?: ViewEncapsulation;
+}
+/**
+ * The file extension or preprocessor to use for style files.
+ */
+export declare enum Style {
+    Css = "css",
+    Less = "less",
+    Sass = "sass",
+    Scss = "scss",
+    Styl = "styl"
 }
 /**
  * The view encapsulation strategy to use in the new app.

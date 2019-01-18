@@ -72,9 +72,9 @@ export interface Schema {
      */
     spec?: boolean;
     /**
-     * The file extension to use for style files.
+     * The file extension or preprocessor to use for style files.
      */
-    style?: string;
+    style?: Style;
     /**
      * The file extension to use for style files.
      * @deprecated Use "style" instead.
@@ -91,6 +91,16 @@ export interface Schema {
 export declare enum ChangeDetection {
     Default = "Default",
     OnPush = "OnPush"
+}
+/**
+ * The file extension or preprocessor to use for style files.
+ */
+export declare enum Style {
+    Css = "css",
+    Less = "less",
+    Sass = "sass",
+    Scss = "scss",
+    Styl = "styl"
 }
 /**
  * The view encapsulation strategy to use in the new component.

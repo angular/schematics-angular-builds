@@ -63,9 +63,9 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * The file extension to use for style files.
+     * The file extension or preprocessor to use for style files.
      */
-    style?: string;
+    style?: Style;
     /**
      * The version of the Angular CLI to use.
      */
@@ -83,6 +83,16 @@ export interface CommitObject {
     email: string;
     message?: string;
     name: string;
+}
+/**
+ * The file extension or preprocessor to use for style files.
+ */
+export declare enum Style {
+    Css = "css",
+    Less = "less",
+    Sass = "sass",
+    Scss = "scss",
+    Styl = "styl"
 }
 /**
  * The view encapsulation strategy to use in the initial project.
