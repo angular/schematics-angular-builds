@@ -5,7 +5,7 @@ export interface Schema {
     /**
      * EXPERIMENTAL: True to create a new app that uses the Ivy rendering engine.
      */
-    experimentalIvy?: boolean;
+    enableIvy?: boolean;
     /**
      * When true, includes styles inline in the root component.ts file. Only CSS styles can be
      * included inline. Default is false, meaning that an external styles file is created and
