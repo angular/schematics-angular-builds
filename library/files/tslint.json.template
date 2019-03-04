@@ -4,13 +4,13 @@
     "directive-selector": [
       true,
       "attribute",
-      "<%= camelize(prefix) %>",
+      "<%= prefix %>",
       "camelCase"
     ],
     "component-selector": [
       true,
       "element",
-      "<%= dasherize(prefix) %>",
+      "<%= prefix %>",
       "kebab-case"
     ]
   }
