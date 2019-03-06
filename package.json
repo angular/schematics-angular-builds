@@ -14,8 +14,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#392f525",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#392f525",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#5714f18",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#5714f18",
     "typescript": "3.2.4"
   },
   "repository": {
@@ -31,5 +31,10 @@
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/angular-cli"
+  "homepage": "https://github.com/angular/angular-cli",
+  "husky": {
+    "hooks": {
+      "pre-push": "node ./bin/devkit-admin hooks/pre-push"
+    }
+  }
 }
