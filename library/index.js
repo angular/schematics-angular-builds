@@ -64,20 +64,15 @@ function addDependenciesToPackageJson() {
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: '@angular-devkit/build-angular',
-                version: latest_versions_1.latestVersions.DevkitBuildNgPackagr,
+                version: latest_versions_1.latestVersions.DevkitBuildAngular,
             },
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: 'ng-packagr',
-                version: '^4.2.0',
+                version: '^5.0.0',
             },
             {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: 'tsickle',
-                version: '>=0.34.0',
-            },
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
+                type: dependencies_1.NodeDependencyType.Default,
                 name: 'tslib',
                 version: latest_versions_1.latestVersions.TsLib,
             },
