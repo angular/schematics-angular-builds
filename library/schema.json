@@ -31,14 +31,12 @@
     "skipPackageJson": {
       "type": "boolean",
       "default": false,
-      "description": "When true, does not add dependencies to the \"package.json\" file. ",
-      "x-user-analytics": 13
+      "description": "When true, does not add dependencies to the \"package.json\" file. "
     },
     "skipInstall": {
       "description": "When true, does not install dependency packages.",
       "type": "boolean",
-      "default": false,
-      "x-user-analytics": 4
+      "default": false
     },
     "skipTsConfig": {
       "type": "boolean",
