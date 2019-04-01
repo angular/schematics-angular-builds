@@ -92,7 +92,7 @@ function buildRelativePath(from, to) {
     // Remove file names (preserving destination)
     fromParts.pop();
     const toFileName = toParts.pop();
-    const relativePath = core_1.relative(core_1.normalize(fromParts.join('/')), core_1.normalize(toParts.join('/')));
+    const relativePath = core_1.relative(core_1.normalize(fromParts.join('/') || '/'), core_1.normalize(toParts.join('/') || '/'));
     let pathPrefix = '';
     // Set the path prefix for same dir or child dir, parent dir starts with `..`
     if (!relativePath) {
