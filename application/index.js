@@ -112,29 +112,6 @@ function mergeWithRootTsLint(parentHost) {
         host.overwrite(tsLintPath, JSON.stringify(content.value, undefined, 2));
     };
 }
-function addPostInstallScript() {
-    return (host) => {
-        const pkgJsonPath = '/package.json';
-        const buffer = host.read(pkgJsonPath);
-        if (!buffer) {
-            throw new schematics_1.SchematicsException('Could not read package.json.');
-        }
-        const packageJsonAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Strict);
-        if (packageJsonAst.kind !== 'object') {
-            throw new schematics_1.SchematicsException('Invalid package.json. Was expecting an object.');
-        }
-        const scriptsNode = json_utils_1.findPropertyInAstObject(packageJsonAst, 'scripts');
-        if (scriptsNode && scriptsNode.kind === 'object') {
-            const recorder = host.beginUpdate(pkgJsonPath);
-            const postInstall = json_utils_1.findPropertyInAstObject(scriptsNode, 'postinstall');
-            if (!postInstall) {
-                // postinstall script not found, add it.
-                json_utils_1.insertPropertyInAstObjectInOrder(recorder, scriptsNode, 'postinstall', 'ivy-ngcc', 4);
-            }
-            host.commitUpdate(recorder);
-        }
-    };
-}
 function addAppToWorkspaceFile(options, workspace) {
     // TODO: use JsonAST
     // const workspacePath = '/angular.json';
@@ -344,7 +321,6 @@ function default_1(options) {
                 schematics_1.move(sourceDir),
             ]), schematics_1.MergeStrategy.Overwrite),
             options.minimal ? schematics_1.noop() : schematics_1.schematic('e2e', e2eOptions),
-            options.enableIvy ? addPostInstallScript() : schematics_1.noop(),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(options),
             options.lintFix ? lint_fix_1.applyLintFix(appDir) : schematics_1.noop(),
         ]);
