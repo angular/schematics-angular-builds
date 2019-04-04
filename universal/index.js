@@ -154,9 +154,7 @@ function addDependencies() {
             throw new schematics_1.SchematicsException('Could not find version.');
         }
         const platformServerDep = Object.assign({}, coreDep, { name: '@angular/platform-server' });
-        const httpDep = Object.assign({}, coreDep, { name: '@angular/http' });
         dependencies_1.addPackageJsonDependency(host, platformServerDep);
-        dependencies_1.addPackageJsonDependency(host, httpDep);
         return host;
     };
 }
