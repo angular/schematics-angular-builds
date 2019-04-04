@@ -219,7 +219,7 @@ function addAppToWorkspaceFile(options, workspace) {
                     browserTarget: `${options.name}:build`,
                 },
             },
-            test: {
+            test: options.minimal ? undefined : {
                 builder: workspace_models_1.Builders.Karma,
                 options: {
                     main: `${sourceRoot}/test.ts`,

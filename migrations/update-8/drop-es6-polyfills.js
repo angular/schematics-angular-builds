@@ -21,7 +21,6 @@ const toDrop = {
     'core-js/es6/array': true,
     'core-js/es6/regexp': true,
     'core-js/es6/map': true,
-    'zone.js/dist/zone': true,
     'core-js/es6/set': true,
 };
 const header = `/**
