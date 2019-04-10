@@ -3,7 +3,7 @@
  */
 export interface Schema {
     /**
-     * EXPERIMENTAL: True to create a new app that uses the Ivy rendering engine.
+     * **EXPERIMENTAL** True to create a new app that uses the Ivy rendering engine.
      */
     enableIvy?: boolean;
     /**
