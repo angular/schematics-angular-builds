@@ -108,7 +108,10 @@ function extractCliConfig(config) {
     }
     if (config.warnings) {
         if (config.warnings.versionMismatch !== undefined) {
-            newConfig.warnings = Object.assign({}, (newConfig.warnings || {}), { versionMismatch: config.warnings.versionMismatch });
+            newConfig.warnings = {
+                ...(newConfig.warnings || {}),
+                ...{ versionMismatch: config.warnings.versionMismatch },
+            };
         }
     }
     return Object.getOwnPropertyNames(newConfig).length == 0 ? null : newConfig;
@@ -239,7 +242,19 @@ function extractProjectsConfig(config, tree, logger) {
             const source = app.environmentSource;
             const environments = app.environments;
             const serviceWorker = app.serviceWorker;
-            const productionPartial = Object.assign({ optimization: true, outputHashing: 'all', sourceMap: false, extractCss: true, namedChunks: false, aot: true, extractLicenses: true, vendorChunk: false, buildOptimizer: true }, (serviceWorker ? { serviceWorker: true, ngswConfigPath: 'src/ngsw-config.json' } : {}), (app.budgets ? { budgets: app.budgets } : {}));
+            const productionPartial = {
+                optimization: true,
+                outputHashing: 'all',
+                sourceMap: false,
+                extractCss: true,
+                namedChunks: false,
+                aot: true,
+                extractLicenses: true,
+                vendorChunk: false,
+                buildOptimizer: true,
+                ...(serviceWorker ? { serviceWorker: true, ngswConfigPath: 'src/ngsw-config.json' } : {}),
+                ...(app.budgets ? { budgets: app.budgets } : {}),
+            };
             if (!environments) {
                 return { production: productionPartial };
             }
@@ -263,16 +278,19 @@ function extractProjectsConfig(config, tree, logger) {
                 else {
                     configurationName = environment;
                 }
-                acc[configurationName] = Object.assign({}, (isProduction ? productionPartial : {}), { fileReplacements: [
+                acc[configurationName] = {
+                    ...(isProduction ? productionPartial : {}),
+                    fileReplacements: [
                         {
                             replace: `${app.root}/${source}`,
                             with: `${app.root}/${environments[environment]}`,
                         },
-                    ] });
+                    ],
+                };
                 return acc;
             }, {});
             if (!configurations['production']) {
-                configurations['production'] = Object.assign({}, productionPartial);
+                configurations['production'] = { ...productionPartial };
             }
             return configurations;
         }
@@ -313,9 +331,15 @@ function extractProjectsConfig(config, tree, logger) {
         const targets = {};
         project.architect = targets;
         // Browser target
-        const buildOptions = Object.assign({ 
+        const buildOptions = {
             // Make outputPath relative to root.
-            outputPath: outDir, index: `${appRoot}/${app.index || defaults.index}`, main: `${appRoot}/${app.main || defaults.main}`, tsConfig: `${appRoot}/${app.tsconfig || defaults.tsConfig}` }, (app.baseHref ? { baseHref: app.baseHref } : {}), buildDefaults);
+            outputPath: outDir,
+            index: `${appRoot}/${app.index || defaults.index}`,
+            main: `${appRoot}/${app.main || defaults.main}`,
+            tsConfig: `${appRoot}/${app.tsconfig || defaults.tsConfig}`,
+            ...(app.baseHref ? { baseHref: app.baseHref } : {}),
+            ...buildDefaults,
+        };
         if (app.polyfills) {
             buildOptions.polyfills = appRoot + '/' + app.polyfills;
         }
@@ -337,7 +361,10 @@ function extractProjectsConfig(config, tree, logger) {
             configurations: _buildConfigurations(),
         };
         // Serve target
-        const serveOptions = Object.assign({ browserTarget: `${name}:build` }, serveDefaults);
+        const serveOptions = {
+            browserTarget: `${name}:build`,
+            ...serveDefaults,
+        };
         targets.serve = {
             builder: `${builderPackage}:dev-server`,
             options: serveOptions,

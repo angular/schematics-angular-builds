@@ -148,11 +148,17 @@ function default_1(options) {
         const sourceDir = `${projectRoot}/src/lib`;
         const relativePathToWorkspaceRoot = projectRoot.split('/').map(x => '..').join('/');
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            schematics_1.applyTemplates(Object.assign({}, core_1.strings, options, { packageName,
+            schematics_1.applyTemplates({
+                ...core_1.strings,
+                ...options,
+                packageName,
                 projectRoot,
                 distRoot,
                 relativePathToWorkspaceRoot,
-                prefix, angularLatestVersion: latest_versions_1.latestVersions.Angular.replace('~', '').replace('^', ''), folderName })),
+                prefix,
+                angularLatestVersion: latest_versions_1.latestVersions.Angular.replace('~', '').replace('^', ''),
+                folderName,
+            }),
             schematics_1.move(projectRoot),
         ]);
         return schematics_1.chain([

@@ -38,7 +38,7 @@ function addConfig(options, root) {
         // Add tsconfig.worker.json.
         const relativePathToWorkspaceRoot = root.split('/').map(x => '..').join('/');
         tsConfigRules.push(schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [
-            schematics_1.applyTemplates(Object.assign({}, options, { relativePathToWorkspaceRoot })),
+            schematics_1.applyTemplates({ ...options, relativePathToWorkspaceRoot }),
             schematics_1.move(root),
         ])));
         // Add build-angular config flag.
@@ -75,7 +75,7 @@ function addConfig(options, root) {
         else {
             // Otherwise create it.
             tsConfigRules.push(schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/project-tsconfig'), [
-                schematics_1.applyTemplates(Object.assign({}, options, { relativePathToWorkspaceRoot })),
+                schematics_1.applyTemplates({ ...options, relativePathToWorkspaceRoot }),
                 schematics_1.move(root),
             ])));
         }
@@ -162,7 +162,7 @@ function default_1(options) {
         options.path = parsedPath.path;
         const root = project.root || project.sourceRoot || '';
         const templateSource = schematics_1.apply(schematics_1.url('./files/worker'), [
-            schematics_1.applyTemplates(Object.assign({}, options, core_1.strings)),
+            schematics_1.applyTemplates({ ...options, ...core_1.strings }),
             schematics_1.move(parsedPath.path),
         ]);
         return schematics_1.chain([

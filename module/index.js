@@ -61,7 +61,11 @@ function default_1(options) {
         options.path = parsedPath.path;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             options.routing ? schematics_1.noop() : schematics_1.filter(path => !path.endsWith('-routing.module.ts.template')),
-            schematics_1.applyTemplates(Object.assign({}, core_1.strings, { 'if-flat': (s) => options.flat ? '' : s }, options)),
+            schematics_1.applyTemplates({
+                ...core_1.strings,
+                'if-flat': (s) => options.flat ? '' : s,
+                ...options,
+            }),
             schematics_1.move(parsedPath.path),
         ]);
         return schematics_1.chain([

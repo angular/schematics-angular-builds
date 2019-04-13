@@ -58,7 +58,11 @@ function default_1(options) {
         return schematics_1.chain([
             AddBuilderToWorkspace(options, workspace),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
-                schematics_1.applyTemplates(Object.assign({ utils: core_1.strings }, options, { relativePathToWorkspaceRoot })),
+                schematics_1.applyTemplates({
+                    utils: core_1.strings,
+                    ...options,
+                    relativePathToWorkspaceRoot,
+                }),
                 schematics_1.move(root),
             ])),
         ]);

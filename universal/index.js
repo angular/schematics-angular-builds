@@ -153,7 +153,10 @@ function addDependencies() {
         if (coreDep === null) {
             throw new schematics_1.SchematicsException('Could not find version.');
         }
-        const platformServerDep = Object.assign({}, coreDep, { name: '@angular/platform-server' });
+        const platformServerDep = {
+            ...coreDep,
+            name: '@angular/platform-server',
+        };
         dependencies_1.addPackageJsonDependency(host, platformServerDep);
         return host;
     };
@@ -195,13 +198,22 @@ function default_1(options) {
             context.addTask(new tasks_1.NodePackageInstallTask());
         }
         const templateSource = schematics_1.apply(schematics_1.url('./files/src'), [
-            schematics_1.applyTemplates(Object.assign({}, core_1.strings, options, { stripTsExtension: (s) => s.replace(/\.ts$/, '') })),
+            schematics_1.applyTemplates({
+                ...core_1.strings,
+                ...options,
+                stripTsExtension: (s) => s.replace(/\.ts$/, ''),
+            }),
             schematics_1.move(core_1.join(core_1.normalize(clientProject.root), 'src')),
         ]);
         const rootSource = schematics_1.apply(schematics_1.url('./files/root'), [
-            schematics_1.applyTemplates(Object.assign({}, core_1.strings, options, { stripTsExtension: (s) => s.replace(/\.ts$/, ''), outDir,
+            schematics_1.applyTemplates({
+                ...core_1.strings,
+                ...options,
+                stripTsExtension: (s) => s.replace(/\.ts$/, ''),
+                outDir,
                 tsConfigExtends,
-                rootInSrc })),
+                rootInSrc,
+            }),
             schematics_1.move(tsConfigDirectory),
         ]);
         return schematics_1.chain([

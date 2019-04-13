@@ -14,7 +14,12 @@ function default_1(options) {
     const minimalFilesRegExp = /(.editorconfig|tslint.json)\.template$/;
     return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
         options.minimal ? schematics_1.filter(path => !minimalFilesRegExp.test(path)) : schematics_1.noop(),
-        schematics_1.applyTemplates(Object.assign({ utils: core_1.strings }, options, { 'dot': '.', latestVersions: latest_versions_1.latestVersions })),
+        schematics_1.applyTemplates({
+            utils: core_1.strings,
+            ...options,
+            'dot': '.',
+            latestVersions: latest_versions_1.latestVersions,
+        }),
     ]));
 }
 exports.default = default_1;

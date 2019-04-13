@@ -108,7 +108,11 @@ function default_1(options) {
             options.skipTests ? schematics_1.filter(path => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
             options.inlineStyle ? schematics_1.filter(path => !path.endsWith('.__style__.template')) : schematics_1.noop(),
             options.inlineTemplate ? schematics_1.filter(path => !path.endsWith('.html.template')) : schematics_1.noop(),
-            schematics_1.applyTemplates(Object.assign({}, core_1.strings, { 'if-flat': (s) => options.flat ? '' : s }, options)),
+            schematics_1.applyTemplates({
+                ...core_1.strings,
+                'if-flat': (s) => options.flat ? '' : s,
+                ...options,
+            }),
             schematics_1.move(parsedPath.path),
         ]);
         return schematics_1.chain([

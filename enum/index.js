@@ -25,7 +25,10 @@ function default_1(options) {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            schematics_1.applyTemplates(Object.assign({}, core_1.strings, options)),
+            schematics_1.applyTemplates({
+                ...core_1.strings,
+                ...options,
+            }),
             schematics_1.move(parsedPath.path),
         ]);
         return schematics_1.chain([

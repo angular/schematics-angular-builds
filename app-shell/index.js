@@ -111,7 +111,9 @@ function addUniversalTarget(options) {
             return host;
         }
         // Copy options.
-        const universalOptions = Object.assign({}, options);
+        const universalOptions = {
+            ...options,
+        };
         // Delete non-universal options.
         delete universalOptions.universalProject;
         delete universalOptions.route;

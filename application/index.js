@@ -296,7 +296,13 @@ function default_1(options) {
             addAppToWorkspaceFile(options, workspace),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
                 options.minimal ? schematics_1.filter(minimalPathFilter) : schematics_1.noop(),
-                schematics_1.applyTemplates(Object.assign({ utils: core_1.strings }, options, { relativePathToWorkspaceRoot, appName: options.name, isRootApp })),
+                schematics_1.applyTemplates({
+                    utils: core_1.strings,
+                    ...options,
+                    relativePathToWorkspaceRoot,
+                    appName: options.name,
+                    isRootApp,
+                }),
                 isRootApp ? mergeWithRootTsLint(host) : schematics_1.noop(),
                 schematics_1.move(appDir),
             ]), schematics_1.MergeStrategy.Overwrite),
@@ -309,7 +315,15 @@ function default_1(options) {
                 path: sourceDir,
                 project: options.name,
             }),
-            schematics_1.schematic('component', Object.assign({ name: 'app', selector: appRootSelector, flat: true, path: sourceDir, skipImport: true, project: options.name }, componentOptions)),
+            schematics_1.schematic('component', {
+                name: 'app',
+                selector: appRootSelector,
+                flat: true,
+                path: sourceDir,
+                skipImport: true,
+                project: options.name,
+                ...componentOptions,
+            }),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./other-files'), [
                 componentOptions.inlineTemplate
                     ? schematics_1.filter(path => !path.endsWith('.html.template'))
@@ -317,7 +331,12 @@ function default_1(options) {
                 componentOptions.skipTests
                     ? schematics_1.filter(path => !path.endsWith('.spec.ts.template'))
                     : schematics_1.noop(),
-                schematics_1.applyTemplates(Object.assign({ utils: core_1.strings }, options, { selector: appRootSelector }, componentOptions)),
+                schematics_1.applyTemplates({
+                    utils: core_1.strings,
+                    ...options,
+                    selector: appRootSelector,
+                    ...componentOptions,
+                }),
                 schematics_1.move(sourceDir),
             ]), schematics_1.MergeStrategy.Overwrite),
             options.minimal ? schematics_1.noop() : schematics_1.schematic('e2e', e2eOptions),

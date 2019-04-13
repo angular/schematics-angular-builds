@@ -47,7 +47,10 @@ function addDependencies() {
         if (coreDep === null) {
             throw new schematics_1.SchematicsException('Could not find version.');
         }
-        const serviceWorkerDep = Object.assign({}, coreDep, { name: packageName });
+        const serviceWorkerDep = {
+            ...coreDep,
+            name: packageName,
+        };
         dependencies_1.addPackageJsonDependency(host, serviceWorkerDep);
         return host;
     };
@@ -132,7 +135,7 @@ function default_1(options) {
             resourcesOutputPath = '/' + resourcesOutputPath.split('/').filter(x => !!x).join('/');
         }
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            schematics_1.applyTemplates(Object.assign({}, options, { resourcesOutputPath, relativePathToWorkspaceRoot })),
+            schematics_1.applyTemplates({ ...options, resourcesOutputPath, relativePathToWorkspaceRoot }),
             schematics_1.move(project.root),
         ]);
         context.addTask(new tasks_1.NodePackageInstallTask());
