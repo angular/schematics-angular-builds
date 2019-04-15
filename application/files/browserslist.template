@@ -1,13 +1,11 @@
-# This file is used by the build system to adjust CSS and JS output to support the specified browsers below.
+# This file is currently used by autoprefixer to adjust CSS to support the below specified browsers
 # For additional information regarding the format and rule options, please see:
 # https://github.com/browserslist/browserslist#queries
-
-# Googlebot uses an older version of Chrome
-# For additional information see: https://developers.google.com/search/docs/guides/rendering
+#
+# For IE 9-11 support, please remove 'not' from the last line of the file and adjust as needed
 
 > 0.5%
 last 2 versions
 Firefox ESR
 not dead
-not IE 9-11 # For IE 9-11 support, remove 'not'.
-not Chrome 41 # For Googlebot support, remove 'not'.
+not IE 9-11
