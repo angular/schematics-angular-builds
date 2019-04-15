@@ -10,11 +10,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
-const config_1 = require("../utility/config");
 const dependencies_1 = require("../utility/dependencies");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
 const validation_1 = require("../utility/validation");
+const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function updateJsonFile(host, path, callback) {
     const source = host.read(path);
@@ -85,46 +85,51 @@ function addDependenciesToPackageJson() {
         return host;
     };
 }
-function addAppToWorkspaceFile(options, workspace, projectRoot, projectName) {
-    const project = {
-        root: projectRoot,
-        sourceRoot: `${projectRoot}/src`,
-        projectType: workspace_models_1.ProjectType.Library,
-        prefix: options.prefix || 'lib',
-        architect: {
-            build: {
-                builder: workspace_models_1.Builders.NgPackagr,
-                options: {
-                    tsConfig: `${projectRoot}/tsconfig.lib.json`,
-                    project: `${projectRoot}/ng-package.json`,
+function addAppToWorkspaceFile(options, projectRoot, projectName) {
+    return workspace_1.updateWorkspace(workspace => {
+        if (workspace.projects.size === 0) {
+            workspace.extensions.defaultProject = projectName;
+        }
+        workspace.projects.add({
+            name: projectName,
+            root: projectRoot,
+            sourceRoot: `${projectRoot}/src`,
+            projectType: workspace_models_1.ProjectType.Library,
+            prefix: options.prefix || 'lib',
+            targets: {
+                build: {
+                    builder: workspace_models_1.Builders.NgPackagr,
+                    options: {
+                        tsConfig: `${projectRoot}/tsconfig.lib.json`,
+                        project: `${projectRoot}/ng-package.json`,
+                    },
+                },
+                test: {
+                    builder: workspace_models_1.Builders.Karma,
+                    options: {
+                        main: `${projectRoot}/src/test.ts`,
+                        tsConfig: `${projectRoot}/tsconfig.spec.json`,
+                        karmaConfig: `${projectRoot}/karma.conf.js`,
+                    },
+                },
+                lint: {
+                    builder: workspace_models_1.Builders.TsLint,
+                    options: {
+                        tsConfig: [
+                            `${projectRoot}/tsconfig.lib.json`,
+                            `${projectRoot}/tsconfig.spec.json`,
+                        ],
+                        exclude: [
+                            '**/node_modules/**',
+                        ],
+                    },
                 },
             },
-            test: {
-                builder: workspace_models_1.Builders.Karma,
-                options: {
-                    main: `${projectRoot}/src/test.ts`,
-                    tsConfig: `${projectRoot}/tsconfig.spec.json`,
-                    karmaConfig: `${projectRoot}/karma.conf.js`,
-                },
-            },
-            lint: {
-                builder: workspace_models_1.Builders.TsLint,
-                options: {
-                    tsConfig: [
-                        `${projectRoot}/tsconfig.lib.json`,
-                        `${projectRoot}/tsconfig.spec.json`,
-                    ],
-                    exclude: [
-                        '**/node_modules/**',
-                    ],
-                },
-            },
-        },
-    };
-    return config_1.addProjectToWorkspace(workspace, projectName, project);
+        });
+    });
 }
 function default_1(options) {
-    return (host, context) => {
+    return async (host) => {
         if (!options.name) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
@@ -139,8 +144,8 @@ function default_1(options) {
             scopeName = scope.replace(/^@/, '');
             options.name = name;
         }
-        const workspace = config_1.getWorkspace(host);
-        const newProjectRoot = workspace.newProjectRoot || '';
+        const workspace = await workspace_1.getWorkspace(host);
+        const newProjectRoot = workspace.extensions.newProjectRoot || '';
         const scopeFolder = scopeName ? core_1.strings.dasherize(scopeName) + '/' : '';
         const folderName = `${scopeFolder}${core_1.strings.dasherize(options.name)}`;
         const projectRoot = `${newProjectRoot}/${folderName}`;
@@ -163,7 +168,7 @@ function default_1(options) {
         ]);
         return schematics_1.chain([
             schematics_1.mergeWith(templateSource),
-            addAppToWorkspaceFile(options, workspace, projectRoot, projectName),
+            addAppToWorkspaceFile(options, projectRoot, projectName),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(),
             options.skipTsConfig ? schematics_1.noop() : updateTsConfig(packageName, distRoot),
             schematics_1.schematic('module', {

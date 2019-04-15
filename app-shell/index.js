@@ -12,10 +12,9 @@ const schematics_1 = require("@angular-devkit/schematics");
 const ts = require("../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
-const config_1 = require("../utility/config");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
-const project_1 = require("../utility/project");
 const project_targets_1 = require("../utility/project-targets");
+const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function getSourceFile(host, path) {
     const buffer = host.read(path);
@@ -26,8 +25,7 @@ function getSourceFile(host, path) {
     const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
     return source;
 }
-function getServerModulePath(host, project, architect) {
-    const mainPath = architect.server.options.main;
+function getServerModulePath(host, projectRoot, mainPath) {
     const mainSource = getSourceFile(host, mainPath);
     const allNodes = ast_utils_1.getSourceNodes(mainSource);
     const expNode = allNodes.filter(node => node.kind === ts.SyntaxKind.ExportDeclaration)[0];
@@ -35,7 +33,7 @@ function getServerModulePath(host, project, architect) {
         return null;
     }
     const relativePath = expNode.moduleSpecifier;
-    const modulePath = core_1.normalize(`/${project.root}/src/${relativePath.text}.ts`);
+    const modulePath = core_1.normalize(`/${projectRoot}/src/${relativePath.text}.ts`);
     return modulePath;
 }
 function getComponentTemplateInfo(host, componentPath) {
@@ -62,12 +60,7 @@ function getComponentTemplate(host, compPath, tmplInfo) {
     }
     return template;
 }
-function getBootstrapComponentPath(host, project) {
-    const projectTargets = project_targets_1.getProjectTargets(project);
-    if (!projectTargets.build) {
-        throw project_targets_1.targetBuildNotFoundError();
-    }
-    const mainPath = projectTargets.build.options.main;
+function getBootstrapComponentPath(host, mainPath) {
     const modulePath = ng_ast_utils_1.getAppModulePath(host, mainPath);
     const moduleSource = getSourceFile(host, modulePath);
     const metadataNode = ast_utils_1.getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
@@ -87,14 +80,10 @@ function getBootstrapComponentPath(host, project) {
     return core_1.join(core_1.dirname(core_1.normalize(modulePath)), relativePath + '.ts');
 }
 // end helper functions.
-function validateProject(options) {
+function validateProject(mainPath) {
     return (host, context) => {
         const routerOutletCheckRegex = /<router\-outlet.*?>([\s\S]*?)<\/router\-outlet>/;
-        const clientProject = project_1.getProject(host, options.clientProject);
-        if (clientProject.projectType !== 'application') {
-            throw new schematics_1.SchematicsException(`App shell requires a project type of "application".`);
-        }
-        const componentPath = getBootstrapComponentPath(host, clientProject);
+        const componentPath = getBootstrapComponentPath(host, mainPath);
         const tmpl = getComponentTemplateInfo(host, componentPath);
         const template = getComponentTemplate(host, componentPath, tmpl);
         if (!routerOutletCheckRegex.test(template)) {
@@ -105,11 +94,7 @@ function validateProject(options) {
     };
 }
 function addUniversalTarget(options) {
-    return (host, context) => {
-        const architect = project_targets_1.getProjectTargets(host, options.clientProject);
-        if (architect.server) {
-            return host;
-        }
+    return () => {
         // Copy options.
         const universalOptions = {
             ...options,
@@ -126,36 +111,35 @@ function addUniversalTarget(options) {
     };
 }
 function addAppShellConfigToWorkspace(options) {
-    return (host) => {
+    return () => {
         if (!options.route) {
             throw new schematics_1.SchematicsException(`Route is not defined`);
         }
-        const workspace = config_1.getWorkspace(host);
-        const projectTargets = project_targets_1.getProjectTargets(workspace, options.clientProject);
-        projectTargets['app-shell'] = {
-            builder: workspace_models_1.Builders.AppShell,
-            options: {
-                browserTarget: `${options.clientProject}:build`,
-                serverTarget: `${options.clientProject}:server`,
-                route: options.route,
-            },
-            configurations: {
-                production: {
-                    browserTarget: `${options.clientProject}:build:production`,
-                    serverTarget: `${options.clientProject}:server:production`,
+        return workspace_1.updateWorkspace(workspace => {
+            const project = workspace.projects.get(options.clientProject);
+            if (!project) {
+                return;
+            }
+            project.targets.add({
+                name: 'app-shell',
+                builder: workspace_models_1.Builders.AppShell,
+                options: {
+                    browserTarget: `${options.clientProject}:build`,
+                    serverTarget: `${options.clientProject}:server`,
+                    route: options.route,
                 },
-            },
-        };
-        return config_1.updateWorkspace(workspace);
+                configurations: {
+                    production: {
+                        browserTarget: `${options.clientProject}:build:production`,
+                        serverTarget: `${options.clientProject}:server:production`,
+                    },
+                },
+            });
+        });
     };
 }
-function addRouterModule(options) {
+function addRouterModule(mainPath) {
     return (host) => {
-        const projectTargets = project_targets_1.getProjectTargets(host, options.clientProject);
-        if (!projectTargets.build) {
-            throw project_targets_1.targetBuildNotFoundError();
-        }
-        const mainPath = projectTargets.build.options.main;
         const modulePath = ng_ast_utils_1.getAppModulePath(host, mainPath);
         const moduleSource = getSourceFile(host, modulePath);
         const changes = ast_utils_1.addImportToModule(moduleSource, modulePath, 'RouterModule', '@angular/router');
@@ -186,11 +170,22 @@ function getMetadataProperty(metadata, propertyName) {
     return property;
 }
 function addServerRoutes(options) {
-    return (host) => {
-        const clientProject = project_1.getProject(host, options.clientProject);
-        const architect = project_targets_1.getProjectTargets(clientProject);
-        // const mainPath = universalArchitect.build.options.main;
-        const modulePath = getServerModulePath(host, clientProject, architect);
+    return async (host) => {
+        // The workspace gets updated so this needs to be reloaded
+        const workspace = await workspace_1.getWorkspace(host);
+        const clientProject = workspace.projects.get(options.clientProject);
+        if (!clientProject) {
+            throw new Error('Universal schematic removed client project.');
+        }
+        const clientServerTarget = clientProject.targets.get('server');
+        if (!clientServerTarget) {
+            throw new Error('Universal schematic did not add server target to client project.');
+        }
+        const clientServerOptions = clientServerTarget.options;
+        if (!clientServerOptions) {
+            throw new schematics_1.SchematicsException('Server target does not contain options.');
+        }
+        const modulePath = getServerModulePath(host, clientProject.root, clientServerOptions.main);
         if (modulePath === null) {
             throw new schematics_1.SchematicsException('Universal/server module not found.');
         }
@@ -224,7 +219,6 @@ function addServerRoutes(options) {
             }
             host.commitUpdate(recorder);
         }
-        return host;
     };
 }
 function addShellComponent(options) {
@@ -236,13 +230,25 @@ function addShellComponent(options) {
     return schematics_1.schematic('component', componentOptions);
 }
 function default_1(options) {
-    return schematics_1.chain([
-        validateProject(options),
-        addUniversalTarget(options),
-        addAppShellConfigToWorkspace(options),
-        addRouterModule(options),
-        addServerRoutes(options),
-        addShellComponent(options),
-    ]);
+    return async (tree) => {
+        const workspace = await workspace_1.getWorkspace(tree);
+        const clientProject = workspace.projects.get(options.clientProject);
+        if (!clientProject || clientProject.extensions.projectType !== 'application') {
+            throw new schematics_1.SchematicsException(`A client project type of "application" is required.`);
+        }
+        const clientBuildTarget = clientProject.targets.get('build');
+        if (!clientBuildTarget) {
+            throw project_targets_1.targetBuildNotFoundError();
+        }
+        const clientBuildOptions = (clientBuildTarget.options || {});
+        return schematics_1.chain([
+            validateProject(clientBuildOptions.main),
+            clientProject.targets.has('server') ? schematics_1.noop() : addUniversalTarget(options),
+            addAppShellConfigToWorkspace(options),
+            addRouterModule(clientBuildOptions.main),
+            addServerRoutes(options),
+            addShellComponent(options),
+        ]);
+    };
 }
 exports.default = default_1;

@@ -11,15 +11,11 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const lint_fix_1 = require("../utility/lint-fix");
 const parse_name_1 = require("../utility/parse-name");
-const project_1 = require("../utility/project");
+const workspace_1 = require("../utility/workspace");
 function default_1(options) {
-    return (host, context) => {
-        if (!options.project) {
-            throw new schematics_1.SchematicsException('Option (project) is required.');
-        }
-        const project = project_1.getProject(host, options.project);
+    return async (host) => {
         if (options.path === undefined) {
-            options.path = project_1.buildDefaultPath(project);
+            options.path = await workspace_1.createDefaultPath(host, options.project);
         }
         options.type = !!options.type ? `.${options.type}` : '';
         const parsedPath = parse_name_1.parseName(options.path, options.name);

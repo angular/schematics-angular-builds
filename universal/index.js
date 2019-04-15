@@ -13,44 +13,41 @@ const tasks_1 = require("@angular-devkit/schematics/tasks");
 const ts = require("../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
-const config_1 = require("../utility/config");
 const dependencies_1 = require("../utility/dependencies");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
-const project_1 = require("../utility/project");
 const project_targets_1 = require("../utility/project-targets");
+const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
-function getFileReplacements(target) {
-    const fileReplacements = target.build &&
-        target.build.configurations &&
-        target.build.configurations.production &&
-        target.build.configurations.production.fileReplacements;
-    return fileReplacements || [];
-}
 function updateConfigFile(options, tsConfigDirectory) {
-    return (host) => {
-        const workspace = config_1.getWorkspace(host);
-        const clientProject = project_1.getProject(workspace, options.clientProject);
-        const projectTargets = project_targets_1.getProjectTargets(clientProject);
-        projectTargets.server = {
-            builder: workspace_models_1.Builders.Server,
-            options: {
-                outputPath: `dist/${options.clientProject}-server`,
-                main: `${clientProject.root}src/main.server.ts`,
-                tsConfig: core_1.join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
-            },
-            configurations: {
-                production: {
-                    fileReplacements: getFileReplacements(projectTargets),
-                    sourceMap: false,
-                    optimization: {
-                        scripts: false,
-                        styles: true,
+    return workspace_1.updateWorkspace(workspace => {
+        const clientProject = workspace.projects.get(options.clientProject);
+        if (clientProject) {
+            const buildTarget = clientProject.targets.get('build');
+            let fileReplacements;
+            if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
+                fileReplacements = buildTarget.configurations.production.fileReplacements;
+            }
+            clientProject.targets.add({
+                name: 'server',
+                builder: workspace_models_1.Builders.Server,
+                options: {
+                    outputPath: `dist/${options.clientProject}-server`,
+                    main: `${clientProject.root}src/main.server.ts`,
+                    tsConfig: core_1.join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
+                },
+                configurations: {
+                    production: {
+                        fileReplacements,
+                        sourceMap: false,
+                        optimization: {
+                            scripts: false,
+                            styles: true,
+                        },
                     },
                 },
-            },
-        };
-        return config_1.updateWorkspace(workspace);
-    };
+            });
+        }
+    });
 }
 function findBrowserModuleImport(host, modulePath) {
     const moduleBuffer = host.read(modulePath);
@@ -66,13 +63,9 @@ function findBrowserModuleImport(host, modulePath) {
     }
     return browserModuleNode;
 }
-function wrapBootstrapCall(options) {
+function wrapBootstrapCall(mainFile) {
     return (host) => {
-        const clientTargets = project_targets_1.getProjectTargets(host, options.clientProject);
-        if (!clientTargets.build) {
-            throw project_targets_1.targetBuildNotFoundError();
-        }
-        const mainPath = core_1.normalize('/' + clientTargets.build.options.main);
+        const mainPath = core_1.normalize('/' + mainFile);
         let bootstrapCall = ng_ast_utils_1.findBootstrapModuleCall(host, mainPath);
         if (bootstrapCall === null) {
             throw new schematics_1.SchematicsException('Bootstrap module not found.');
@@ -127,16 +120,11 @@ function findCallExpressionNode(node, text) {
     });
     return foundNode;
 }
-function addServerTransition(options) {
+function addServerTransition(options, mainFile, clientProjectRoot) {
     return (host) => {
-        const clientProject = project_1.getProject(host, options.clientProject);
-        const clientTargets = project_targets_1.getProjectTargets(clientProject);
-        if (!clientTargets.build) {
-            throw project_targets_1.targetBuildNotFoundError();
-        }
-        const mainPath = core_1.normalize('/' + clientTargets.build.options.main);
+        const mainPath = core_1.normalize('/' + mainFile);
         const bootstrapModuleRelativePath = ng_ast_utils_1.findBootstrapModulePath(host, mainPath);
-        const bootstrapModulePath = core_1.normalize(`/${clientProject.root}/src/${bootstrapModuleRelativePath}.ts`);
+        const bootstrapModulePath = core_1.normalize(`/${clientProjectRoot}/src/${bootstrapModuleRelativePath}.ts`);
         const browserModuleImport = findBrowserModuleImport(host, bootstrapModulePath);
         const appId = options.appId;
         const transitionCall = `.withServerTransition({ appId: '${appId}' })`;
@@ -161,8 +149,7 @@ function addDependencies() {
         return host;
     };
 }
-function getTsConfigOutDir(host, targets) {
-    const tsConfigPath = targets.build.options.tsConfig;
+function getTsConfigOutDir(host, tsConfigPath) {
     const tsConfigBuffer = host.read(tsConfigPath);
     if (!tsConfigBuffer) {
         throw new schematics_1.SchematicsException(`Could not read ${tsConfigPath}`);
@@ -178,17 +165,19 @@ function getTsConfigOutDir(host, targets) {
     return outDir;
 }
 function default_1(options) {
-    return (host, context) => {
-        const clientProject = project_1.getProject(host, options.clientProject);
-        if (clientProject.projectType !== 'application') {
+    return async (host, context) => {
+        const workspace = await workspace_1.getWorkspace(host);
+        const clientProject = workspace.projects.get(options.clientProject);
+        if (!clientProject || clientProject.extensions.projectType !== 'application') {
             throw new schematics_1.SchematicsException(`Universal requires a project type of "application".`);
         }
-        const clientTargets = project_targets_1.getProjectTargets(clientProject);
-        const outDir = getTsConfigOutDir(host, clientTargets);
-        if (!clientTargets.build) {
+        const clientBuildTarget = clientProject.targets.get('build');
+        if (!clientBuildTarget) {
             throw project_targets_1.targetBuildNotFoundError();
         }
-        const clientTsConfig = core_1.normalize(clientTargets.build.options.tsConfig);
+        const clientBuildOptions = (clientBuildTarget.options || {});
+        const outDir = getTsConfigOutDir(host, clientBuildOptions.tsConfig);
+        const clientTsConfig = core_1.normalize(clientBuildOptions.tsConfig);
         const tsConfigExtends = core_1.basename(clientTsConfig);
         // this is needed because prior to version 8, tsconfig might have been in 'src'
         // and we don't want to break the 'ng add @nguniversal/express-engine schematics'
@@ -221,8 +210,8 @@ function default_1(options) {
             schematics_1.mergeWith(rootSource),
             addDependencies(),
             updateConfigFile(options, tsConfigDirectory),
-            wrapBootstrapCall(options),
-            addServerTransition(options),
+            wrapBootstrapCall(clientBuildOptions.main),
+            addServerTransition(options, clientBuildOptions.main, clientProject.root),
         ]);
     };
 }

@@ -9,31 +9,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const config_1 = require("../utility/config");
 const json_utils_1 = require("../utility/json-utils");
 const parse_name_1 = require("../utility/parse-name");
-const project_1 = require("../utility/project");
-const project_targets_1 = require("../utility/project-targets");
-function getProjectConfiguration(workspace, options) {
-    if (!options.target) {
-        throw new schematics_1.SchematicsException('Option (target) is required.');
-    }
-    const projectTargets = project_targets_1.getProjectTargets(workspace, options.project);
-    if (!projectTargets[options.target]) {
-        throw new Error(`Target is not defined for this project.`);
-    }
-    const target = projectTargets[options.target];
-    return target.options;
-}
-function addConfig(options, root) {
+const workspace_1 = require("../utility/workspace");
+function addConfig(options, root, tsConfigPath) {
     return (host, context) => {
         context.logger.debug('updating project configuration.');
-        const workspace = config_1.getWorkspace(host);
-        const config = getProjectConfiguration(workspace, options);
-        if (config.webWorkerTsConfig) {
-            // Don't do anything if the configuration is already there.
-            return;
-        }
         const tsConfigRules = [];
         // Add tsconfig.worker.json.
         const relativePathToWorkspaceRoot = root.split('/').map(x => '..').join('/');
@@ -41,8 +22,6 @@ function addConfig(options, root) {
             schematics_1.applyTemplates({ ...options, relativePathToWorkspaceRoot }),
             schematics_1.move(root),
         ])));
-        // Add build-angular config flag.
-        config.webWorkerTsConfig = `${root.endsWith('/') ? root : root + '/'}tsconfig.worker.json`;
         // Add project tsconfig.json.
         // The project level tsconfig.json with webworker lib is for editor support since
         // the dom and webworker libs are mutually exclusive.
@@ -81,7 +60,6 @@ function addConfig(options, root) {
         }
         // Add worker glob exclusion to tsconfig.app.json.
         const workerGlob = '**/*.worker.ts';
-        const tsConfigPath = config.tsConfig;
         const buffer = host.read(tsConfigPath);
         if (buffer) {
             const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
@@ -101,8 +79,6 @@ function addConfig(options, root) {
         return schematics_1.chain([
             // Add tsconfigs.
             ...tsConfigRules,
-            // Add workspace configuration.
-            config_1.updateWorkspace(workspace),
         ]);
     };
 }
@@ -143,31 +119,47 @@ function addSnippet(options) {
     };
 }
 function default_1(options) {
-    return (host, context) => {
-        const project = project_1.getProject(host, options.project);
+    return async (host) => {
+        const workspace = await workspace_1.getWorkspace(host);
         if (!options.project) {
             throw new schematics_1.SchematicsException('Option "project" is required.');
         }
+        if (!options.target) {
+            throw new schematics_1.SchematicsException('Option (target) is required.');
+        }
+        const project = workspace.projects.get(options.project);
         if (!project) {
             throw new schematics_1.SchematicsException(`Invalid project name (${options.project})`);
         }
-        if (project.projectType !== 'application') {
+        const projectType = project.extensions['projectType'];
+        if (projectType !== 'application') {
             throw new schematics_1.SchematicsException(`Web Worker requires a project type of "application".`);
         }
+        const projectTarget = project.targets.get(options.target);
+        if (!projectTarget) {
+            throw new Error(`Target is not defined for this project.`);
+        }
+        const projectTargetOptions = (projectTarget.options || {});
         if (options.path === undefined) {
-            options.path = project_1.buildDefaultPath(project);
+            options.path = workspace_1.buildDefaultPath(project);
         }
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         const root = project.root || project.sourceRoot || '';
+        const needWebWorkerConfig = !projectTargetOptions.webWorkerTsConfig;
+        if (needWebWorkerConfig) {
+            projectTargetOptions.webWorkerTsConfig =
+                `${root.endsWith('/') ? root : root + '/'}tsconfig.worker.json`;
+        }
         const templateSource = schematics_1.apply(schematics_1.url('./files/worker'), [
             schematics_1.applyTemplates({ ...options, ...core_1.strings }),
             schematics_1.move(parsedPath.path),
         ]);
         return schematics_1.chain([
             // Add project configuration.
-            addConfig(options, root),
+            needWebWorkerConfig ? addConfig(options, root, projectTargetOptions.tsConfig) : schematics_1.noop(),
+            needWebWorkerConfig ? workspace_1.updateWorkspace(workspace) : schematics_1.noop(),
             // Create the worker in a sibling module.
             options.snippet ? addSnippet(options) : schematics_1.noop(),
             // Add the worker.
