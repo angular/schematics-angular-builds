@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const schematics_1 = require("@angular-devkit/schematics");
 const codelyzer_5_1 = require("./codelyzer-5");
+const differential_loading_1 = require("./differential-loading");
 const drop_es6_polyfills_1 = require("./drop-es6-polyfills");
 function default_1() {
     return () => {
@@ -16,6 +17,7 @@ function default_1() {
             codelyzer_5_1.updateTsLintConfig(),
             codelyzer_5_1.updatePackageJson(),
             drop_es6_polyfills_1.dropES2015Polyfills(),
+            differential_loading_1.updateES5Projects(),
         ]);
     };
 }
