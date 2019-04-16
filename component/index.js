@@ -15,8 +15,8 @@ const change_1 = require("../utility/change");
 const find_module_1 = require("../utility/find-module");
 const lint_fix_1 = require("../utility/lint-fix");
 const parse_name_1 = require("../utility/parse-name");
-const project_1 = require("../utility/project");
 const validation_1 = require("../utility/validation");
+const workspace_1 = require("../utility/workspace");
 const schema_1 = require("./schema");
 function readIntoSourceFile(host, modulePath) {
     const text = host.read(modulePath);
@@ -85,19 +85,17 @@ function buildSelector(options, projectPrefix) {
     return selector;
 }
 function default_1(options) {
-    return (host) => {
-        if (!options.project) {
-            throw new schematics_1.SchematicsException('Option (project) is required.');
-        }
-        const project = project_1.getProject(host, options.project);
-        if (options.path === undefined) {
-            options.path = project_1.buildDefaultPath(project);
+    return async (host) => {
+        const workspace = await workspace_1.getWorkspace(host);
+        const project = workspace.projects.get(options.project);
+        if (options.path === undefined && project) {
+            options.path = workspace_1.buildDefaultPath(project);
         }
         options.module = find_module_1.findModuleFromOptions(host, options);
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
-        options.selector = options.selector || buildSelector(options, project.prefix);
+        options.selector = options.selector || buildSelector(options, project && project.prefix || '');
         // todo remove these when we remove the deprecations
         options.style = (options.style && options.style !== schema_1.Style.Css
             ? options.style : options.styleext) || schema_1.Style.Css;

@@ -11,34 +11,10 @@ const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const ts = require("../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 const ast_utils_1 = require("../utility/ast-utils");
-const config_1 = require("../utility/config");
 const dependencies_1 = require("../utility/dependencies");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const project_targets_1 = require("../utility/project-targets");
-function getProjectConfiguration(workspace, options) {
-    const projectTargets = project_targets_1.getProjectTargets(workspace, options.project);
-    if (!projectTargets[options.target]) {
-        throw new Error(`Target is not defined for this project.`);
-    }
-    const target = projectTargets[options.target];
-    let applyTo = target.options;
-    if (options.configuration &&
-        target.configurations &&
-        target.configurations[options.configuration]) {
-        applyTo = target.configurations[options.configuration];
-    }
-    return applyTo;
-}
-function updateConfigFile(options, root) {
-    return (host, context) => {
-        context.logger.debug('updating config file.');
-        const workspace = config_1.getWorkspace(host);
-        const config = getProjectConfiguration(workspace, options);
-        config.serviceWorker = true;
-        config.ngswConfigPath = `${root && !root.endsWith('/') ? root + '/' : root}ngsw-config.json`;
-        return config_1.updateWorkspace(workspace);
-    };
-}
+const workspace_1 = require("../utility/workspace");
 function addDependencies() {
     return (host, context) => {
         const packageName = '@angular/service-worker';
@@ -55,15 +31,9 @@ function addDependencies() {
         return host;
     };
 }
-function updateAppModule(options) {
+function updateAppModule(mainPath) {
     return (host, context) => {
         context.logger.debug('Updating appmodule');
-        // find app module
-        const projectTargets = project_targets_1.getProjectTargets(host, options.project);
-        if (!projectTargets.build) {
-            throw project_targets_1.targetBuildNotFoundError();
-        }
-        const mainPath = projectTargets.build.options.main;
         const modulePath = ng_ast_utils_1.getAppModulePath(host, mainPath);
         context.logger.debug(`module path: ${modulePath}`);
         // add import
@@ -116,21 +86,32 @@ function getTsSourceFile(host, path) {
     return source;
 }
 function default_1(options) {
-    return (host, context) => {
-        const workspace = config_1.getWorkspace(host);
-        if (!options.project) {
-            throw new schematics_1.SchematicsException('Option "project" is required.');
-        }
-        const project = workspace.projects[options.project];
+    return async (host, context) => {
+        const workspace = await workspace_1.getWorkspace(host);
+        const project = workspace.projects.get(options.project);
         if (!project) {
             throw new schematics_1.SchematicsException(`Invalid project name (${options.project})`);
         }
-        if (project.projectType !== 'application') {
+        if (project.extensions.projectType !== 'application') {
             throw new schematics_1.SchematicsException(`Service worker requires a project type of "application".`);
         }
+        const buildTarget = project.targets.get('build');
+        if (!buildTarget) {
+            throw project_targets_1.targetBuildNotFoundError();
+        }
+        const buildOptions = (buildTarget.options || {});
+        let buildConfiguration;
+        if (options.configuration && buildTarget.configurations) {
+            buildConfiguration =
+                buildTarget.configurations[options.configuration];
+        }
+        const config = buildConfiguration || buildOptions;
+        const root = project.root;
+        config.serviceWorker = true;
+        config.ngswConfigPath = `${root && !root.endsWith('/') ? root + '/' : root}ngsw-config.json`;
         const relativePathToWorkspaceRoot = project.root ?
             project.root.split('/').filter(x => x !== '').map(x => '..').join('/') : '.';
-        let { resourcesOutputPath = '' } = getProjectConfiguration(workspace, options);
+        let { resourcesOutputPath = '' } = config;
         if (resourcesOutputPath) {
             resourcesOutputPath = '/' + resourcesOutputPath.split('/').filter(x => !!x).join('/');
         }
@@ -141,9 +122,9 @@ function default_1(options) {
         context.addTask(new tasks_1.NodePackageInstallTask());
         return schematics_1.chain([
             schematics_1.mergeWith(templateSource),
-            updateConfigFile(options, project.root),
+            workspace_1.updateWorkspace(workspace),
             addDependencies(),
-            updateAppModule(options),
+            updateAppModule(buildOptions.main),
         ]);
     };
 }

@@ -15,7 +15,7 @@ const change_1 = require("../utility/change");
 const find_module_1 = require("../utility/find-module");
 const lint_fix_1 = require("../utility/lint-fix");
 const parse_name_1 = require("../utility/parse-name");
-const project_1 = require("../utility/project");
+const workspace_1 = require("../utility/workspace");
 function addDeclarationToNgModule(options) {
     return (host) => {
         if (!options.module) {
@@ -45,13 +45,9 @@ function addDeclarationToNgModule(options) {
     };
 }
 function default_1(options) {
-    return (host) => {
-        if (!options.project) {
-            throw new schematics_1.SchematicsException('Option (project) is required.');
-        }
-        const project = project_1.getProject(host, options.project);
+    return async (host) => {
         if (options.path === undefined) {
-            options.path = project_1.buildDefaultPath(project);
+            options.path = await workspace_1.createDefaultPath(host, options.project);
         }
         if (options.module) {
             options.module = find_module_1.findModuleFromOptions(host, options);

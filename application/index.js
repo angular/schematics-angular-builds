@@ -10,35 +10,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
-const config_1 = require("../utility/config");
 const dependencies_1 = require("../utility/dependencies");
 const json_utils_1 = require("../utility/json-utils");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
 const validation_1 = require("../utility/validation");
+const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 const schema_1 = require("./schema");
-// TODO: use JsonAST
-// function appendPropertyInAstObject(
-//   recorder: UpdateRecorder,
-//   node: JsonAstObject,
-//   propertyName: string,
-//   value: JsonValue,
-//   indent = 4,
-// ) {
-//   const indentStr = '\n' + new Array(indent + 1).join(' ');
-//   if (node.properties.length > 0) {
-//     // Insert comma.
-//     const last = node.properties[node.properties.length - 1];
-//     recorder.insertRight(last.start.offset + last.text.replace(/\s+$/, '').length, ',');
-//   }
-//   recorder.insertLeft(
-//     node.end.offset - 1,
-//     '  '
-//     + `"${propertyName}": ${JSON.stringify(value, null, 2).replace(/\n/g, indentStr)}`
-//     + indentStr.slice(0, -2),
-//   );
-// }
 function addDependenciesToPackageJson(options) {
     return (host, context) => {
         [
@@ -112,20 +91,10 @@ function mergeWithRootTsLint(parentHost) {
         host.overwrite(tsLintPath, JSON.stringify(content.value, undefined, 2));
     };
 }
-function addAppToWorkspaceFile(options, workspace) {
-    // TODO: use JsonAST
-    // const workspacePath = '/angular.json';
-    // const workspaceBuffer = host.read(workspacePath);
-    // if (workspaceBuffer === null) {
-    //   throw new SchematicsException(`Configuration file (${workspacePath}) not found.`);
-    // }
-    // const workspaceJson = parseJson(workspaceBuffer.toString());
-    // if (workspaceJson.value === null) {
-    //   throw new SchematicsException(`Unable to parse configuration file (${workspacePath}).`);
-    // }
+function addAppToWorkspaceFile(options, newProjectRoot) {
     let projectRoot = options.projectRoot !== undefined
         ? options.projectRoot
-        : `${workspace.newProjectRoot}/${options.name}`;
+        : `${newProjectRoot}/${options.name}`;
     if (projectRoot !== '' && !projectRoot.endsWith('/')) {
         projectRoot += '/';
     }
@@ -160,7 +129,7 @@ function addAppToWorkspaceFile(options, workspace) {
         projectType: workspace_models_1.ProjectType.Application,
         prefix: options.prefix || 'app',
         schematics,
-        architect: {
+        targets: {
             build: {
                 builder: workspace_models_1.Builders.Browser,
                 options: {
@@ -250,14 +219,22 @@ function addAppToWorkspaceFile(options, workspace) {
             },
         },
     };
-    return config_1.addProjectToWorkspace(workspace, options.name, project);
+    return workspace_1.updateWorkspace(workspace => {
+        if (workspace.projects.size === 0) {
+            workspace.extensions.defaultProject = options.name;
+        }
+        workspace.projects.add({
+            name: options.name,
+            ...project,
+        });
+    });
 }
 function minimalPathFilter(path) {
     const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js|tslint.json).template$/;
     return !toRemoveList.test(path);
 }
 function default_1(options) {
-    return (host, context) => {
+    return async (host, context) => {
         if (!options.name) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
@@ -278,8 +255,8 @@ function default_1(options) {
                 skipTests: true,
                 style: options.style,
             };
-        const workspace = config_1.getWorkspace(host);
-        const newProjectRoot = workspace.newProjectRoot || '';
+        const workspace = await workspace_1.getWorkspace(host);
+        const newProjectRoot = workspace.extensions.newProjectRoot || '';
         const isRootApp = options.projectRoot !== undefined;
         const appDir = isRootApp
             ? options.projectRoot
@@ -293,7 +270,7 @@ function default_1(options) {
             rootSelector: appRootSelector,
         };
         return schematics_1.chain([
-            addAppToWorkspaceFile(options, workspace),
+            addAppToWorkspaceFile(options, newProjectRoot),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
                 options.minimal ? schematics_1.filter(minimalPathFilter) : schematics_1.noop(),
                 schematics_1.applyTemplates({

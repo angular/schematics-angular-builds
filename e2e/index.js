@@ -9,54 +9,42 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const config_1 = require("../utility/config");
-const project_1 = require("../utility/project");
+const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function getE2eRoot(projectRoot) {
     const root = core_1.normalize(projectRoot);
     return root ? root + '/e2e' : 'e2e';
 }
-function AddBuilderToWorkspace(options, workspace) {
-    return (host, context) => {
-        const appProject = options.relatedAppName;
-        const project = project_1.getProject(workspace, appProject);
-        const architect = project.architect;
-        const projectRoot = getE2eRoot(project.root);
-        if (architect) {
-            architect.e2e = {
-                builder: workspace_models_1.Builders.Protractor,
-                options: {
-                    protractorConfig: `${projectRoot}/protractor.conf.js`,
-                    devServerTarget: `${options.relatedAppName}:serve`,
-                },
-                configurations: {
-                    production: {
-                        devServerTarget: `${options.relatedAppName}:serve:production`,
-                    },
-                },
-            };
-            const lintConfig = architect.lint;
-            if (lintConfig) {
-                lintConfig.options.tsConfig =
-                    lintConfig.options.tsConfig.concat(`${projectRoot}/tsconfig.json`);
-            }
-            workspace.projects[options.relatedAppName] = project;
-        }
-        return config_1.updateWorkspace(workspace);
-    };
-}
 function default_1(options) {
-    return (host) => {
+    return async (host) => {
         const appProject = options.relatedAppName;
-        const workspace = config_1.getWorkspace(host);
-        const project = project_1.getProject(workspace, appProject);
+        const workspace = await workspace_1.getWorkspace(host);
+        const project = workspace.projects.get(appProject);
         if (!project) {
             throw new schematics_1.SchematicsException(`Project name "${appProject}" doesn't not exist.`);
         }
         const root = getE2eRoot(project.root);
         const relativePathToWorkspaceRoot = root.split('/').map(() => '..').join('/');
+        project.targets.add({
+            name: 'e2e',
+            builder: workspace_models_1.Builders.Protractor,
+            options: {
+                protractorConfig: `${root}/protractor.conf.js`,
+                devServerTarget: `${options.relatedAppName}:serve`,
+            },
+            configurations: {
+                production: {
+                    devServerTarget: `${options.relatedAppName}:serve:production`,
+                },
+            },
+        });
+        const lintTarget = project.targets.get('lint');
+        if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
+            lintTarget.options.tsConfig =
+                lintTarget.options.tsConfig.concat(`${root}/tsconfig.json`);
+        }
         return schematics_1.chain([
-            AddBuilderToWorkspace(options, workspace),
+            workspace_1.updateWorkspace(workspace),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
                 schematics_1.applyTemplates({
                     utils: core_1.strings,
