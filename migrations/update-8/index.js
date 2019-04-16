@@ -11,6 +11,8 @@ const schematics_1 = require("@angular-devkit/schematics");
 const codelyzer_5_1 = require("./codelyzer-5");
 const differential_loading_1 = require("./differential-loading");
 const drop_es6_polyfills_1 = require("./drop-es6-polyfills");
+var update_lazy_module_paths_1 = require("./update-lazy-module-paths");
+exports.updateLazyModulePaths = update_lazy_module_paths_1.updateLazyModulePaths;
 function default_1() {
     return () => {
         return schematics_1.chain([
