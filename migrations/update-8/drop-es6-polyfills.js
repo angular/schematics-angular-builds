@@ -7,6 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = require("@angular-devkit/core");
+const schematics_1 = require("@angular-devkit/schematics");
 const ts = require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 const toDrop = {
     'core-js/es6/symbol': true,
@@ -24,25 +26,38 @@ const toDrop = {
     'core-js/es6/set': true,
 };
 const header = `/**
-*/
+ * This file includes polyfills needed by Angular and is loaded before the app.
+ * You can add your own extra polyfills to this file.
+ *
+ * This file is divided into 2 sections:
+ *   1. Browser polyfills. These are applied before loading ZoneJS and are sorted by browsers.
+ *   2. Application imports. Files imported after ZoneJS that should be loaded before your main
+ *      file.
+ *
+ * The current setup is for so-called "evergreen" browsers; the last versions of browsers that
+ * automatically update themselves. This includes Safari >= 10, Chrome >= 55 (including Opera),
+ * Edge >= 13 on the desktop, and iOS 10 and Chrome on mobile.
+ *
+ * Learn more in https://angular.io/guide/browser-support
+ */
 
 /***************************************************************************************************
 * BROWSER POLYFILLS
 */
 
 /** IE9, IE10 and IE11 requires all of the following polyfills. **/
-// import 'core-js/es6/weak-map';`;
+// import 'core-js/es6/weak-map';
+`;
 const applicationPolyfillsHeader = 'APPLICATION IMPORTS';
-exports.dropES2015Polyfills = () => {
+function dropES2015PolyfillsFromFile(polyfillPath) {
     return (tree) => {
-        const path = '/polyfills.ts';
-        const source = tree.read(path);
+        const source = tree.read(polyfillPath);
         if (!source) {
             return;
         }
         // Start the update of the file.
-        const recorder = tree.beginUpdate(path);
-        const sourceFile = ts.createSourceFile(path, source.toString(), ts.ScriptTarget.Latest, true);
+        const recorder = tree.beginUpdate(polyfillPath);
+        const sourceFile = ts.createSourceFile(polyfillPath, source.toString(), ts.ScriptTarget.Latest, true);
         const imports = sourceFile.statements
             .filter(s => s.kind === ts.SyntaxKind.ImportDeclaration);
         const applicationPolyfillsStart = sourceFile.getText().indexOf(applicationPolyfillsHeader);
@@ -64,4 +79,43 @@ exports.dropES2015Polyfills = () => {
         }
         tree.commitUpdate(recorder);
     };
-};
+}
+/**
+ * Drop ES2015 polyfills from all application projects
+ */
+function dropES2015Polyfills() {
+    return (tree) => {
+        // Simple. Take the ast of polyfills (if it exists) and find the import metadata. Remove it.
+        const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
+        const rules = [];
+        if (!angularConfigContent) {
+            // Is this even an angular project?
+            return;
+        }
+        const angularJson = core_1.parseJson(angularConfigContent.toString(), core_1.JsonParseMode.Loose);
+        if (!core_1.isJsonObject(angularJson) || !core_1.isJsonObject(angularJson.projects)) {
+            // If that field isn't there, no use...
+            return;
+        }
+        // For all projects
+        for (const projectName of Object.keys(angularJson.projects)) {
+            const project = angularJson.projects[projectName];
+            if (!core_1.isJsonObject(project)) {
+                continue;
+            }
+            if (project.projectType !== 'application') {
+                continue;
+            }
+            const architect = project.architect;
+            if (!core_1.isJsonObject(architect)
+                || !core_1.isJsonObject(architect.build)
+                || !core_1.isJsonObject(architect.build.options)
+                || typeof architect.build.options.polyfills !== 'string') {
+                continue;
+            }
+            rules.push(dropES2015PolyfillsFromFile(architect.build.options.polyfills));
+        }
+        return schematics_1.chain(rules);
+    };
+}
+exports.dropES2015Polyfills = dropES2015Polyfills;
