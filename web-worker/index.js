@@ -15,51 +15,14 @@ const workspace_1 = require("../utility/workspace");
 function addConfig(options, root, tsConfigPath) {
     return (host, context) => {
         context.logger.debug('updating project configuration.');
-        const tsConfigRules = [];
-        // Add tsconfig.worker.json.
-        const relativePathToWorkspaceRoot = root.split('/').map(x => '..').join('/');
-        tsConfigRules.push(schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [
-            schematics_1.applyTemplates({ ...options, relativePathToWorkspaceRoot }),
-            schematics_1.move(root),
-        ])));
-        // Add project tsconfig.json.
-        // The project level tsconfig.json with webworker lib is for editor support since
-        // the dom and webworker libs are mutually exclusive.
-        // Note: this schematic does not change other tsconfigs to use the project-level tsconfig.
-        const projectTsConfigPath = `${root}/tsconfig.json`;
-        if (host.exists(projectTsConfigPath)) {
-            // If the file already exists, alter it.
-            const buffer = host.read(projectTsConfigPath);
-            if (buffer) {
-                const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
-                if (tsCfgAst.kind != 'object') {
-                    throw new schematics_1.SchematicsException('Invalid tsconfig. Was expecting an object');
-                }
-                const optsAstNode = json_utils_1.findPropertyInAstObject(tsCfgAst, 'compilerOptions');
-                if (optsAstNode && optsAstNode.kind != 'object') {
-                    throw new schematics_1.SchematicsException('Invalid tsconfig "compilerOptions" property; Was expecting an object.');
-                }
-                const libAstNode = json_utils_1.findPropertyInAstObject(tsCfgAst, 'lib');
-                if (libAstNode && libAstNode.kind != 'array') {
-                    throw new schematics_1.SchematicsException('Invalid tsconfig "lib" property; expected an array.');
-                }
-                const newLibProp = 'webworker';
-                if (libAstNode && !libAstNode.value.includes(newLibProp)) {
-                    const recorder = host.beginUpdate(projectTsConfigPath);
-                    json_utils_1.appendValueInAstArray(recorder, libAstNode, newLibProp);
-                    host.commitUpdate(recorder);
-                }
-            }
-        }
-        else {
-            // Otherwise create it.
-            tsConfigRules.push(schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/project-tsconfig'), [
-                schematics_1.applyTemplates({ ...options, relativePathToWorkspaceRoot }),
-                schematics_1.move(root),
-            ])));
-        }
+        // todo: replace with the new helper method in a seperate PR
+        // https://github.com/angular/angular-cli/pull/14207
+        const rootNormalized = root.endsWith('/') ? root.slice(0, -1) : root;
+        const relativePathToWorkspaceRoot = rootNormalized
+            ? rootNormalized.split('/').map(x => '..').join('/')
+            : '.';
         // Add worker glob exclusion to tsconfig.app.json.
-        const workerGlob = '**/*.worker.ts';
+        const workerGlob = 'src/**/*.worker.ts';
         const buffer = host.read(tsConfigPath);
         if (buffer) {
             const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
@@ -70,16 +33,16 @@ function addConfig(options, root, tsConfigPath) {
             if (filesAstNode && filesAstNode.kind != 'array') {
                 throw new schematics_1.SchematicsException('Invalid tsconfig "exclude" property; expected an array.');
             }
-            if (filesAstNode && filesAstNode.value.indexOf(workerGlob) == -1) {
+            if (filesAstNode && !filesAstNode.value.includes(workerGlob)) {
                 const recorder = host.beginUpdate(tsConfigPath);
                 json_utils_1.appendValueInAstArray(recorder, filesAstNode, workerGlob);
                 host.commitUpdate(recorder);
             }
         }
-        return schematics_1.chain([
-            // Add tsconfigs.
-            ...tsConfigRules,
-        ]);
+        return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [
+            schematics_1.applyTemplates({ ...options, relativePathToWorkspaceRoot }),
+            schematics_1.move(root),
+        ]));
     };
 }
 function addSnippet(options) {
@@ -125,7 +88,7 @@ function default_1(options) {
             throw new schematics_1.SchematicsException('Option "project" is required.');
         }
         if (!options.target) {
-            throw new schematics_1.SchematicsException('Option (target) is required.');
+            throw new schematics_1.SchematicsException('Option "target" is required.');
         }
         const project = workspace.projects.get(options.project);
         if (!project) {
@@ -146,10 +109,10 @@ function default_1(options) {
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
-        const root = project.root || project.sourceRoot || '';
+        const root = project.root || '';
         const needWebWorkerConfig = !projectTargetOptions.webWorkerTsConfig;
         if (needWebWorkerConfig) {
-            const workerConfigPath = `${root.endsWith('/') ? root : root + '/'}tsconfig.worker.json`;
+            const workerConfigPath = core_1.join(core_1.normalize(root), 'tsconfig.worker.json');
             projectTargetOptions.webWorkerTsConfig = workerConfigPath;
             // add worker tsconfig to lint architect target
             const lintTarget = project.targets.get('lint');
