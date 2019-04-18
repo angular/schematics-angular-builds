@@ -1,5 +1,5 @@
 {
-  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/worker",
     "lib": [
@@ -9,6 +9,6 @@
     "types": []
   },
   "include": [
-    "src/**/*.worker.ts"
+    "**/*.worker.ts"
   ]
 }
