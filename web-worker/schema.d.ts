@@ -1,5 +1,5 @@
 /**
- * Pass this schematic to the "run" command to create a Web Worker
+ * Creates a new generic web worker definition in the given or default project.
  */
 export interface Schema {
     /**
@@ -19,7 +19,7 @@ export interface Schema {
      */
     snippet?: boolean;
     /**
-     * The target to apply service worker to.
+     * The target to apply web worker to.
      */
     target?: string;
 }
