@@ -7,12 +7,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const ts = require("../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 const ast_utils_1 = require("../utility/ast-utils");
 const dependencies_1 = require("../utility/dependencies");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
+const paths_1 = require("../utility/paths");
 const project_targets_1 = require("../utility/project-targets");
 const workspace_1 = require("../utility/workspace");
 function addDependencies() {
@@ -108,15 +110,17 @@ function default_1(options) {
         const config = buildConfiguration || buildOptions;
         const root = project.root;
         config.serviceWorker = true;
-        config.ngswConfigPath = `${root && !root.endsWith('/') ? root + '/' : root}ngsw-config.json`;
-        const relativePathToWorkspaceRoot = project.root ?
-            project.root.split('/').filter(x => x !== '').map(x => '..').join('/') : '.';
+        config.ngswConfigPath = core_1.join(core_1.normalize(root), 'ngsw-config.json');
         let { resourcesOutputPath = '' } = config;
         if (resourcesOutputPath) {
-            resourcesOutputPath = '/' + resourcesOutputPath.split('/').filter(x => !!x).join('/');
+            resourcesOutputPath = core_1.normalize(`/${resourcesOutputPath}`);
         }
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            schematics_1.applyTemplates({ ...options, resourcesOutputPath, relativePathToWorkspaceRoot }),
+            schematics_1.applyTemplates({
+                ...options,
+                resourcesOutputPath,
+                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(project.root),
+            }),
             schematics_1.move(project.root),
         ]);
         context.addTask(new tasks_1.NodePackageInstallTask());
