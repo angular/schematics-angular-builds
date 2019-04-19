@@ -14,7 +14,6 @@ const dependencies_1 = require("../utility/dependencies");
 const json_utils_1 = require("../utility/json-utils");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
-const paths_1 = require("../utility/paths");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
@@ -96,8 +95,7 @@ function addAppToWorkspaceFile(options, newProjectRoot) {
     let projectRoot = options.projectRoot !== undefined
         ? options.projectRoot
         : `${newProjectRoot}/${options.name}`;
-    projectRoot = core_1.normalize(projectRoot);
-    if (projectRoot) {
+    if (projectRoot !== '' && !projectRoot.endsWith('/')) {
         projectRoot += '/';
     }
     const schematics = {};
@@ -262,6 +260,9 @@ function default_1(options) {
         const appDir = isRootApp
             ? options.projectRoot
             : `${newProjectRoot}/${options.name}`;
+        const relativePathToWorkspaceRoot = appDir
+            ? appDir.split('/').map(() => '..').join('/')
+            : '.';
         const sourceDir = `${appDir}/src/app`;
         const e2eOptions = {
             relatedAppName: options.name,
@@ -274,7 +275,7 @@ function default_1(options) {
                 schematics_1.applyTemplates({
                     utils: core_1.strings,
                     ...options,
-                    relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(appDir),
+                    relativePathToWorkspaceRoot,
                     appName: options.name,
                     isRootApp,
                 }),
