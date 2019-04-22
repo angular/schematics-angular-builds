@@ -9,12 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
+const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
-function getE2eRoot(projectRoot) {
-    const root = core_1.normalize(projectRoot);
-    return root ? root + '/e2e' : 'e2e';
-}
 function default_1(options) {
     return async (host) => {
         const appProject = options.relatedAppName;
@@ -23,8 +20,7 @@ function default_1(options) {
         if (!project) {
             throw new schematics_1.SchematicsException(`Project name "${appProject}" doesn't not exist.`);
         }
-        const root = getE2eRoot(project.root);
-        const relativePathToWorkspaceRoot = root.split('/').map(() => '..').join('/');
+        const root = core_1.join(core_1.normalize(project.root), 'e2e');
         project.targets.add({
             name: 'e2e',
             builder: workspace_models_1.Builders.Protractor,
@@ -49,7 +45,7 @@ function default_1(options) {
                 schematics_1.applyTemplates({
                     utils: core_1.strings,
                     ...options,
-                    relativePathToWorkspaceRoot,
+                    relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(root),
                 }),
                 schematics_1.move(root),
             ])),

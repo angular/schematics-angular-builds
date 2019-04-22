@@ -38,18 +38,24 @@ function updateES5Projects() {
         if (!compilerOptions || compilerOptions.kind !== 'object') {
             return host;
         }
-        const scriptTarget = json_utils_1.findPropertyInAstObject(compilerOptions, 'target');
-        if (scriptTarget && scriptTarget.value === 'es2015') {
-            return host;
-        }
         const recorder = host.beginUpdate(tsConfigPath);
-        if (scriptTarget) {
+        const scriptTarget = json_utils_1.findPropertyInAstObject(compilerOptions, 'target');
+        if (!scriptTarget) {
+            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
+        }
+        else if (scriptTarget.value !== 'es2015') {
             const { start, end } = scriptTarget;
             recorder.remove(start.offset, end.offset - start.offset);
             recorder.insertLeft(start.offset, '"es2015"');
         }
-        else {
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
+        const scriptModule = json_utils_1.findPropertyInAstObject(compilerOptions, 'module');
+        if (!scriptModule) {
+            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'module', 'esnext', 4);
+        }
+        else if (scriptModule.value !== 'esnext') {
+            const { start, end } = scriptModule;
+            recorder.remove(start.offset, end.offset - start.offset);
+            recorder.insertLeft(start.offset, '"esnext"');
         }
         host.commitUpdate(recorder);
         return updateBrowserlist;

@@ -13,6 +13,7 @@ const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../utility/dependencies");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
+const paths_1 = require("../utility/paths");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
@@ -151,7 +152,6 @@ function default_1(options) {
         const projectRoot = `${newProjectRoot}/${folderName}`;
         const distRoot = `dist/${folderName}`;
         const sourceDir = `${projectRoot}/src/lib`;
-        const relativePathToWorkspaceRoot = projectRoot.split('/').map(x => '..').join('/');
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             schematics_1.applyTemplates({
                 ...core_1.strings,
@@ -159,7 +159,7 @@ function default_1(options) {
                 packageName,
                 projectRoot,
                 distRoot,
-                relativePathToWorkspaceRoot,
+                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(projectRoot),
                 prefix,
                 angularLatestVersion: latest_versions_1.latestVersions.Angular.replace('~', '').replace('^', ''),
                 folderName,
