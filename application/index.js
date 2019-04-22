@@ -92,11 +92,8 @@ function mergeWithRootTsLint(parentHost) {
         host.overwrite(tsLintPath, JSON.stringify(content.value, undefined, 2));
     };
 }
-function addAppToWorkspaceFile(options, newProjectRoot) {
-    let projectRoot = options.projectRoot !== undefined
-        ? options.projectRoot
-        : `${newProjectRoot}/${options.name}`;
-    projectRoot = core_1.normalize(projectRoot);
+function addAppToWorkspaceFile(options, appDir) {
+    let projectRoot = appDir;
     if (projectRoot) {
         projectRoot += '/';
     }
@@ -126,7 +123,7 @@ function addAppToWorkspaceFile(options, newProjectRoot) {
     }
     const sourceRoot = core_1.join(core_1.normalize(projectRoot), 'src');
     const project = {
-        root: projectRoot,
+        root: core_1.normalize(projectRoot),
         sourceRoot,
         projectType: workspace_models_1.ProjectType.Application,
         prefix: options.prefix || 'app',
@@ -261,14 +258,14 @@ function default_1(options) {
         const isRootApp = options.projectRoot !== undefined;
         const appDir = isRootApp
             ? options.projectRoot
-            : `${newProjectRoot}/${options.name}`;
+            : core_1.join(core_1.normalize(newProjectRoot), options.name);
         const sourceDir = `${appDir}/src/app`;
         const e2eOptions = {
             relatedAppName: options.name,
             rootSelector: appRootSelector,
         };
         return schematics_1.chain([
-            addAppToWorkspaceFile(options, newProjectRoot),
+            addAppToWorkspaceFile(options, appDir),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
                 options.minimal ? schematics_1.filter(minimalPathFilter) : schematics_1.noop(),
                 schematics_1.applyTemplates({

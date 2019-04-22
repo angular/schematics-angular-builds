@@ -32,7 +32,7 @@ function updateConfigFile(options, tsConfigDirectory) {
                 builder: workspace_models_1.Builders.Server,
                 options: {
                     outputPath: `dist/${options.clientProject}-server`,
-                    main: `${clientProject.root}src/main.server.ts`,
+                    main: core_1.join(core_1.normalize(clientProject.root), 'src/main.server.ts'),
                     tsConfig: core_1.join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
                 },
                 configurations: {

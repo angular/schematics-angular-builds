@@ -149,7 +149,7 @@ function default_1(options) {
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
         const scopeFolder = scopeName ? core_1.strings.dasherize(scopeName) + '/' : '';
         const folderName = `${scopeFolder}${core_1.strings.dasherize(options.name)}`;
-        const projectRoot = `${newProjectRoot}/${folderName}`;
+        const projectRoot = core_1.join(core_1.normalize(newProjectRoot), folderName);
         const distRoot = `dist/${folderName}`;
         const sourceDir = `${projectRoot}/src/lib`;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
