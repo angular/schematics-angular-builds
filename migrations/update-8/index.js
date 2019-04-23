@@ -11,6 +11,7 @@ const schematics_1 = require("@angular-devkit/schematics");
 const codelyzer_5_1 = require("./codelyzer-5");
 const differential_loading_1 = require("./differential-loading");
 const drop_es6_polyfills_1 = require("./drop-es6-polyfills");
+const remove_angular_http_1 = require("./remove-angular-http");
 const update_builders_1 = require("./update-builders");
 var update_lazy_module_paths_1 = require("./update-lazy-module-paths");
 exports.updateLazyModulePaths = update_lazy_module_paths_1.updateLazyModulePaths;
@@ -22,6 +23,7 @@ function default_1() {
             drop_es6_polyfills_1.dropES2015Polyfills(),
             differential_loading_1.updateES5Projects(),
             update_builders_1.updateBuilders(),
+            remove_angular_http_1.removeAngularHttp(),
         ]);
     };
 }
