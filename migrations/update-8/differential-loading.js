@@ -88,12 +88,18 @@ function updateBrowserlist() {
                 // Skip existing separate E2E projects
                 continue;
             }
-            const browserslistPath = core_1.join(core_1.normalize(project.root), '/browserslist');
+            const browserslistPath = core_1.join(core_1.normalize(project.root), 'browserslist');
+            if (typeof project.sourceRoot === 'string') {
+                const srcBrowsersList = core_1.join(core_1.normalize(project.sourceRoot), 'browserslist');
+                if (tree.exists(srcBrowsersList)) {
+                    tree.rename(srcBrowsersList, browserslistPath);
+                }
+            }
             const source = tree.read(browserslistPath);
             if (!source) {
                 tree.create(browserslistPath, browserslistContent);
             }
-            else {
+            else if (!source.toString().toLowerCase().includes('chrome 41')) {
                 const recorder = tree.beginUpdate(browserslistPath);
                 recorder.insertRight(source.length, '\nChrome 41 # Googlebot');
                 tree.commitUpdate(recorder);
