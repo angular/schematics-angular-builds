@@ -9,6 +9,4 @@ import { RuleFailure, Rules } from 'tslint';
 import * as ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 export declare class Rule extends Rules.AbstractRule {
     apply(ast: ts.SourceFile): Array<RuleFailure>;
-    private _promiseReplacement;
-    private _getChunks;
 }
