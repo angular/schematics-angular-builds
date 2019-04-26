@@ -26,6 +26,16 @@ function updateBuilders() {
                 overwrite: true,
             });
         }
+        current = dependencies_1.getPackageJsonDependency(host, 'zone.js');
+        if (current && current.version !== latest_versions_1.latestVersions.ZoneJs) {
+            updates = true;
+            dependencies_1.addPackageJsonDependency(host, {
+                type: current.type,
+                name: 'zone.js',
+                version: latest_versions_1.latestVersions.ZoneJs,
+                overwrite: true,
+            });
+        }
         if (updates) {
             context.addTask(new tasks_1.NodePackageInstallTask());
         }

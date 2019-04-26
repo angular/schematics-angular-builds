@@ -65,7 +65,7 @@ exports.updatePackageJson = () => {
         const dependency = {
             type: dependencies_1.NodeDependencyType.Dev,
             name: 'codelyzer',
-            version: '^5.0.0',
+            version: '^5.0.1',
             overwrite: true,
         };
         dependencies_1.addPackageJsonDependency(host, dependency);
