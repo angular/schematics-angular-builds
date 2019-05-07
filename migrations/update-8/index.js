@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const schematics_1 = require("@angular-devkit/schematics");
+const tasks_1 = require("@angular-devkit/schematics/tasks");
 const codelyzer_5_1 = require("./codelyzer-5");
 const differential_loading_1 = require("./differential-loading");
 const drop_es6_polyfills_1 = require("./drop-es6-polyfills");
@@ -24,6 +25,12 @@ function default_1() {
             differential_loading_1.updateES5Projects(),
             update_builders_1.updateBuilders(),
             remove_angular_http_1.removeAngularHttp(),
+            (tree, context) => {
+                const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
+                if (packageChanges) {
+                    context.addTask(new tasks_1.NodePackageInstallTask());
+                }
+            },
         ]);
     };
 }
