@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
-const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../../utility/dependencies");
 const json_utils_1 = require("../../utility/json-utils");
 const ruleMapping = {
@@ -61,7 +60,7 @@ exports.updateTsLintConfig = () => {
     };
 };
 exports.updatePackageJson = () => {
-    return (host, context) => {
+    return (host) => {
         const dependency = {
             type: dependencies_1.NodeDependencyType.Dev,
             name: 'codelyzer',
@@ -69,7 +68,5 @@ exports.updatePackageJson = () => {
             overwrite: true,
         };
         dependencies_1.addPackageJsonDependency(host, dependency);
-        context.addTask(new tasks_1.NodePackageInstallTask());
-        return host;
     };
 };
