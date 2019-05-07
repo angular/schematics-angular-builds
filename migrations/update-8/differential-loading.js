@@ -29,16 +29,8 @@ not IE 9-11 # For IE 9-11 support, remove 'not'.`;
 function updateES5Projects() {
     return (host) => {
         const tsConfigPath = '/tsconfig.json';
-        const buffer = host.read(tsConfigPath);
-        if (!buffer) {
-            return host;
-        }
-        const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
-        if (tsCfgAst.kind !== 'object') {
-            return host;
-        }
-        const compilerOptions = json_utils_1.findPropertyInAstObject(tsCfgAst, 'compilerOptions');
-        if (!compilerOptions || compilerOptions.kind !== 'object') {
+        const compilerOptions = getCompilerOptionsAstObject(host, tsConfigPath);
+        if (!compilerOptions) {
             return host;
         }
         const recorder = host.beginUpdate(tsConfigPath);
@@ -61,11 +53,11 @@ function updateES5Projects() {
             recorder.insertLeft(start.offset, '"esnext"');
         }
         host.commitUpdate(recorder);
-        return updateBrowserlist;
+        return updateProjects;
     };
 }
 exports.updateES5Projects = updateES5Projects;
-function updateBrowserlist() {
+function updateProjects() {
     return (tree) => {
         const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
         if (!angularConfigContent) {
@@ -87,6 +79,31 @@ function updateBrowserlist() {
             if (name.endsWith('-e2e')) {
                 // Skip existing separate E2E projects
                 continue;
+            }
+            // Older projects app and spec ts configs had script and module set in them.
+            const tsConfigs = [];
+            const architect = project.architect;
+            if (core_1.isJsonObject(architect)
+                && core_1.isJsonObject(architect.build)
+                && core_1.isJsonObject(architect.build.options)
+                && typeof architect.build.options.tsConfig === 'string') {
+                tsConfigs.push(architect.build.options.tsConfig);
+            }
+            if (core_1.isJsonObject(architect)
+                && core_1.isJsonObject(architect.test)
+                && core_1.isJsonObject(architect.test.options)
+                && typeof architect.test.options.tsConfig === 'string') {
+                tsConfigs.push(architect.test.options.tsConfig);
+            }
+            for (const tsConfig of tsConfigs) {
+                const compilerOptions = getCompilerOptionsAstObject(tree, tsConfig);
+                if (!compilerOptions) {
+                    continue;
+                }
+                const recorder = tree.beginUpdate(tsConfig);
+                json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'target');
+                json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'module');
+                tree.commitUpdate(recorder);
             }
             const browserslistPath = core_1.join(core_1.normalize(project.root), 'browserslist');
             if (typeof project.sourceRoot === 'string') {
@@ -119,4 +136,19 @@ function updateBrowserlist() {
         }
         return tree;
     };
+}
+function getCompilerOptionsAstObject(host, tsConfigPath) {
+    const buffer = host.read(tsConfigPath);
+    if (!buffer) {
+        return;
+    }
+    const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
+    if (tsCfgAst.kind !== 'object') {
+        return;
+    }
+    const compilerOptions = json_utils_1.findPropertyInAstObject(tsCfgAst, 'compilerOptions');
+    if (!compilerOptions || compilerOptions.kind !== 'object') {
+        return;
+    }
+    return compilerOptions;
 }
