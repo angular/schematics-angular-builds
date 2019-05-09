@@ -155,7 +155,7 @@ function getTsConfigOutDir(host, tsConfigPath) {
         throw new schematics_1.SchematicsException(`Could not read ${tsConfigPath}`);
     }
     const tsConfigContent = tsConfigBuffer.toString();
-    const tsConfig = core_1.parseJson(tsConfigContent);
+    const tsConfig = core_1.parseJson(tsConfigContent, core_1.JsonParseMode.Loose);
     if (tsConfig === null || typeof tsConfig !== 'object' || Array.isArray(tsConfig) ||
         tsConfig.compilerOptions === null || typeof tsConfig.compilerOptions !== 'object' ||
         Array.isArray(tsConfig.compilerOptions)) {
