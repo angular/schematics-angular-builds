@@ -156,10 +156,7 @@ function nodesByPosition(first, second) {
 function insertAfterLastOccurrence(nodes, toInsert, file, fallbackPos, syntaxKind) {
     // sort() has a side effect, so make a copy so that we won't overwrite the parent's object.
     let lastItem = [...nodes].sort(nodesByPosition).pop();
-    if (!lastItem) {
-        throw new Error();
-    }
-    if (syntaxKind) {
+    if (syntaxKind && lastItem) {
         lastItem = findNodes(lastItem, syntaxKind).sort(nodesByPosition).pop();
     }
     if (!lastItem && fallbackPos == undefined) {
