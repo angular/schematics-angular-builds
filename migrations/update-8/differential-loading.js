@@ -77,19 +77,23 @@ function updateProjects() {
                 continue;
             }
             // Older projects app and spec ts configs had script and module set in them.
-            const tsConfigs = [];
             const architect = project.architect;
-            if (core_1.isJsonObject(architect)
+            if (!(core_1.isJsonObject(architect)
                 && core_1.isJsonObject(architect.build)
-                && core_1.isJsonObject(architect.build.options)
-                && typeof architect.build.options.tsConfig === 'string') {
-                tsConfigs.push(architect.build.options.tsConfig);
+                && architect.build.builder === '@angular-devkit/build-angular:browser')) {
+                // Skip projects who's build builder is not build-angular:browser
+                continue;
             }
-            if (core_1.isJsonObject(architect)
-                && core_1.isJsonObject(architect.test)
-                && core_1.isJsonObject(architect.test.options)
-                && typeof architect.test.options.tsConfig === 'string') {
-                tsConfigs.push(architect.test.options.tsConfig);
+            const tsConfigs = [];
+            const buildOptionsConfig = architect.build.options;
+            if (core_1.isJsonObject(buildOptionsConfig) && typeof buildOptionsConfig.tsConfig === 'string') {
+                tsConfigs.push(buildOptionsConfig.tsConfig);
+            }
+            const testConfig = architect.test;
+            if (core_1.isJsonObject(testConfig)
+                && core_1.isJsonObject(testConfig.options)
+                && typeof testConfig.options.tsConfig === 'string') {
+                tsConfigs.push(testConfig.options.tsConfig);
             }
             for (const tsConfig of tsConfigs) {
                 const compilerOptions = getCompilerOptionsAstObject(tree, tsConfig);
