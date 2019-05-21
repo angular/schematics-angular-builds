@@ -23,38 +23,9 @@ Firefox ESR
 not dead
 not IE 9-11 # For IE 9-11 support, remove 'not'.`;
 function updateES5Projects() {
-    return (host) => {
-        const tsConfigPath = '/tsconfig.json';
-        const compilerOptions = getCompilerOptionsAstObject(host, tsConfigPath);
-        if (!compilerOptions) {
-            return host;
-        }
-        const recorder = host.beginUpdate(tsConfigPath);
-        const scriptTarget = json_utils_1.findPropertyInAstObject(compilerOptions, 'target');
-        if (!scriptTarget) {
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
-        }
-        else if (scriptTarget.value !== 'es2015') {
-            const { start, end } = scriptTarget;
-            recorder.remove(start.offset, end.offset - start.offset);
-            recorder.insertLeft(start.offset, '"es2015"');
-        }
-        const scriptModule = json_utils_1.findPropertyInAstObject(compilerOptions, 'module');
-        if (!scriptModule) {
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'module', 'esnext', 4);
-        }
-        else if (scriptModule.value !== 'esnext') {
-            const { start, end } = scriptModule;
-            recorder.remove(start.offset, end.offset - start.offset);
-            recorder.insertLeft(start.offset, '"esnext"');
-        }
-        host.commitUpdate(recorder);
-        return updateProjects;
-    };
-}
-exports.updateES5Projects = updateES5Projects;
-function updateProjects() {
     return (tree) => {
+        // update workspace tsconfig
+        updateTsConfig(tree, '/tsconfig.json');
         const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
         if (!angularConfigContent) {
             return;
@@ -84,26 +55,15 @@ function updateProjects() {
                 // Skip projects who's build builder is not build-angular:browser
                 continue;
             }
-            const tsConfigs = [];
             const buildOptionsConfig = architect.build.options;
             if (core_1.isJsonObject(buildOptionsConfig) && typeof buildOptionsConfig.tsConfig === 'string') {
-                tsConfigs.push(buildOptionsConfig.tsConfig);
+                updateTsConfig(tree, buildOptionsConfig.tsConfig);
             }
             const testConfig = architect.test;
             if (core_1.isJsonObject(testConfig)
                 && core_1.isJsonObject(testConfig.options)
                 && typeof testConfig.options.tsConfig === 'string') {
-                tsConfigs.push(testConfig.options.tsConfig);
-            }
-            for (const tsConfig of tsConfigs) {
-                const compilerOptions = getCompilerOptionsAstObject(tree, tsConfig);
-                if (!compilerOptions) {
-                    continue;
-                }
-                const recorder = tree.beginUpdate(tsConfig);
-                json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'target');
-                json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'module');
-                tree.commitUpdate(recorder);
+                updateTsConfig(tree, testConfig.options.tsConfig);
             }
             const browserslistPath = core_1.join(core_1.normalize(project.root), 'browserslist');
             if (typeof project.sourceRoot === 'string') {
@@ -131,8 +91,9 @@ function updateProjects() {
         return tree;
     };
 }
-function getCompilerOptionsAstObject(host, tsConfigPath) {
-    const buffer = host.read(tsConfigPath);
+exports.updateES5Projects = updateES5Projects;
+function updateTsConfig(tree, tsConfigPath) {
+    const buffer = tree.read(tsConfigPath);
     if (!buffer) {
         return;
     }
@@ -140,9 +101,36 @@ function getCompilerOptionsAstObject(host, tsConfigPath) {
     if (tsCfgAst.kind !== 'object') {
         return;
     }
+    const configExtends = json_utils_1.findPropertyInAstObject(tsCfgAst, 'extends');
+    const isExtendedConfig = configExtends && configExtends.kind === 'string';
     const compilerOptions = json_utils_1.findPropertyInAstObject(tsCfgAst, 'compilerOptions');
     if (!compilerOptions || compilerOptions.kind !== 'object') {
         return;
     }
-    return compilerOptions;
+    const recorder = tree.beginUpdate(tsConfigPath);
+    if (isExtendedConfig) {
+        json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'target');
+        json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'module');
+    }
+    else {
+        const scriptTarget = json_utils_1.findPropertyInAstObject(compilerOptions, 'target');
+        if (!scriptTarget) {
+            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
+        }
+        else if (scriptTarget.value !== 'es2015') {
+            const { start, end } = scriptTarget;
+            recorder.remove(start.offset, end.offset - start.offset);
+            recorder.insertLeft(start.offset, '"es2015"');
+        }
+        const scriptModule = json_utils_1.findPropertyInAstObject(compilerOptions, 'module');
+        if (!scriptModule) {
+            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'module', 'esnext', 4);
+        }
+        else if (scriptModule.value !== 'esnext') {
+            const { start, end } = scriptModule;
+            recorder.remove(start.offset, end.offset - start.offset);
+            recorder.insertLeft(start.offset, '"esnext"');
+        }
+    }
+    tree.commitUpdate(recorder);
 }
