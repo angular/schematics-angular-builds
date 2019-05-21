@@ -49,9 +49,11 @@ function addSnippet(options) {
         if (options.path === undefined) {
             return;
         }
+        const fileRegExp = new RegExp(`^${options.name}.*\.ts`);
         const siblingModules = host.getDir(options.path).subfiles
-            // Find all files that start with the same name, are ts files, and aren't spec files.
-            .filter(f => f.startsWith(options.name) && f.endsWith('.ts') && !f.endsWith('spec.ts'))
+            // Find all files that start with the same name, are ts files,
+            // and aren't spec or module files.
+            .filter(f => fileRegExp.test(f) && !/(module|spec)\.ts$/.test(f))
             // Sort alphabetically for consistency.
             .sort();
         if (siblingModules.length === 0) {
