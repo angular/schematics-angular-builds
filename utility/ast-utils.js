@@ -244,7 +244,8 @@ function getDecoratorMetadata(source, identifier, module) {
         .filter(expr => {
         if (expr.expression.kind == ts.SyntaxKind.Identifier) {
             const id = expr.expression;
-            return id.text == identifier && angularImports[id.text] === module;
+            return id.getFullText(source) == identifier
+                && angularImports[id.getFullText(source)] === module;
         }
         else if (expr.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
             // This covers foo.NgModule when importing * as foo.
@@ -254,7 +255,7 @@ function getDecoratorMetadata(source, identifier, module) {
                 return false;
             }
             const id = paExpr.name.text;
-            const moduleId = paExpr.expression.text;
+            const moduleId = paExpr.expression.getText(source);
             return id === identifier && (angularImports[moduleId + '.'] === module);
         }
         return false;
