@@ -73,6 +73,11 @@ function addDependenciesToPackageJson() {
                 version: '^5.1.0',
             },
             {
+                type: dependencies_1.NodeDependencyType.Dev,
+                name: 'tsickle',
+                version: '^0.35.0',
+            },
+            {
                 type: dependencies_1.NodeDependencyType.Default,
                 name: 'tslib',
                 version: latest_versions_1.latestVersions.TsLib,
