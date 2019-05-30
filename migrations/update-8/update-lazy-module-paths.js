@@ -8,7 +8,7 @@ function* visit(directory) {
             if (entry) {
                 const content = entry.content;
                 if (content.includes('loadChildren')) {
-                    const source = ts.createSourceFile(entry.path, content.toString().replace(/^\uFEFF/, ''), ts.ScriptTarget.Latest, true);
+                    const source = ts.createSourceFile(entry.path, content.toString(), ts.ScriptTarget.Latest, true);
                     yield source;
                 }
             }
