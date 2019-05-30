@@ -84,7 +84,7 @@ function dropES2015PolyfillsFromFile(polyfillPath) {
             // no action required if no mention of core-js
             return;
         }
-        const sourceFile = ts.createSourceFile(polyfillPath, content, ts.ScriptTarget.Latest, true);
+        const sourceFile = ts.createSourceFile(polyfillPath, content.replace(/^\uFEFF/, ''), ts.ScriptTarget.Latest, true);
         const imports = sourceFile.statements
             .filter(s => s.kind === ts.SyntaxKind.ImportDeclaration);
         if (imports.length === 0) {

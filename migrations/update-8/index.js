@@ -13,7 +13,7 @@ const codelyzer_5_1 = require("./codelyzer-5");
 const differential_loading_1 = require("./differential-loading");
 const drop_es6_polyfills_1 = require("./drop-es6-polyfills");
 const remove_angular_http_1 = require("./remove-angular-http");
-const update_builders_1 = require("./update-builders");
+const update_dependencies_1 = require("./update-dependencies");
 var update_lazy_module_paths_1 = require("./update-lazy-module-paths");
 exports.updateLazyModulePaths = update_lazy_module_paths_1.updateLazyModulePaths;
 function default_1() {
@@ -23,7 +23,7 @@ function default_1() {
             codelyzer_5_1.updatePackageJson(),
             drop_es6_polyfills_1.dropES2015Polyfills(),
             differential_loading_1.updateES5Projects(),
-            update_builders_1.updateBuilders(),
+            update_dependencies_1.updateDependencies(),
             remove_angular_http_1.removeAngularHttp(),
             (tree, context) => {
                 const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
