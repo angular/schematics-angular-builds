@@ -66,25 +66,15 @@ function updateES5Projects() {
                 updateTsConfig(tree, testConfig.options.tsConfig);
             }
             const browserslistPath = core_1.join(core_1.normalize(project.root), 'browserslist');
-            if (typeof project.sourceRoot === 'string') {
-                // Move the CLI 7 style browserlist to root if it's there.
-                const srcBrowsersList = core_1.join(core_1.normalize(project.sourceRoot), 'browserslist');
-                if (tree.exists(srcBrowsersList) && !tree.exists(browserslistPath)) {
-                    // TODO: use rename instead.
-                    // This is a hacky workaround. We should be able to just rename it.
-                    // On unit tests the rename works fine but on real projects it fails with
-                    //     ERROR! browserslist does not exist..
-                    // This seems to happen because we are both renaming and then commiting an update.
-                    // But it's fine if we read/create/delete. There's a bug somewhere.
-                    // tree.rename(srcBrowsersList, browserslistPath);
-                    const content = tree.read(srcBrowsersList);
-                    if (content) {
-                        tree.create(browserslistPath, content);
-                        tree.delete(srcBrowsersList);
-                    }
-                }
+            // Move the CLI 7 style browserlist to root if it's there.
+            const sourceRoot = project.sourceRoot === 'string'
+                ? project.sourceRoot
+                : core_1.join(core_1.normalize(project.root), 'src');
+            const srcBrowsersList = core_1.join(core_1.normalize(sourceRoot), 'browserslist');
+            if (tree.exists(srcBrowsersList)) {
+                tree.rename(srcBrowsersList, browserslistPath);
             }
-            if (!tree.exists(browserslistPath)) {
+            else if (!tree.exists(browserslistPath)) {
                 tree.create(browserslistPath, browserslistContent);
             }
         }
