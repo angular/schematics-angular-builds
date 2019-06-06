@@ -17,4 +17,7 @@ exports.latestVersions = {
     // The versions below must be manually updated when making a new devkit release.
     DevkitBuildAngular: '~0.800.0',
     DevkitBuildNgPackagr: '~0.800.0',
+    DevkitBuildWebpack: '~0.800.0',
+    tsickle: '^0.35.0',
+    ngPackagr: '^5.1.0',
 };

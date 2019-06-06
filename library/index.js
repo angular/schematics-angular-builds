@@ -70,12 +70,12 @@ function addDependenciesToPackageJson() {
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: 'ng-packagr',
-                version: '^5.1.0',
+                version: latest_versions_1.latestVersions.ngPackagr,
             },
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: 'tsickle',
-                version: '^0.35.0',
+                version: latest_versions_1.latestVersions.tsickle,
             },
             {
                 type: dependencies_1.NodeDependencyType.Default,

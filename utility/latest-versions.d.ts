@@ -13,4 +13,7 @@ export declare const latestVersions: {
     TsLib: string;
     DevkitBuildAngular: string;
     DevkitBuildNgPackagr: string;
+    DevkitBuildWebpack: string;
+    tsickle: string;
+    ngPackagr: string;
 };
