@@ -42,7 +42,7 @@ function default_1(options) {
         schematics_1.mergeWith(schematics_1.apply(schematics_1.empty(), [
             schematics_1.schematic('workspace', workspaceOptions),
             options.createApplication ? schematics_1.schematic('application', applicationOptions) : schematics_1.noop,
-            schematics_1.move(options.directory || options.name),
+            schematics_1.move(options.directory),
         ])),
         (_host, context) => {
             let packageTask;
