@@ -101,8 +101,18 @@ function updateTsConfig(tree, tsConfigPath) {
     if (isExtendedConfig) {
         json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'target');
         json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'module');
+        json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'downlevelIteration');
     }
     else {
+        const downlevelIteration = json_utils_1.findPropertyInAstObject(compilerOptions, 'downlevelIteration');
+        if (!downlevelIteration) {
+            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'downlevelIteration', true, 4);
+        }
+        else if (!downlevelIteration.value) {
+            const { start, end } = downlevelIteration;
+            recorder.remove(start.offset, end.offset - start.offset);
+            recorder.insertLeft(start.offset, 'true');
+        }
         const scriptTarget = json_utils_1.findPropertyInAstObject(compilerOptions, 'target');
         if (!scriptTarget) {
             json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'target', 'es2015', 4);
