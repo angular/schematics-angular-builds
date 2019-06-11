@@ -204,7 +204,7 @@ function addAppToWorkspaceFile(options, appDir) {
                     scripts: [],
                 },
             },
-            lint: options.minimal ? undefined : {
+            lint: {
                 builder: workspace_models_1.Builders.TsLint,
                 options: {
                     tsConfig: [
