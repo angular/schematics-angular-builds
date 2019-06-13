@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.latestVersions = {
     // These versions should be kept up to date with latest Angular peer dependencies.
-    Angular: '~8.0.0',
+    Angular: '~8.0.1',
     RxJs: '~6.4.0',
     ZoneJs: '~0.9.1',
     TypeScript: '~3.4.3',
