@@ -17,9 +17,7 @@ function addConfig(options, root, tsConfigPath) {
     return (host, context) => {
         context.logger.debug('updating project configuration.');
         // Add worker glob exclusion to tsconfig.app.json.
-        // Projects pre version 8 should to have tsconfig.app.json inside their application
-        const isInSrc = core_1.dirname(core_1.normalize(tsConfigPath)).endsWith('src');
-        const workerGlob = `${isInSrc ? '' : 'src/'}**/*.worker.ts`;
+        const workerGlob = 'src/**/*.worker.ts';
         const buffer = host.read(tsConfigPath);
         if (buffer) {
             const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
