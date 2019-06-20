@@ -63,10 +63,6 @@ export interface Schema {
      */
     skipImport?: boolean;
     /**
-     * Specifies if the component should have a selector or not.
-     */
-    skipSelector?: boolean;
-    /**
      * When true, does not create "spec.ts" test files for the new component.
      */
     skipTests?: boolean;
