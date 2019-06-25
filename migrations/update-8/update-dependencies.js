@@ -9,10 +9,9 @@ function updateDependencies() {
             '@angular-devkit/build-ng-packagr': latest_versions_1.latestVersions.DevkitBuildNgPackagr,
             '@angular-devkit/build-webpack': latest_versions_1.latestVersions.DevkitBuildWebpack,
             'zone.js': latest_versions_1.latestVersions.ZoneJs,
-            'tsickle': latest_versions_1.latestVersions.tsickle,
+            tsickle: latest_versions_1.latestVersions.tsickle,
             'ng-packagr': latest_versions_1.latestVersions.ngPackagr,
-            // FIXME: change to ^2.3.2 as soon as it's released with the pr208 fix
-            'web-animations-js': 'github:angular/web-animations-js#release_pr208',
+            'web-animations-js': '^2.3.2',
         };
         for (const [name, version] of Object.entries(dependenciesToUpdate)) {
             const current = dependencies_1.getPackageJsonDependency(host, name);
