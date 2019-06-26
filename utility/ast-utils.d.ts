@@ -55,6 +55,7 @@ export declare function getDecoratorMetadata(source: ts.SourceFile, identifier: 
  * @returns the name of the first @NgModule, or `undefined` if none is found
  */
 export declare function getFirstNgModuleName(source: ts.SourceFile): string | undefined;
+export declare function getMetadataField(node: ts.ObjectLiteralExpression, metadataField: string): ts.ObjectLiteralElement[];
 export declare function addSymbolToNgModuleMetadata(source: ts.SourceFile, ngModulePath: string, metadataField: string, symbolName: string, importPath?: string | null): Change[];
 /**
  * Custom function to insert a declaration (component, pipe, directive)
@@ -85,3 +86,11 @@ export declare function addEntryComponentToModule(source: ts.SourceFile, moduleP
  * Determine if an import already exists.
  */
 export declare function isImported(source: ts.SourceFile, classifiedName: string, importPath: string): boolean;
+/**
+ * Returns the RouterModule declaration from NgModule metadata, if any.
+ */
+export declare function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined;
+/**
+ * Adds a new route declaration to a router module (i.e. has a RouterModule declaration)
+ */
+export declare function addRouteDeclarationToModule(source: ts.SourceFile, fileToAdd: string, routeLiteral: string): Change;

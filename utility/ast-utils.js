@@ -292,6 +292,17 @@ function getFirstNgModuleName(source) {
     return moduleClass.name.text;
 }
 exports.getFirstNgModuleName = getFirstNgModuleName;
+function getMetadataField(node, metadataField) {
+    return node.properties
+        .filter(prop => ts.isPropertyAssignment(prop))
+        // Filter out every fields that's not "metadataField". Also handles string literals
+        // (but not expressions).
+        .filter(({ name }) => {
+        return (ts.isIdentifier(name) || ts.isStringLiteral(name))
+            && name.getText() === metadataField;
+    });
+}
+exports.getMetadataField = getMetadataField;
 function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbolName, importPath = null) {
     const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
     let node = nodes[0]; // tslint:disable-line:no-any
@@ -300,20 +311,7 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
         return [];
     }
     // Get all the children property assignment of object literals.
-    const matchingProperties = node.properties
-        .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
-        // Filter out every fields that's not "metadataField". Also handles string literals
-        // (but not expressions).
-        .filter((prop) => {
-        const name = prop.name;
-        switch (name.kind) {
-            case ts.SyntaxKind.Identifier:
-                return name.getText(source) == metadataField;
-            case ts.SyntaxKind.StringLiteral:
-                return name.text == metadataField;
-        }
-        return false;
-    });
+    const matchingProperties = getMetadataField(node, metadataField);
     // Get the last node of the array literal.
     if (!matchingProperties) {
         return [];
@@ -485,3 +483,72 @@ function isImported(source, classifiedName, importPath) {
     return matchingNodes.length > 0;
 }
 exports.isImported = isImported;
+/**
+ * Returns the RouterModule declaration from NgModule metadata, if any.
+ */
+function getRouterModuleDeclaration(source) {
+    const result = getDecoratorMetadata(source, 'NgModule', '@angular/core');
+    const node = result[0];
+    const matchingProperties = getMetadataField(node, 'imports');
+    if (!matchingProperties) {
+        return;
+    }
+    const assignment = matchingProperties[0];
+    if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+        return;
+    }
+    const arrLiteral = assignment.initializer;
+    return arrLiteral.elements
+        .filter(el => el.kind === ts.SyntaxKind.CallExpression)
+        .find(el => el.getText().startsWith('RouterModule'));
+}
+exports.getRouterModuleDeclaration = getRouterModuleDeclaration;
+/**
+ * Adds a new route declaration to a router module (i.e. has a RouterModule declaration)
+ */
+function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
+    const routerModuleExpr = getRouterModuleDeclaration(source);
+    if (!routerModuleExpr) {
+        throw new Error(`Couldn't find a route declaration in ${fileToAdd}.`);
+    }
+    const scopeConfigMethodArgs = routerModuleExpr.arguments;
+    if (!scopeConfigMethodArgs.length) {
+        const { line } = source.getLineAndCharacterOfPosition(routerModuleExpr.getStart());
+        throw new Error(`The router module method doesn't have arguments ` +
+            `at line ${line} in ${fileToAdd}`);
+    }
+    let routesArr;
+    const routesArg = scopeConfigMethodArgs[0];
+    // Check if the route declarations array is
+    // an inlined argument of RouterModule or a standalone variable
+    if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
+        routesArr = routesArg;
+    }
+    else {
+        const routesVarName = routesArg.getText();
+        let routesVar;
+        if (routesArg.kind === ts.SyntaxKind.Identifier) {
+            routesVar = source.statements
+                .filter((s) => s.kind === ts.SyntaxKind.VariableStatement)
+                .find((v) => {
+                return v.declarationList.declarations[0].name.getText() === routesVarName;
+            });
+        }
+        if (!routesVar) {
+            const { line } = source.getLineAndCharacterOfPosition(routesArg.getStart());
+            throw new Error(`No route declaration array was found that corresponds ` +
+                `to router module at line ${line} in ${fileToAdd}`);
+        }
+        const arrExpr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression).pop();
+        routesArr = arrExpr;
+    }
+    const occurencesCount = routesArr.elements.length;
+    const text = routesArr.getFullText(source);
+    let route = routeLiteral;
+    if (occurencesCount > 0) {
+        const identation = text.match(/\r?\n(\r?)\s*/) || [];
+        route = `,${identation[0] || ' '}${routeLiteral}`;
+    }
+    return insertAfterLastOccurrence(routesArr.elements, route, fileToAdd, routesArr.elements.pos, ts.SyntaxKind.ObjectLiteralExpression);
+}
+exports.addRouteDeclarationToModule = addRouteDeclarationToModule;
