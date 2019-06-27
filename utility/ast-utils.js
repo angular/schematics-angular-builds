@@ -362,6 +362,7 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
         node = arrLiteral.elements;
     }
     if (!node) {
+        // tslint:disable-next-line: no-console
         console.error('No app module found. Please add your new class to your component.');
         return [];
     }
