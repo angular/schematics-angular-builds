@@ -1,6 +1,6 @@
 {
   "name": "@schematics/angular",
-  "version": "8.1.0-rc.0+4.f9ae8ab",
+  "version": "8.1.0-rc.0+5.faa255a",
   "description": "Schematics specific to Angular",
   "keywords": [
     "angular",
@@ -14,8 +14,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#f9ae8ab56",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#f9ae8ab56"
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#faa255afc",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#faa255afc"
   },
   "repository": {
     "type": "git",
@@ -33,7 +33,6 @@
   "homepage": "https://github.com/angular/angular-cli",
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
       "pre-push": "node ./bin/devkit-admin hooks/pre-push"
     }
   }
