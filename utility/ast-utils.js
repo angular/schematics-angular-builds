@@ -522,7 +522,7 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
     const routesArg = scopeConfigMethodArgs[0];
     // Check if the route declarations array is
     // an inlined argument of RouterModule or a standalone variable
-    if (routesArg.kind === ts.SyntaxKind.ArrayLiteralExpression) {
+    if (ts.isArrayLiteralExpression(routesArg)) {
         routesArr = routesArg;
     }
     else {
@@ -540,8 +540,7 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
             throw new Error(`No route declaration array was found that corresponds ` +
                 `to router module at line ${line} in ${fileToAdd}`);
         }
-        const arrExpr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression).pop();
-        routesArr = arrExpr;
+        routesArr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression, 1)[0];
     }
     const occurencesCount = routesArr.elements.length;
     const text = routesArr.getFullText(source);
