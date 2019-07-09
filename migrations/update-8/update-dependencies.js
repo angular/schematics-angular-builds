@@ -5,6 +5,7 @@ const latest_versions_1 = require("../../utility/latest-versions");
 function updateDependencies() {
     return (host) => {
         const dependenciesToUpdate = {
+            '@angular/pwa': latest_versions_1.latestVersions.AngularPWA,
             '@angular-devkit/build-angular': latest_versions_1.latestVersions.DevkitBuildAngular,
             '@angular-devkit/build-ng-packagr': latest_versions_1.latestVersions.DevkitBuildNgPackagr,
             '@angular-devkit/build-webpack': latest_versions_1.latestVersions.DevkitBuildWebpack,

@@ -18,6 +18,7 @@ exports.latestVersions = {
     DevkitBuildAngular: '~0.801.0',
     DevkitBuildNgPackagr: '~0.801.0',
     DevkitBuildWebpack: '~0.801.0',
+    AngularPWA: '~0.801.0',
     tsickle: '^0.35.0',
     ngPackagr: '^5.1.0',
 };
