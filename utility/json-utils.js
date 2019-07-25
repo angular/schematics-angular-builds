@@ -11,7 +11,7 @@ function appendPropertyInAstObject(recorder, node, propertyName, value, indent) 
         recorder.insertRight(commaIndex, ',');
         index = end.offset;
     }
-    const content = _stringifyContent(value, indentStr);
+    const content = JSON.stringify(value, null, indent).replace(/\n/g, indentStr);
     recorder.insertRight(index, (node.properties.length === 0 && indent ? '\n' : '')
         + ' '.repeat(indent)
         + `"${propertyName}":${indent ? ' ' : ''}${content}`
@@ -49,7 +49,7 @@ function insertPropertyInAstObjectInOrder(recorder, node, propertyName, value, i
     const insertIndex = insertAfterProp === null
         ? node.start.offset + 1
         : insertAfterProp.end.offset + 1;
-    const content = _stringifyContent(value, indentStr);
+    const content = JSON.stringify(value, null, indent).replace(/\n/g, indentStr);
     recorder.insertRight(insertIndex, indentStr
         + `"${propertyName}":${indent ? ' ' : ''}${content}`
         + ',');
@@ -111,7 +111,7 @@ function appendValueInAstArray(recorder, node, value, indent = 4) {
     }
     recorder.insertRight(index, (node.elements.length === 0 && indent ? '\n' : '')
         + ' '.repeat(indent)
-        + _stringifyContent(value, indentStr)
+        + JSON.stringify(value, null, indent).replace(/\n/g, indentStr)
         + indentStr.slice(0, -indent));
 }
 exports.appendValueInAstArray = appendValueInAstArray;
@@ -127,22 +127,4 @@ function findPropertyInAstObject(node, propertyName) {
 exports.findPropertyInAstObject = findPropertyInAstObject;
 function _buildIndent(count) {
     return count ? '\n' + ' '.repeat(count) : '';
-}
-function _stringifyContent(value, indentStr) {
-    // TODO: Add snapshot tests
-    // The 'space' value is 2, because we want to add 2 additional
-    // indents from the 'key' node.
-    // If we use the indent provided we will have double indents: 
-    // "budgets": [
-    //   {
-    //     "type": "initial",
-    //     "maximumWarning": "2mb",
-    //     "maximumError": "5mb"
-    //   },
-    //   {
-    //       "type": "anyComponentStyle",
-    //       'maximumWarning": "5kb"
-    //   }
-    // ]
-    return JSON.stringify(value, null, 2).replace(/\n/g, indentStr);
 }

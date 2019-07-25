@@ -119,7 +119,7 @@ export interface AppConfig {
         /**
          * The type of budget
          */
-        type?: ('bundle' | 'initial' | 'allScript' | 'all' | 'anyScript' | 'any' | 'anyComponentStyle');
+        type?: ('bundle' | 'initial' | 'allScript' | 'all' | 'anyScript' | 'any');
         /**
          * The name of the bundle
          */
