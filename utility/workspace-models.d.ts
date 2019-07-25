@@ -33,8 +33,8 @@ export interface BrowserBuilderBaseOptions {
     index?: string;
     polyfills: string;
     assets?: (object | string)[];
-    styles?: (object | string)[];
-    scripts?: (object | string)[];
+    styles?: string[];
+    scripts?: string[];
     sourceMap?: boolean;
 }
 export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {

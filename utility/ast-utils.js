@@ -74,11 +74,9 @@ exports.insertImport = insertImport;
  * @param node
  * @param kind
  * @param max The maximum number of items to return.
- * @param recursive Continue looking for nodes of kind recursive until end
- * the last child even when node of kind has been found.
  * @return all nodes of kind, or [] if none is found
  */
-function findNodes(node, kind, max = Infinity, recursive = false) {
+function findNodes(node, kind, max = Infinity) {
     if (!node || max == 0) {
         return [];
     }
@@ -87,7 +85,7 @@ function findNodes(node, kind, max = Infinity, recursive = false) {
         arr.push(node);
         max--;
     }
-    if (max > 0 && (recursive || node.kind !== kind)) {
+    if (max > 0) {
         for (const child of node.getChildren()) {
             findNodes(child, kind, max).forEach(node => {
                 if (max > 0) {
