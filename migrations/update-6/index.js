@@ -468,7 +468,6 @@ function extractProjectsConfig(config, tree, logger) {
             projectType: 'application',
         };
         const e2eTargets = {};
-        // tslint:disable-next-line:max-line-length
         const protractorConfig = config && config.e2e && config.e2e.protractor && config.e2e.protractor.config
             ? config.e2e.protractor.config
             : '';

@@ -22,9 +22,11 @@ export declare function insertImport(source: ts.SourceFile, fileToEdit: string, 
  * @param node
  * @param kind
  * @param max The maximum number of items to return.
+ * @param recursive Continue looking for nodes of kind recursive until end
+ * the last child even when node of kind has been found.
  * @return all nodes of kind, or [] if none is found
  */
-export declare function findNodes(node: ts.Node, kind: ts.SyntaxKind, max?: number): ts.Node[];
+export declare function findNodes(node: ts.Node, kind: ts.SyntaxKind, max?: number, recursive?: boolean): ts.Node[];
 /**
  * Get all the nodes from a source.
  * @param sourceFile The source file object.
