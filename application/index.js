@@ -162,7 +162,8 @@ function addAppToWorkspaceFile(options, appDir) {
                         extractLicenses: true,
                         vendorChunk: false,
                         buildOptimizer: true,
-                        budgets: [{
+                        budgets: [
+                            {
                                 type: 'initial',
                                 maximumWarning: '2mb',
                                 maximumError: '5mb',
@@ -171,7 +172,8 @@ function addAppToWorkspaceFile(options, appDir) {
                                 type: 'anyComponentStyle',
                                 maximumWarning: '6kb',
                                 maximumError: '10kb',
-                            }],
+                            }
+                        ],
                     },
                 },
             },
