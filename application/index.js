@@ -245,11 +245,6 @@ function default_1(options) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
         validation_1.validateProjectName(options.name);
-        options.prefix = options.prefix || 'app';
-        // This line and the one above shouldn't be needed, but at the moment they are.
-        // This is because the default value defined in the schema.json file is not
-        // correctly set when this schematic is run from another schematic.
-        options.style = options.style || schema_1.Style.Css;
         const appRootSelector = `${options.prefix}-root`;
         const componentOptions = !options.minimal ?
             {

@@ -101,7 +101,7 @@ function addAppToWorkspaceFile(options, projectRoot, projectName) {
             root: projectRoot,
             sourceRoot: `${projectRoot}/src`,
             projectType: workspace_models_1.ProjectType.Library,
-            prefix: options.prefix || 'lib',
+            prefix: options.prefix,
             targets: {
                 build: {
                     builder: workspace_models_1.Builders.NgPackagr,
@@ -139,7 +139,7 @@ function default_1(options) {
         if (!options.name) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
-        const prefix = options.prefix || 'lib';
+        const prefix = options.prefix;
         validation_1.validateProjectName(options.name);
         // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
         const projectName = options.name;
