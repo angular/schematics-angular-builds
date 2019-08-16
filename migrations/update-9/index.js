@@ -8,11 +8,13 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const schematics_1 = require("@angular-devkit/schematics");
+const ivy_libraries_1 = require("./ivy-libraries");
 const update_workspace_config_1 = require("./update-workspace-config");
 function default_1() {
     return () => {
         return schematics_1.chain([
             update_workspace_config_1.UpdateWorkspaceConfig(),
+            ivy_libraries_1.UpdateLibraries(),
         ]);
     };
 }

@@ -9,7 +9,7 @@ export interface Schema {
     /**
      * Specifies which interfaces to implement.
      */
-    implements?: string[];
+    implements?: Implement[];
     /**
      * When true, applies lint fixes after generating the guard.
      */
@@ -36,4 +36,9 @@ export interface Schema {
      * @deprecated Use "skipTests" instead.
      */
     spec?: boolean;
+}
+export declare enum Implement {
+    CanActivate = "CanActivate",
+    CanActivateChild = "CanActivateChild",
+    CanLoad = "CanLoad"
 }
