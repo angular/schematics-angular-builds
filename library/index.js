@@ -91,7 +91,7 @@ function addDependenciesToPackageJson() {
         return host;
     };
 }
-function addLibToWorkspaceFile(options, projectRoot, projectName) {
+function addAppToWorkspaceFile(options, projectRoot, projectName) {
     return workspace_1.updateWorkspace(workspace => {
         if (workspace.projects.size === 0) {
             workspace.extensions.defaultProject = projectName;
@@ -108,11 +108,6 @@ function addLibToWorkspaceFile(options, projectRoot, projectName) {
                     options: {
                         tsConfig: `${projectRoot}/tsconfig.lib.json`,
                         project: `${projectRoot}/ng-package.json`,
-                    },
-                    configurations: {
-                        production: {
-                            tsConfig: `${projectRoot}/tsconfig.lib.prod.json`,
-                        },
                     },
                 },
                 test: {
@@ -178,7 +173,7 @@ function default_1(options) {
         ]);
         return schematics_1.chain([
             schematics_1.mergeWith(templateSource),
-            addLibToWorkspaceFile(options, projectRoot, projectName),
+            addAppToWorkspaceFile(options, projectRoot, projectName),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(),
             options.skipTsConfig ? schematics_1.noop() : updateTsConfig(packageName, distRoot),
             schematics_1.schematic('module', {

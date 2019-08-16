@@ -137,7 +137,7 @@ function addAppToWorkspaceFile(options, appDir) {
                     main: `${sourceRoot}/main.ts`,
                     polyfills: `${sourceRoot}/polyfills.ts`,
                     tsConfig: `${projectRoot}tsconfig.app.json`,
-                    aot: true,
+                    aot: !!options.enableIvy,
                     assets: [
                         `${sourceRoot}/favicon.ico`,
                         `${sourceRoot}/assets`,

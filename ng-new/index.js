@@ -25,6 +25,7 @@ function default_1(options) {
     const applicationOptions = {
         projectRoot: '',
         name: options.name,
+        enableIvy: options.enableIvy,
         inlineStyle: options.inlineStyle,
         inlineTemplate: options.inlineTemplate,
         prefix: options.prefix,
