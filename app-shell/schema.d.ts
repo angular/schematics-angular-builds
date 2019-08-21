@@ -64,6 +64,7 @@ export interface Schema {
     tsconfigFileName?: string;
     /**
      * The name of related Universal app.
+     * @deprecated This option has no effect.
      */
-    universalProject: string;
+    universalProject?: string;
 }
