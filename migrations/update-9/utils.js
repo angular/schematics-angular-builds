@@ -67,3 +67,29 @@ function getWorkspace(host) {
     return core_1.parseJsonAst(content, core_1.JsonParseMode.Loose);
 }
 exports.getWorkspace = getWorkspace;
+function isIvyEnabled(tree, tsConfigPath) {
+    // In version 9, Ivy is turned on by default
+    // Ivy is opted out only when 'enableIvy' is set to false.
+    const buffer = tree.read(tsConfigPath);
+    if (!buffer) {
+        return true;
+    }
+    const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
+    if (tsCfgAst.kind !== 'object') {
+        return true;
+    }
+    const ngCompilerOptions = json_utils_1.findPropertyInAstObject(tsCfgAst, 'angularCompilerOptions');
+    if (ngCompilerOptions && ngCompilerOptions.kind === 'object') {
+        const enableIvy = json_utils_1.findPropertyInAstObject(ngCompilerOptions, 'enableIvy');
+        if (enableIvy) {
+            return !!enableIvy.value;
+        }
+    }
+    const configExtends = json_utils_1.findPropertyInAstObject(tsCfgAst, 'extends');
+    if (configExtends && configExtends.kind === 'string') {
+        const extendedTsConfigPath = core_1.resolve(core_1.dirname(core_1.normalize(tsConfigPath)), core_1.normalize(configExtends.value));
+        return isIvyEnabled(tree, extendedTsConfigPath);
+    }
+    return true;
+}
+exports.isIvyEnabled = isIvyEnabled;
