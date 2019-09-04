@@ -1,13 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-const core_1 = require("@angular-devkit/core");
 const config_1 = require("../../utility/config");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
@@ -19,7 +11,7 @@ const utils_1 = require("./utils");
  * - Creates a production configuration for VE compilations.
  * - Create a prod tsconfig for which disables Ivy and enables VE compilations.
  */
-function UpdateLibraries() {
+function updateLibraries() {
     return (tree) => {
         const workspacePath = config_1.getWorkspacePath(tree);
         const workspace = utils_1.getWorkspace(tree);
@@ -52,15 +44,7 @@ function UpdateLibraries() {
                 continue;
             }
             // tsConfig for production already exists.
-            const tsConfigContent = tree.read(tsConfigOption.value);
-            if (!tsConfigContent) {
-                continue;
-            }
-            const tsConfigAst = core_1.parseJsonAst(tsConfigContent.toString(), core_1.JsonParseMode.Loose);
-            if (!tsConfigAst || tsConfigAst.kind !== 'object') {
-                // Invalid tsConfig
-                continue;
-            }
+            const tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigOption.value);
             const tsConfigRecorder = tree.beginUpdate(tsConfigOption.value);
             const ngCompilerOptions = json_utils_1.findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
             if (!ngCompilerOptions) {
@@ -89,7 +73,7 @@ function UpdateLibraries() {
         return tree;
     };
 }
-exports.UpdateLibraries = UpdateLibraries;
+exports.updateLibraries = updateLibraries;
 function createTsConfig(tree, tsConfigPath) {
     const tsConfigContent = {
         extends: './tsconfig.lib.json',

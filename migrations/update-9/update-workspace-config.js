@@ -8,7 +8,7 @@ exports.ANY_COMPONENT_STYLE_BUDGET = {
     type: 'anyComponentStyle',
     maximumWarning: '6kb',
 };
-function UpdateWorkspaceConfig() {
+function updateWorkspaceConfig() {
     return (tree) => {
         const workspacePath = config_1.getWorkspacePath(tree);
         const workspace = utils_1.getWorkspace(tree);
@@ -27,7 +27,7 @@ function UpdateWorkspaceConfig() {
         return tree;
     };
 }
-exports.UpdateWorkspaceConfig = UpdateWorkspaceConfig;
+exports.updateWorkspaceConfig = updateWorkspaceConfig;
 function updateAotOption(tree, recorder, builderConfig) {
     const options = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
     if (!options || options.kind !== 'object') {

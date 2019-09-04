@@ -11,14 +11,16 @@ const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const ivy_libraries_1 = require("./ivy-libraries");
 const ngsw_config_1 = require("./ngsw-config");
+const update_app_tsconfigs_1 = require("./update-app-tsconfigs");
 const update_dependencies_1 = require("./update-dependencies");
 const update_workspace_config_1 = require("./update-workspace-config");
 function default_1() {
     return () => {
         return schematics_1.chain([
-            update_workspace_config_1.UpdateWorkspaceConfig(),
-            ivy_libraries_1.UpdateLibraries(),
+            update_workspace_config_1.updateWorkspaceConfig(),
+            ivy_libraries_1.updateLibraries(),
             ngsw_config_1.updateNGSWConfig(),
+            update_app_tsconfigs_1.updateApplicationTsConfigs(),
             update_dependencies_1.updateDependencies(),
             (tree, context) => {
                 const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));

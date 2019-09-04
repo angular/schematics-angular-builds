@@ -1,14 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-const core_1 = require("@angular-devkit/core");
-const schematics_1 = require("@angular-devkit/schematics");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
 const utils_1 = require("./utils");
@@ -25,12 +16,7 @@ function updateNGSWConfig() {
                     continue;
                 }
                 const path = ngswConfigPath.value;
-                const configBuffer = tree.read(path);
-                if (!configBuffer) {
-                    throw new schematics_1.SchematicsException(`Could not find (${path})`);
-                }
-                const content = configBuffer.toString();
-                const ngswConfigAst = core_1.parseJsonAst(content, core_1.JsonParseMode.Loose);
+                const ngswConfigAst = utils_1.readJsonFileAsAstObject(tree, path);
                 if (!ngswConfigAst || ngswConfigAst.kind !== 'object') {
                     continue;
                 }

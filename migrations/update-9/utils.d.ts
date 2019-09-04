@@ -16,4 +16,5 @@ export declare function getTargets(workspace: JsonAstObject, targetName: Exclude
 /** Helper to retreive all the options in various configurations. */
 export declare function getAllOptions(builderConfig: JsonAstObject, configurationsOnly?: boolean): JsonAstObject[];
 export declare function getWorkspace(host: Tree): JsonAstObject;
+export declare function readJsonFileAsAstObject(host: Tree, path: string): JsonAstObject;
 export declare function isIvyEnabled(tree: Tree, tsConfigPath: string): boolean;

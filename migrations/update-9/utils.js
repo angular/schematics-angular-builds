@@ -59,14 +59,22 @@ function getAllOptions(builderConfig, configurationsOnly = false) {
 exports.getAllOptions = getAllOptions;
 function getWorkspace(host) {
     const path = config_1.getWorkspacePath(host);
+    return readJsonFileAsAstObject(host, path);
+}
+exports.getWorkspace = getWorkspace;
+function readJsonFileAsAstObject(host, path) {
     const configBuffer = host.read(path);
     if (!configBuffer) {
         throw new schematics_1.SchematicsException(`Could not find (${path})`);
     }
     const content = configBuffer.toString();
-    return core_1.parseJsonAst(content, core_1.JsonParseMode.Loose);
+    const astContent = core_1.parseJsonAst(content, core_1.JsonParseMode.Loose);
+    if (!astContent || astContent.kind !== 'object') {
+        throw new schematics_1.SchematicsException(`Invalid JSON AST Object (${path})`);
+    }
+    return astContent;
 }
-exports.getWorkspace = getWorkspace;
+exports.readJsonFileAsAstObject = readJsonFileAsAstObject;
 function isIvyEnabled(tree, tsConfigPath) {
     // In version 9, Ivy is turned on by default
     // Ivy is opted out only when 'enableIvy' is set to false.

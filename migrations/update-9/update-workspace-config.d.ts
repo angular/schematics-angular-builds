@@ -3,4 +3,4 @@ export declare const ANY_COMPONENT_STYLE_BUDGET: {
     type: string;
     maximumWarning: string;
 };
-export declare function UpdateWorkspaceConfig(): Rule;
+export declare function updateWorkspaceConfig(): Rule;
