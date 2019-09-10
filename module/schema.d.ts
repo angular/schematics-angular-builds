@@ -31,7 +31,7 @@ export interface Schema {
      */
     project?: string;
     /**
-     * Creates lazy loaded routing module. Requires --module option.
+     * The route path for the lazy loaded module. Requires --module option.
      */
     route?: string;
     /**

@@ -8,8 +8,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const core_1 = require("@angular-devkit/core");
-const MODULE_EXT = '.module.ts';
-const ROUTING_MODULE_EXT = '-routing.module.ts';
+exports.MODULE_EXT = '.module.ts';
+exports.ROUTING_MODULE_EXT = '-routing.module.ts';
 /**
  * Find the module referred by a set of options passed to the schematics.
  */
@@ -17,8 +17,8 @@ function findModuleFromOptions(host, options) {
     if (options.hasOwnProperty('skipImport') && options.skipImport) {
         return undefined;
     }
-    const moduleExt = options.moduleExt || MODULE_EXT;
-    const routingModuleExt = options.routingModuleExt || ROUTING_MODULE_EXT;
+    const moduleExt = options.moduleExt || exports.MODULE_EXT;
+    const routingModuleExt = options.routingModuleExt || exports.ROUTING_MODULE_EXT;
     if (!options.module) {
         const pathToCheck = (options.path || '') + '/' + options.name;
         return core_1.normalize(findModule(host, pathToCheck, moduleExt, routingModuleExt));
@@ -57,7 +57,7 @@ exports.findModuleFromOptions = findModuleFromOptions;
 /**
  * Function to find the "closest" module to a generated file's path.
  */
-function findModule(host, generateDir, moduleExt = MODULE_EXT, routingModuleExt = ROUTING_MODULE_EXT) {
+function findModule(host, generateDir, moduleExt = exports.MODULE_EXT, routingModuleExt = exports.ROUTING_MODULE_EXT) {
     let dir = host.getDir('/' + generateDir);
     let foundRoutingModule = false;
     while (dir) {
