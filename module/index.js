@@ -75,11 +75,16 @@ function addRouteDeclarationToNgModule(options, routingModulePath) {
         return host;
     };
 }
-function getRoutingModulePath(host, modulePath) {
-    const routingModulePath = modulePath.endsWith(find_module_1.ROUTING_MODULE_EXT)
-        ? modulePath
-        : modulePath.replace(find_module_1.MODULE_EXT, find_module_1.ROUTING_MODULE_EXT);
-    return host.exists(routingModulePath) ? core_1.normalize(routingModulePath) : undefined;
+function getRoutingModulePath(host, options) {
+    let path;
+    const modulePath = options.module;
+    const routingModuleName = modulePath.split('.')[0] + '-routing';
+    const { module, ...rest } = options;
+    try {
+        path = find_module_1.findModuleFromOptions(host, { module: routingModuleName, ...rest });
+    }
+    catch (_a) { }
+    return path;
 }
 function buildRoute(options, modulePath) {
     const relativeModulePath = buildRelativeModulePath(options, modulePath);
@@ -95,15 +100,15 @@ function default_1(options) {
         if (options.module) {
             options.module = find_module_1.findModuleFromOptions(host, options);
         }
+        const parsedPath = parse_name_1.parseName(options.path, options.name);
+        options.name = parsedPath.name;
+        options.path = parsedPath.path;
         let routingModulePath;
         const isLazyLoadedModuleGen = options.route && options.module;
         if (isLazyLoadedModuleGen) {
             options.routingScope = schema_1.RoutingScope.Child;
-            routingModulePath = getRoutingModulePath(host, options.module);
+            routingModulePath = getRoutingModulePath(host, options);
         }
-        const parsedPath = parse_name_1.parseName(options.path, options.name);
-        options.name = parsedPath.name;
-        options.path = parsedPath.path;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             options.routing || isLazyLoadedModuleGen && !!routingModulePath
                 ? schematics_1.noop()

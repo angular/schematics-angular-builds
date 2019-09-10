@@ -5,7 +5,7 @@
     "module": "commonjs"
   },
   "files": [
-    "src/<%= stripTsExtension(main) %>.ts"
+    "src/main.server.ts"
   ],
   "angularCompilerOptions": {
     "entryModule": "./<%= rootInSrc ? '' : 'src/' %><%= appDir %>/<%= stripTsExtension(rootModuleFileName) %>#<%= rootModuleClassName %>"
