@@ -13,6 +13,7 @@ const ivy_libraries_1 = require("./ivy-libraries");
 const ngsw_config_1 = require("./ngsw-config");
 const update_app_tsconfigs_1 = require("./update-app-tsconfigs");
 const update_dependencies_1 = require("./update-dependencies");
+const update_server_main_file_1 = require("./update-server-main-file");
 const update_workspace_config_1 = require("./update-workspace-config");
 function default_1() {
     return () => {
@@ -22,6 +23,7 @@ function default_1() {
             ngsw_config_1.updateNGSWConfig(),
             update_app_tsconfigs_1.updateApplicationTsConfigs(),
             update_dependencies_1.updateDependencies(),
+            update_server_main_file_1.updateServerMainFile(),
             (tree, context) => {
                 const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
                 if (packageChanges) {
