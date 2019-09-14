@@ -2,10 +2,7 @@
   "extends": "./<%= tsConfigExtends %>",
   "compilerOptions": {
     "outDir": "<%= outDir %>-server",
-    "module": "commonjs",
-    "types": [
-      "node"
-    ]
+    "module": "commonjs"
   },
   "files": [
     "src/<%= stripTsExtension(main) %>.ts"
