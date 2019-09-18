@@ -13,10 +13,6 @@ export interface Schema {
      */
     newProjectRoot?: string;
     /**
-     * Creates a workspace with stricter TypeScript compiler options.
-     */
-    strict?: boolean;
-    /**
      * The version of the Angular CLI to use.
      */
     version: string;
