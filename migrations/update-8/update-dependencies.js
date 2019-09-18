@@ -10,7 +10,7 @@ function updateDependencies() {
             '@angular-devkit/build-ng-packagr': latest_versions_1.latestVersions.DevkitBuildNgPackagr,
             '@angular-devkit/build-webpack': latest_versions_1.latestVersions.DevkitBuildWebpack,
             'zone.js': latest_versions_1.latestVersions.ZoneJs,
-            tsickle: latest_versions_1.latestVersions.tsickle,
+            tsickle: '^0.37.0',
             'ng-packagr': latest_versions_1.latestVersions.ngPackagr,
             'web-animations-js': '^2.3.2',
         };
