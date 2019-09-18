@@ -15,5 +15,6 @@ export declare const latestVersions: {
     DevkitBuildNgPackagr: string;
     DevkitBuildWebpack: string;
     AngularPWA: string;
+    tsickle: string;
     ngPackagr: string;
 };
