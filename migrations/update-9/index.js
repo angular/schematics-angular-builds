@@ -11,6 +11,7 @@ const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const ivy_libraries_1 = require("./ivy-libraries");
 const ngsw_config_1 = require("./ngsw-config");
+const remove_tsickle_1 = require("./remove-tsickle");
 const update_app_tsconfigs_1 = require("./update-app-tsconfigs");
 const update_dependencies_1 = require("./update-dependencies");
 const update_server_main_file_1 = require("./update-server-main-file");
@@ -24,6 +25,7 @@ function default_1() {
             update_app_tsconfigs_1.updateApplicationTsConfigs(),
             update_dependencies_1.updateDependencies(),
             update_server_main_file_1.updateServerMainFile(),
+            remove_tsickle_1.removeTsickle(),
             (tree, context) => {
                 const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
                 if (packageChanges) {
