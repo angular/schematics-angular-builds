@@ -23,6 +23,9 @@ function updateWorkspaceConfig() {
             updateStyleOrScriptOption('styles', recorder, target);
             updateStyleOrScriptOption('scripts', recorder, target);
         }
+        for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
+            updateOptimizationOption(recorder, target);
+        }
         tree.commitUpdate(recorder);
         return tree;
     };
@@ -99,6 +102,22 @@ function addAnyComponentStyleBudget(recorder, builderConfig) {
         });
         if (!hasAnyComponentStyle) {
             json_utils_1.appendValueInAstArray(recorder, budgetOption, exports.ANY_COMPONENT_STYLE_BUDGET, 16);
+        }
+    }
+}
+function updateOptimizationOption(recorder, builderConfig) {
+    const options = utils_1.getAllOptions(builderConfig, true);
+    for (const option of options) {
+        const optimizationOption = json_utils_1.findPropertyInAstObject(option, 'optimization');
+        if (!optimizationOption) {
+            // add
+            json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'optimization', true, 14);
+            continue;
+        }
+        if (optimizationOption.kind !== 'true') {
+            const { start, end } = optimizationOption;
+            recorder.remove(start.offset, end.offset - start.offset);
+            recorder.insertLeft(start.offset, 'true');
         }
     }
 }

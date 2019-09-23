@@ -40,10 +40,7 @@ function updateConfigFile(options, tsConfigDirectory) {
                     production: {
                         fileReplacements,
                         sourceMap: false,
-                        optimization: {
-                            scripts: false,
-                            styles: true,
-                        },
+                        optimization: true,
                     },
                 },
             });
