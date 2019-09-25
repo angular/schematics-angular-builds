@@ -189,6 +189,7 @@ function default_1(options) {
                 ...core_1.strings,
                 ...options,
                 stripTsExtension: (s) => s.replace(/\.ts$/, ''),
+                hasLocalizePackage: !!dependencies_1.getPackageJsonDependency(host, '@angular/localize'),
             }),
             schematics_1.move(core_1.join(core_1.normalize(clientProject.root), 'src')),
         ]);
