@@ -21,6 +21,7 @@ function default_1(options) {
         version: options.version,
         newProjectRoot: options.newProjectRoot || 'projects',
         minimal: options.minimal,
+        strict: options.strict,
     };
     const applicationOptions = {
         projectRoot: '',

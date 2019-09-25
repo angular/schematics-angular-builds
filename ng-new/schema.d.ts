@@ -61,6 +61,10 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
+     * Creates a workspace with stricter TypeScript compiler options.
+     */
+    strict?: boolean;
+    /**
      * The file extension or preprocessor to use for style files.
      */
     style?: Style;
