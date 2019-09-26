@@ -114,7 +114,7 @@ function addAppToWorkspaceFile(options, appDir) {
         schematics['@schematics/angular:component'] = componentSchematicsOptions;
     }
     if (options.skipTests || options.minimal) {
-        ['class', 'component', 'directive', 'guard', 'module', 'pipe', 'service'].forEach((type) => {
+        ['class', 'component', 'directive', 'guard', 'interceptor', 'module', 'pipe', 'service'].forEach((type) => {
             if (!(`@schematics/angular:${type}` in schematics)) {
                 schematics[`@schematics/angular:${type}`] = {};
             }
