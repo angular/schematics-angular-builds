@@ -12,7 +12,6 @@ function updateDependencies() {
             'zone.js': latest_versions_1.latestVersions.ZoneJs,
             'ng-packagr': latest_versions_1.latestVersions.ngPackagr,
             'web-animations-js': '^2.3.2',
-            'codelyzer': '^5.1.2',
         };
         for (const [name, version] of Object.entries(dependenciesToUpdate)) {
             const current = dependencies_1.getPackageJsonDependency(host, name);
