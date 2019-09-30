@@ -27,12 +27,15 @@ function updateConfigFile(options, tsConfigDirectory) {
             if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
                 fileReplacements = buildTarget.configurations.production.fileReplacements;
             }
+            if (buildTarget && buildTarget.options) {
+                buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
+            }
             const mainPath = options.main;
             clientProject.targets.add({
                 name: 'server',
                 builder: workspace_models_1.Builders.Server,
                 options: {
-                    outputPath: `dist/${options.clientProject}-server`,
+                    outputPath: `dist/${options.clientProject}/server`,
                     main: core_1.join(core_1.normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
                     tsConfig: core_1.join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
                 },
