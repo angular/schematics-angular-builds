@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
+const add_tslib_1 = require("./add-tslib");
 const ivy_libraries_1 = require("./ivy-libraries");
 const ngsw_config_1 = require("./ngsw-config");
 const remove_tsickle_1 = require("./remove-tsickle");
@@ -26,6 +27,7 @@ function default_1() {
             update_dependencies_1.updateDependencies(),
             update_server_main_file_1.updateServerMainFile(),
             remove_tsickle_1.removeTsickle(),
+            add_tslib_1.addTsLib(),
             (tree, context) => {
                 const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
                 if (packageChanges) {
