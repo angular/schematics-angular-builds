@@ -85,10 +85,6 @@ export interface Schema {
      */
     styleext?: string;
     /**
-     * Adds a developer-defined type to the filename, in the format "name.type.ts".
-     */
-    type?: string;
-    /**
      * The view encapsulation strategy to use in the new component.
      */
     viewEncapsulation?: ViewEncapsulation;

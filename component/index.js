@@ -31,16 +31,14 @@ function addDeclarationToNgModule(options) {
         if (options.skipImport || !options.module) {
             return host;
         }
-        options.type = !!options.type ? options.type : 'Component';
         const modulePath = options.module;
         const source = readIntoSourceFile(host, modulePath);
         const componentPath = `/${options.path}/`
             + (options.flat ? '' : core_1.strings.dasherize(options.name) + '/')
             + core_1.strings.dasherize(options.name)
-            + '.'
-            + core_1.strings.dasherize(options.type);
+            + '.component';
         const relativePath = find_module_1.buildRelativePath(modulePath, componentPath);
-        const classifiedName = core_1.strings.classify(options.name) + core_1.strings.classify(options.type);
+        const classifiedName = core_1.strings.classify(`${options.name}Component`);
         const declarationChanges = ast_utils_1.addDeclarationToModule(source, modulePath, classifiedName, relativePath);
         const declarationRecorder = host.beginUpdate(modulePath);
         for (const change of declarationChanges) {
@@ -53,7 +51,7 @@ function addDeclarationToNgModule(options) {
             // Need to refresh the AST because we overwrote the file in the host.
             const source = readIntoSourceFile(host, modulePath);
             const exportRecorder = host.beginUpdate(modulePath);
-            const exportChanges = ast_utils_1.addExportToModule(source, modulePath, core_1.strings.classify(options.name) + core_1.strings.classify(options.type), relativePath);
+            const exportChanges = ast_utils_1.addExportToModule(source, modulePath, core_1.strings.classify(`${options.name}Component`), relativePath);
             for (const change of exportChanges) {
                 if (change instanceof change_1.InsertChange) {
                     exportRecorder.insertLeft(change.pos, change.toAdd);
@@ -65,7 +63,7 @@ function addDeclarationToNgModule(options) {
             // Need to refresh the AST because we overwrote the file in the host.
             const source = readIntoSourceFile(host, modulePath);
             const entryComponentRecorder = host.beginUpdate(modulePath);
-            const entryComponentChanges = ast_utils_1.addEntryComponentToModule(source, modulePath, core_1.strings.classify(options.name) + core_1.strings.classify(options.type), relativePath);
+            const entryComponentChanges = ast_utils_1.addEntryComponentToModule(source, modulePath, core_1.strings.classify(`${options.name}Component`), relativePath);
             for (const change of entryComponentChanges) {
                 if (change instanceof change_1.InsertChange) {
                     entryComponentRecorder.insertLeft(change.pos, change.toAdd);
