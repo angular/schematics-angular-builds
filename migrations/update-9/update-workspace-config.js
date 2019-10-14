@@ -18,6 +18,7 @@ function updateWorkspaceConfig() {
             updateStyleOrScriptOption('scripts', recorder, target);
             addAnyComponentStyleBudget(recorder, target);
             updateAotOption(tree, recorder, target);
+            addBuilderI18NOptions(recorder, target);
         }
         for (const { target } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
             updateStyleOrScriptOption('styles', recorder, target);
@@ -25,12 +26,72 @@ function updateWorkspaceConfig() {
         }
         for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
             updateOptimizationOption(recorder, target);
+            addBuilderI18NOptions(recorder, target);
+        }
+        for (const { target, project } of utils_1.getTargets(workspace, 'extract-i18n', workspace_models_1.Builders.ExtractI18n)) {
+            addProjectI18NOptions(recorder, target, project);
         }
         tree.commitUpdate(recorder);
         return tree;
     };
 }
 exports.updateWorkspaceConfig = updateWorkspaceConfig;
+function addProjectI18NOptions(recorder, builderConfig, projectConfig) {
+    const browserConfig = utils_1.getProjectTarget(projectConfig, 'build', workspace_models_1.Builders.Browser);
+    if (!browserConfig || browserConfig.kind !== 'object') {
+        return;
+    }
+    // browser builder options
+    let locales;
+    const options = utils_1.getAllOptions(browserConfig);
+    for (const option of options) {
+        const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
+        if (!localeId || localeId.kind !== 'string') {
+            continue;
+        }
+        const localeFile = json_utils_1.findPropertyInAstObject(option, 'i18nFile');
+        if (!localeFile || localeFile.kind !== 'string') {
+            continue;
+        }
+        const localIdValue = localeId.value;
+        const localeFileValue = localeFile.value;
+        if (!locales) {
+            locales = {
+                [localIdValue]: localeFileValue,
+            };
+        }
+        else {
+            locales[localIdValue] = localeFileValue;
+        }
+    }
+    if (locales) {
+        // Get sourceLocale from extract-i18n builder
+        const i18nOptions = utils_1.getAllOptions(builderConfig);
+        const sourceLocale = i18nOptions
+            .map(o => {
+            const sourceLocale = json_utils_1.findPropertyInAstObject(o, 'i18nLocale');
+            return sourceLocale && sourceLocale.value;
+        })
+            .find(x => !!x);
+        // Add i18n project configuration
+        json_utils_1.insertPropertyInAstObjectInOrder(recorder, projectConfig, 'i18n', {
+            locales,
+            // tslint:disable-next-line: no-any
+            sourceLocale: sourceLocale,
+        }, 6);
+    }
+}
+function addBuilderI18NOptions(recorder, builderConfig) {
+    const options = utils_1.getAllOptions(builderConfig);
+    for (const option of options) {
+        const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
+        if (!localeId || localeId.kind !== 'string') {
+            continue;
+        }
+        // add new localize option
+        json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'localize', [localeId.value], 12);
+    }
+}
 function updateAotOption(tree, recorder, builderConfig) {
     const options = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
     if (!options || options.kind !== 'object') {

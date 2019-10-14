@@ -8,7 +8,8 @@
 import { JsonAstObject } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
 import { Builders, WorkspaceTargets } from '../../utility/workspace-models';
-/** Get all workspace targets which builder and target names matches the provided. */
+/** Get a project target which builder and target names matches the provided. */
+export declare function getProjectTarget(project: JsonAstObject, targetName: Exclude<keyof WorkspaceTargets, number>, builderName: Builders): JsonAstObject | undefined;
 export declare function getTargets(workspace: JsonAstObject, targetName: Exclude<keyof WorkspaceTargets, number>, builderName: Builders): {
     target: JsonAstObject;
     project: JsonAstObject;

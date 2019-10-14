@@ -11,7 +11,28 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const config_1 = require("../../utility/config");
 const json_utils_1 = require("../../utility/json-utils");
-/** Get all workspace targets which builder and target names matches the provided. */
+/** Get a project target which builder and target names matches the provided. */
+function getProjectTarget(project, targetName, builderName) {
+    const projectRoot = json_utils_1.findPropertyInAstObject(project, 'root');
+    if (!projectRoot || projectRoot.kind !== 'string') {
+        return undefined;
+    }
+    const architect = json_utils_1.findPropertyInAstObject(project, 'architect');
+    if (!architect || architect.kind !== 'object') {
+        return undefined;
+    }
+    const target = json_utils_1.findPropertyInAstObject(architect, targetName);
+    if (!target || target.kind !== 'object') {
+        return undefined;
+    }
+    const builder = json_utils_1.findPropertyInAstObject(target, 'builder');
+    // Projects who's build builder is @angular-devkit/build-ng-packagr
+    if (builder && builder.kind === 'string' && builder.value === builderName) {
+        return target;
+    }
+    return undefined;
+}
+exports.getProjectTarget = getProjectTarget;
 function getTargets(workspace, targetName, builderName) {
     const projects = json_utils_1.findPropertyInAstObject(workspace, 'projects');
     if (!projects || projects.kind !== 'object' || !projects.properties) {
@@ -23,21 +44,8 @@ function getTargets(workspace, targetName, builderName) {
         if (projectConfig.kind !== 'object') {
             continue;
         }
-        const projectRoot = json_utils_1.findPropertyInAstObject(projectConfig, 'root');
-        if (!projectRoot || projectRoot.kind !== 'string') {
-            continue;
-        }
-        const architect = json_utils_1.findPropertyInAstObject(projectConfig, 'architect');
-        if (!architect || architect.kind !== 'object') {
-            continue;
-        }
-        const target = json_utils_1.findPropertyInAstObject(architect, targetName);
-        if (!target || target.kind !== 'object') {
-            continue;
-        }
-        const builder = json_utils_1.findPropertyInAstObject(target, 'builder');
-        // Projects who's build builder is @angular-devkit/build-ng-packagr
-        if (builder && builder.kind === 'string' && builder.value === builderName) {
+        const target = getProjectTarget(projectConfig, targetName, builderName);
+        if (target) {
             targets.push({ target, project: projectConfig });
         }
     }
