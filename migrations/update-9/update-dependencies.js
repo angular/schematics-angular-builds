@@ -5,7 +5,6 @@ const latest_versions_1 = require("../../utility/latest-versions");
 function updateDependencies() {
     return host => {
         const dependenciesToUpdate = {
-            '@angular/pwa': latest_versions_1.latestVersions.AngularPWA,
             '@angular-devkit/build-angular': latest_versions_1.latestVersions.DevkitBuildAngular,
             '@angular-devkit/build-ng-packagr': latest_versions_1.latestVersions.DevkitBuildNgPackagr,
             '@angular-devkit/build-webpack': latest_versions_1.latestVersions.DevkitBuildWebpack,
@@ -26,6 +25,8 @@ function updateDependencies() {
                 overwrite: true,
             });
         }
+        // `@angular/pwa` package is only needed when running `ng-add`.
+        dependencies_1.removePackageJsonDependency(host, '@angular/pwa');
     };
 }
 exports.updateDependencies = updateDependencies;
