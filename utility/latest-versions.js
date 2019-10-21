@@ -12,7 +12,7 @@ exports.latestVersions = {
     Angular: '~9.0.0-next.11',
     RxJs: '~6.5.3',
     ZoneJs: '~0.10.2',
-    TypeScript: '~3.5.3',
+    TypeScript: '~3.6.4',
     TsLib: '^1.10.0',
     // The versions below must be manually updated when making a new devkit release.
     DevkitBuildAngular: '~0.900.0-next.12',
