@@ -167,7 +167,6 @@ function default_1(options) {
                 relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(projectRoot),
                 prefix,
                 angularLatestVersion: latest_versions_1.latestVersions.Angular.replace('~', '').replace('^', ''),
-                tsLibLatestVersion: latest_versions_1.latestVersions.TsLib.replace('~', '').replace('^', ''),
                 folderName,
             }),
             schematics_1.move(projectRoot),
