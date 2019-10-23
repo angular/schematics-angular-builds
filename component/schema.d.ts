@@ -71,19 +71,9 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * When true (the default), generates a  "spec.ts" test file for the new component.
-     * @deprecated Use "skipTests" instead.
-     */
-    spec?: boolean;
-    /**
      * The file extension or preprocessor to use for style files.
      */
     style?: Style;
-    /**
-     * The file extension to use for style files.
-     * @deprecated Use "style" instead.
-     */
-    styleext?: string;
     /**
      * Adds a developer-defined type to the filename, in the format "name.type.ts".
      */
