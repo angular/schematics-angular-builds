@@ -19,7 +19,7 @@ function default_1(options) {
     const workspaceOptions = {
         name: options.name,
         version: options.version,
-        newProjectRoot: options.newProjectRoot,
+        newProjectRoot: options.newProjectRoot || 'projects',
         minimal: options.minimal,
         strict: options.strict,
     };
