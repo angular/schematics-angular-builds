@@ -17,7 +17,6 @@ const lint_fix_1 = require("../utility/lint-fix");
 const parse_name_1 = require("../utility/parse-name");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
-const schema_1 = require("./schema");
 function readIntoSourceFile(host, modulePath) {
     const text = host.read(modulePath);
     if (text === null) {
@@ -98,10 +97,6 @@ function default_1(options) {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         options.selector = options.selector || buildSelector(options, project && project.prefix || '');
-        // todo remove these when we remove the deprecations
-        options.style = (options.style && options.style !== schema_1.Style.Css
-            ? options.style : options.styleext) || schema_1.Style.Css;
-        options.skipTests = options.skipTests || !options.spec;
         validation_1.validateName(options.name);
         validation_1.validateHtmlSelector(options.selector);
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
