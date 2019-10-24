@@ -23,11 +23,6 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * When true (the default), generates a  "spec.ts" test file for the new class.
-     * @deprecated Use "skipTests" instead.
-     */
-    spec?: boolean;
-    /**
      * Adds a developer-defined type to the filename, in the format "name.type.ts".
      */
     type?: string;
