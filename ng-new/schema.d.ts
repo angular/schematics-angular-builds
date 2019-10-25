@@ -41,6 +41,10 @@ export interface Schema {
      */
     newProjectRoot?: string;
     /**
+     * The package manager used to install dependencies.
+     */
+    packageManager?: PackageManager;
+    /**
      * The prefix to apply to generated selectors for the initial project.
      */
     prefix?: string;
@@ -85,6 +89,15 @@ export interface CommitObject {
     email: string;
     message?: string;
     name: string;
+}
+/**
+ * The package manager used to install dependencies.
+ */
+export declare enum PackageManager {
+    Cnpm = "cnpm",
+    Npm = "npm",
+    Pnpm = "pnpm",
+    Yarn = "yarn"
 }
 /**
  * The file extension or preprocessor to use for style files.
