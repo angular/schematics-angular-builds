@@ -22,7 +22,6 @@ function default_1(options) {
         newProjectRoot: options.newProjectRoot,
         minimal: options.minimal,
         strict: options.strict,
-        packageManager: options.packageManager,
     };
     const applicationOptions = {
         projectRoot: '',
@@ -48,10 +47,7 @@ function default_1(options) {
         (_host, context) => {
             let packageTask;
             if (!options.skipInstall) {
-                packageTask = context.addTask(new tasks_1.NodePackageInstallTask({
-                    workingDirectory: options.directory,
-                    packageManager: options.packageManager,
-                }));
+                packageTask = context.addTask(new tasks_1.NodePackageInstallTask(options.directory));
                 if (options.linkCli) {
                     packageTask = context.addTask(new tasks_1.NodePackageLinkTask('@angular/cli', options.directory), [packageTask]);
                 }
