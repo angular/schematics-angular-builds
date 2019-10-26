@@ -21,8 +21,6 @@ function default_1(options) {
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
-        // todo remove these when we remove the deprecations
-        options.skipTests = options.skipTests || !options.spec;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             options.skipTests ? schematics_1.filter(path => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
             schematics_1.applyTemplates({
