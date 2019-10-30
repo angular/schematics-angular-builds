@@ -30,6 +30,19 @@ function updateConfigFile(options, tsConfigDirectory) {
             if (buildTarget && buildTarget.options) {
                 buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
             }
+            // In case the browser builder hashes the assets
+            // we need to add this setting to the server builder
+            // as otherwise when assets it will be requested twice.
+            // One for the server which will be unhashed, and other on the client which will be hashed.
+            let outputHashing;
+            if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
+                switch (buildTarget.configurations.production.outputHashing) {
+                    case 'all':
+                    case 'media':
+                        outputHashing = 'media';
+                        break;
+                }
+            }
             const mainPath = options.main;
             clientProject.targets.add({
                 name: 'server',
@@ -41,6 +54,7 @@ function updateConfigFile(options, tsConfigDirectory) {
                 },
                 configurations: {
                     production: {
+                        outputHashing,
                         fileReplacements,
                         sourceMap: false,
                         optimization: true,
