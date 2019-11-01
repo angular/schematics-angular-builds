@@ -37,10 +37,11 @@ export interface BrowserBuilderBaseOptions {
     scripts?: (object | string)[];
     sourceMap?: boolean;
 }
+export declare type OutputHashing = 'all' | 'media' | 'none' | 'bundles';
 export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
     serviceWorker?: boolean;
     optimization?: boolean;
-    outputHashing?: 'all';
+    outputHashing?: OutputHashing;
     resourcesOutputPath?: string;
     extractCss?: boolean;
     namedChunks?: boolean;
