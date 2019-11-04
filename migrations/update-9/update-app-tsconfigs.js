@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = require("path");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
 const utils_1 = require("./utils");
@@ -59,37 +58,25 @@ function updateTsConfig(tree, builderConfig, builderName) {
             // Note: we need to re-read the tsconfig after very commit because
             // otherwise the updates will be out of sync since we are ammending the same node.
             tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigPath);
-            const include = json_utils_1.findPropertyInAstObject(tsConfigAst, 'include');
-            if (include && include.kind === 'array') {
-                const tsInclude = include.elements.find(({ value }) => typeof value === 'string' && value.endsWith('**/*.ts'));
-                if (tsInclude) {
-                    const { start, end } = tsInclude;
-                    recorder = tree.beginUpdate(tsConfigPath);
-                    recorder.remove(start.offset, end.offset - start.offset);
-                    // Replace ts includes with d.ts
-                    recorder.insertLeft(start.offset, tsInclude.text.replace('.ts', '.d.ts'));
-                    tree.commitUpdate(recorder);
-                }
-            }
             const files = json_utils_1.findPropertyInAstObject(tsConfigAst, 'files');
-            if (!files) {
-                const newFiles = [];
-                const mainOption = json_utils_1.findPropertyInAstObject(option, 'main');
-                if (mainOption && mainOption.kind === 'string') {
-                    newFiles.push(path_1.posix.relative(path_1.posix.dirname(tsConfigPath), mainOption.value));
-                }
-                const polyfillsOption = json_utils_1.findPropertyInAstObject(option, 'polyfills');
-                if (polyfillsOption && polyfillsOption.kind === 'string') {
-                    newFiles.push(path_1.posix.relative(path_1.posix.dirname(tsConfigPath), polyfillsOption.value));
-                }
-                if (newFiles.length) {
-                    recorder = tree.beginUpdate(tsConfigPath);
+            const include = json_utils_1.findPropertyInAstObject(tsConfigAst, 'include');
+            if (!files && !include) {
+                const rootInSrc = tsConfigPath.includes('src/');
+                const rootSrc = rootInSrc ? '' : 'src/';
+                const files = builderName === workspace_models_1.Builders.Server
+                    ? [`${rootSrc}main.server.ts`]
+                    : [`${rootSrc}main.ts`, `${rootSrc}polyfills.ts`];
+                recorder = tree.beginUpdate(tsConfigPath);
+                json_utils_1.insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'files', files, 2);
+                tree.commitUpdate(recorder);
+                if (builderName === workspace_models_1.Builders.Browser) {
                     tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigPath);
-                    json_utils_1.insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'files', newFiles, 2);
+                    recorder = tree.beginUpdate(tsConfigPath);
+                    json_utils_1.insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'include', [`${rootSrc}**/*.d.ts`], 2);
                     tree.commitUpdate(recorder);
                 }
-                recorder = tree.beginUpdate(tsConfigPath);
                 tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigPath);
+                recorder = tree.beginUpdate(tsConfigPath);
                 json_utils_1.removePropertyInAstObject(recorder, tsConfigAst, 'exclude');
                 tree.commitUpdate(recorder);
             }
