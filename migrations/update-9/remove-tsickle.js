@@ -1,13 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-const core_1 = require("@angular-devkit/core");
 const dependencies_1 = require("../../utility/dependencies");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
@@ -16,8 +8,9 @@ const utils_1 = require("./utils");
  * Remove tsickle from libraries
  */
 function removeTsickle() {
-    return (tree) => {
+    return (tree, context) => {
         dependencies_1.removePackageJsonDependency(tree, 'tsickle');
+        const logger = context.logger;
         const workspace = utils_1.getWorkspace(tree);
         for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.NgPackagr)) {
             for (const options of utils_1.getAllOptions(target)) {
@@ -25,18 +18,16 @@ function removeTsickle() {
                 if (!tsConfigOption || tsConfigOption.kind !== 'string') {
                     continue;
                 }
-                const tsConfigContent = tree.read(tsConfigOption.value);
-                if (!tsConfigContent) {
-                    continue;
-                }
-                const tsConfigAst = core_1.parseJsonAst(tsConfigContent.toString(), core_1.JsonParseMode.Loose);
-                if (!tsConfigAst || tsConfigAst.kind !== 'object') {
+                const tsConfigPath = tsConfigOption.value;
+                const tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigPath);
+                if (!tsConfigAst) {
+                    logger.warn(`Cannot find file: ${tsConfigPath}`);
                     continue;
                 }
                 const ngCompilerOptions = json_utils_1.findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
                 if (ngCompilerOptions && ngCompilerOptions.kind === 'object') {
                     // remove annotateForClosureCompiler option
-                    const recorder = tree.beginUpdate(tsConfigOption.value);
+                    const recorder = tree.beginUpdate(tsConfigPath);
                     json_utils_1.removePropertyInAstObject(recorder, ngCompilerOptions, 'annotateForClosureCompiler');
                     tree.commitUpdate(recorder);
                 }
