@@ -7,12 +7,14 @@ const utils_1 = require("./utils");
  * Update ngsw-config.json to fix issue https://github.com/angular/angular-cli/pull/15277
  */
 function updateNGSWConfig() {
-    return (tree) => {
+    return (tree, context) => {
         const workspace = utils_1.getWorkspace(tree);
+        const logger = context.logger;
         for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
             for (const options of utils_1.getAllOptions(target)) {
                 const ngswConfigPath = json_utils_1.findPropertyInAstObject(options, 'ngswConfigPath');
                 if (!ngswConfigPath || ngswConfigPath.kind !== 'string') {
+                    logger.warn(`Cannot find file: ${ngswConfigPath}`);
                     continue;
                 }
                 const path = ngswConfigPath.value;

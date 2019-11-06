@@ -459,6 +459,7 @@ function addBootstrapToModule(source, modulePath, classifiedName, importPath) {
 exports.addBootstrapToModule = addBootstrapToModule;
 /**
  * Custom function to insert an entryComponent into NgModule. It also imports it.
+ * @deprecated - Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
  */
 function addEntryComponentToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'entryComponents', classifiedName, importPath);
