@@ -101,18 +101,35 @@ function removePropertyInAstObject(recorder, node, propertyName) {
 }
 exports.removePropertyInAstObject = removePropertyInAstObject;
 function appendValueInAstArray(recorder, node, value, indent = 4) {
-    const indentStr = _buildIndent(indent);
+    let indentStr = _buildIndent(indent);
     let index = node.start.offset + 1;
+    // tslint:disable-next-line: no-any
+    let newNodes;
     if (node.elements.length > 0) {
         // Insert comma.
-        const last = node.elements[node.elements.length - 1];
-        recorder.insertRight(last.end.offset, ',');
-        index = indent ? last.end.offset + 1 : last.end.offset;
+        const { end } = node.elements[node.elements.length - 1];
+        const isClosingOnSameLine = node.end.offset - end.offset === 1;
+        if (isClosingOnSameLine && indent) {
+            // Reformat the entire array
+            recorder.remove(node.start.offset, node.end.offset - node.start.offset);
+            newNodes = [
+                ...node.elements.map(({ value }) => value),
+                value,
+            ];
+            index = node.start.offset;
+            // In case we are generating the entire node we need to reduce the spacing as
+            // otherwise we'd end up having incorrect double spacing
+            indent = indent - 2;
+            indentStr = _buildIndent(indent);
+        }
+        else {
+            recorder.insertRight(end.offset, ',');
+            index = end.offset;
+        }
     }
-    recorder.insertRight(index, (node.elements.length === 0 && indent ? '\n' : '')
-        + ' '.repeat(indent)
-        + _stringifyContent(value, indentStr)
-        + indentStr.slice(0, -indent));
+    recorder.insertRight(index, (newNodes ? '' : indentStr)
+        + _stringifyContent(newNodes || value, indentStr)
+        + (node.elements.length === 0 && indent ? indentStr.substr(0, -indent) + '\n' : ''));
 }
 exports.appendValueInAstArray = appendValueInAstArray;
 function findPropertyInAstObject(node, propertyName) {

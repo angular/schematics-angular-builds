@@ -8,6 +8,7 @@ export interface Schema {
     changeDetection?: ChangeDetection;
     /**
      * When true, the new component is the entry component of the declaring NgModule.
+     * @deprecated Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
      */
     entryComponent?: boolean;
     /**
