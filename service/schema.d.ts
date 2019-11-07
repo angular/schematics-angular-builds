@@ -7,7 +7,7 @@ export interface Schema {
      */
     flat?: boolean;
     /**
-     * When true, applies lint fixes after generating the pipe.
+     * When true, applies lint fixes after generating the service.
      */
     lintFix?: boolean;
     /**
@@ -26,9 +26,4 @@ export interface Schema {
      * When true, does not create "spec.ts" test files for the new service.
      */
     skipTests?: boolean;
-    /**
-     * When true (the default), generates a  "spec.ts" test file for the new service.
-     * @deprecated Use "skipTests" instead.
-     */
-    spec?: boolean;
 }

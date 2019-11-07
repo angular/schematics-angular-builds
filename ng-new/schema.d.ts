@@ -14,10 +14,6 @@ export interface Schema {
      */
     directory?: string;
     /**
-     * When true, creates a new app that uses the Ivy rendering engine.
-     */
-    enableIvy?: boolean;
-    /**
      * When true, includes styles inline in the component TS file. By default, an external
      * styles file is created and referenced in the component TS file.
      */
@@ -45,6 +41,10 @@ export interface Schema {
      */
     newProjectRoot?: string;
     /**
+     * The package manager used to install dependencies.
+     */
+    packageManager?: PackageManager;
+    /**
      * The prefix to apply to generated selectors for the initial project.
      */
     prefix?: string;
@@ -64,6 +64,10 @@ export interface Schema {
      * When true, does not generate "spec.ts" test files for the new project.
      */
     skipTests?: boolean;
+    /**
+     * Creates a workspace with stricter TypeScript compiler options.
+     */
+    strict?: boolean;
     /**
      * The file extension or preprocessor to use for style files.
      */
@@ -85,6 +89,15 @@ export interface CommitObject {
     email: string;
     message?: string;
     name: string;
+}
+/**
+ * The package manager used to install dependencies.
+ */
+export declare enum PackageManager {
+    Cnpm = "cnpm",
+    Npm = "npm",
+    Pnpm = "pnpm",
+    Yarn = "yarn"
 }
 /**
  * The file extension or preprocessor to use for style files.

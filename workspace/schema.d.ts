@@ -1,13 +1,5 @@
 export interface Schema {
     /**
-     * Initial repository commit information.
-     */
-    commit?: null | Commit;
-    /**
-     * When true, links the CLI to the global version (internal development only).
-     */
-    linkCli?: boolean;
-    /**
      * When true, creates a workspace without any testing frameworks. (Use for learning purposes
      * only.)
      */
@@ -21,20 +13,24 @@ export interface Schema {
      */
     newProjectRoot?: string;
     /**
-     * When true, does not initialize a git repository.
+     * The package manager used to install dependencies.
      */
-    skipGit?: boolean;
+    packageManager?: PackageManager;
     /**
-     * When true, does not install packages for dependencies.
+     * Creates a workspace with stricter TypeScript compiler options.
      */
-    skipInstall?: boolean;
+    strict?: boolean;
     /**
      * The version of the Angular CLI to use.
      */
     version: string;
 }
-export interface Commit {
-    email: string;
-    message?: string;
-    name: string;
+/**
+ * The package manager used to install dependencies.
+ */
+export declare enum PackageManager {
+    Cnpm = "cnpm",
+    Npm = "npm",
+    Pnpm = "pnpm",
+    Yarn = "yarn"
 }

@@ -12,23 +12,20 @@ const schematics_1 = require("@angular-devkit/schematics");
 const lint_fix_1 = require("../utility/lint-fix");
 const parse_name_1 = require("../utility/parse-name");
 const workspace_1 = require("../utility/workspace");
+const schema_1 = require("./schema");
 function default_1(options) {
     return async (host) => {
         if (options.path === undefined) {
             options.path = await workspace_1.createDefaultPath(host, options.project);
         }
-        if (options.implements === undefined) {
-            options.implements = [];
+        if (!options.implements) {
+            throw new schematics_1.SchematicsException('Option "implements" is required.');
         }
-        let implementations = '';
-        let implementationImports = '';
-        if (options.implements.length > 0) {
-            implementations = options.implements.join(', ');
-            implementationImports = `${implementations}, `;
-            // As long as we aren't in IE... ;)
-            if (options.implements.includes('CanLoad')) {
-                implementationImports = `${implementationImports}Route, UrlSegment, `;
-            }
+        const implementations = options.implements.join(', ');
+        let implementationImports = `${implementations}, `;
+        // As long as we aren't in IE... ;)
+        if (options.implements.includes(schema_1.Implement.CanLoad)) {
+            implementationImports = `${implementationImports}Route, UrlSegment, `;
         }
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;

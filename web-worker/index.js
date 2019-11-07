@@ -11,18 +11,15 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const json_utils_1 = require("../utility/json-utils");
 const parse_name_1 = require("../utility/parse-name");
+const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
 function addConfig(options, root, tsConfigPath) {
     return (host, context) => {
         context.logger.debug('updating project configuration.');
-        // todo: replace with the new helper method in a seperate PR
-        // https://github.com/angular/angular-cli/pull/14207
-        const rootNormalized = root.endsWith('/') ? root.slice(0, -1) : root;
-        const relativePathToWorkspaceRoot = rootNormalized
-            ? rootNormalized.split('/').map(x => '..').join('/')
-            : '.';
         // Add worker glob exclusion to tsconfig.app.json.
-        const workerGlob = 'src/**/*.worker.ts';
+        // Projects pre version 8 should to have tsconfig.app.json inside their application
+        const isInSrc = core_1.dirname(core_1.normalize(tsConfigPath)).endsWith('src');
+        const workerGlob = `${isInSrc ? '' : 'src/'}**/*.worker.ts`;
         const buffer = host.read(tsConfigPath);
         if (buffer) {
             const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
@@ -40,7 +37,10 @@ function addConfig(options, root, tsConfigPath) {
             }
         }
         return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [
-            schematics_1.applyTemplates({ ...options, relativePathToWorkspaceRoot }),
+            schematics_1.applyTemplates({
+                ...options,
+                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(root),
+            }),
             schematics_1.move(root),
         ]));
     };
@@ -51,9 +51,11 @@ function addSnippet(options) {
         if (options.path === undefined) {
             return;
         }
+        const fileRegExp = new RegExp(`^${options.name}.*\.ts`);
         const siblingModules = host.getDir(options.path).subfiles
-            // Find all files that start with the same name, are ts files, and aren't spec files.
-            .filter(f => f.startsWith(options.name) && f.endsWith('.ts') && !f.endsWith('spec.ts'))
+            // Find all files that start with the same name, are ts files,
+            // and aren't spec or module files.
+            .filter(f => fileRegExp.test(f) && !/(module|spec)\.ts$/.test(f))
             // Sort alphabetically for consistency.
             .sort();
         if (siblingModules.length === 0) {

@@ -14,6 +14,7 @@ const dependencies_1 = require("../utility/dependencies");
 const json_utils_1 = require("../utility/json-utils");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
+const paths_1 = require("../utility/paths");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
@@ -91,11 +92,9 @@ function mergeWithRootTsLint(parentHost) {
         host.overwrite(tsLintPath, JSON.stringify(content.value, undefined, 2));
     };
 }
-function addAppToWorkspaceFile(options, newProjectRoot) {
-    let projectRoot = options.projectRoot !== undefined
-        ? options.projectRoot
-        : `${newProjectRoot}/${options.name}`;
-    if (projectRoot !== '' && !projectRoot.endsWith('/')) {
+function addAppToWorkspaceFile(options, appDir) {
+    let projectRoot = appDir;
+    if (projectRoot) {
         projectRoot += '/';
     }
     const schematics = {};
@@ -114,8 +113,8 @@ function addAppToWorkspaceFile(options, newProjectRoot) {
         }
         schematics['@schematics/angular:component'] = componentSchematicsOptions;
     }
-    if (options.skipTests === true) {
-        ['class', 'component', 'directive', 'guard', 'module', 'pipe', 'service'].forEach((type) => {
+    if (options.skipTests || options.minimal) {
+        ['class', 'component', 'directive', 'guard', 'interceptor', 'module', 'pipe', 'service'].forEach((type) => {
             if (!(`@schematics/angular:${type}` in schematics)) {
                 schematics[`@schematics/angular:${type}`] = {};
             }
@@ -124,7 +123,7 @@ function addAppToWorkspaceFile(options, newProjectRoot) {
     }
     const sourceRoot = core_1.join(core_1.normalize(projectRoot), 'src');
     const project = {
-        root: projectRoot,
+        root: core_1.normalize(projectRoot),
         sourceRoot,
         projectType: workspace_models_1.ProjectType.Application,
         prefix: options.prefix || 'app',
@@ -138,6 +137,7 @@ function addAppToWorkspaceFile(options, newProjectRoot) {
                     main: `${sourceRoot}/main.ts`,
                     polyfills: `${sourceRoot}/polyfills.ts`,
                     tsConfig: `${projectRoot}tsconfig.app.json`,
+                    aot: true,
                     assets: [
                         `${sourceRoot}/favicon.ico`,
                         `${sourceRoot}/assets`,
@@ -158,15 +158,21 @@ function addAppToWorkspaceFile(options, newProjectRoot) {
                         sourceMap: false,
                         extractCss: true,
                         namedChunks: false,
-                        aot: true,
                         extractLicenses: true,
                         vendorChunk: false,
                         buildOptimizer: true,
-                        budgets: [{
+                        budgets: [
+                            {
                                 type: 'initial',
                                 maximumWarning: '2mb',
                                 maximumError: '5mb',
-                            }],
+                            },
+                            {
+                                type: 'anyComponentStyle',
+                                maximumWarning: '6kb',
+                                maximumError: '10kb',
+                            }
+                        ],
                     },
                 },
             },
@@ -204,7 +210,7 @@ function addAppToWorkspaceFile(options, newProjectRoot) {
                     scripts: [],
                 },
             },
-            lint: {
+            lint: options.minimal ? undefined : {
                 builder: workspace_models_1.Builders.TsLint,
                 options: {
                     tsConfig: [
@@ -238,7 +244,6 @@ function default_1(options) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
         validation_1.validateProjectName(options.name);
-        options.prefix = options.prefix || 'app';
         const appRootSelector = `${options.prefix}-root`;
         const componentOptions = !options.minimal ?
             {
@@ -259,23 +264,20 @@ function default_1(options) {
         const isRootApp = options.projectRoot !== undefined;
         const appDir = isRootApp
             ? options.projectRoot
-            : `${newProjectRoot}/${options.name}`;
-        const relativePathToWorkspaceRoot = appDir
-            ? appDir.split('/').map(() => '..').join('/')
-            : '.';
+            : core_1.join(core_1.normalize(newProjectRoot), options.name);
         const sourceDir = `${appDir}/src/app`;
         const e2eOptions = {
             relatedAppName: options.name,
             rootSelector: appRootSelector,
         };
         return schematics_1.chain([
-            addAppToWorkspaceFile(options, newProjectRoot),
+            addAppToWorkspaceFile(options, appDir),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
                 options.minimal ? schematics_1.filter(minimalPathFilter) : schematics_1.noop(),
                 schematics_1.applyTemplates({
                     utils: core_1.strings,
                     ...options,
-                    relativePathToWorkspaceRoot,
+                    relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(appDir),
                     appName: options.name,
                     isRootApp,
                 }),

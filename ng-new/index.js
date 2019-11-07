@@ -19,13 +19,14 @@ function default_1(options) {
     const workspaceOptions = {
         name: options.name,
         version: options.version,
-        newProjectRoot: options.newProjectRoot || 'projects',
+        newProjectRoot: options.newProjectRoot,
         minimal: options.minimal,
+        strict: options.strict,
+        packageManager: options.packageManager,
     };
     const applicationOptions = {
         projectRoot: '',
         name: options.name,
-        enableIvy: options.enableIvy,
         inlineStyle: options.inlineStyle,
         inlineTemplate: options.inlineTemplate,
         prefix: options.prefix,
@@ -42,12 +43,15 @@ function default_1(options) {
         schematics_1.mergeWith(schematics_1.apply(schematics_1.empty(), [
             schematics_1.schematic('workspace', workspaceOptions),
             options.createApplication ? schematics_1.schematic('application', applicationOptions) : schematics_1.noop,
-            schematics_1.move(options.directory || options.name),
+            schematics_1.move(options.directory),
         ])),
         (_host, context) => {
             let packageTask;
             if (!options.skipInstall) {
-                packageTask = context.addTask(new tasks_1.NodePackageInstallTask(options.directory));
+                packageTask = context.addTask(new tasks_1.NodePackageInstallTask({
+                    workingDirectory: options.directory,
+                    packageManager: options.packageManager,
+                }));
                 if (options.linkCli) {
                     packageTask = context.addTask(new tasks_1.NodePackageLinkTask('@angular/cli', options.directory), [packageTask]);
                 }

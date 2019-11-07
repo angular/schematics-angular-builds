@@ -89,8 +89,6 @@ function default_1(options) {
         options.path = parsedPath.path;
         options.selector = options.selector || buildSelector(options, project.prefix || '');
         validation_1.validateHtmlSelector(options.selector);
-        // todo remove these when we remove the deprecations
-        options.skipTests = options.skipTests || !options.spec;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             options.skipTests ? schematics_1.filter(path => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
             schematics_1.applyTemplates({

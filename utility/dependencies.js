@@ -45,6 +45,23 @@ function addPackageJsonDependency(tree, dependency) {
     tree.commitUpdate(recorder);
 }
 exports.addPackageJsonDependency = addPackageJsonDependency;
+function removePackageJsonDependency(tree, name) {
+    const packageJson = _readPackageJson(tree);
+    const recorder = tree.beginUpdate(pkgJsonPath);
+    [
+        NodeDependencyType.Default,
+        NodeDependencyType.Dev,
+        NodeDependencyType.Optional,
+        NodeDependencyType.Peer,
+    ].forEach(depType => {
+        const depsNode = json_utils_1.findPropertyInAstObject(packageJson, depType);
+        if (depsNode !== null && depsNode.kind === 'object') {
+            json_utils_1.removePropertyInAstObject(recorder, depsNode, name);
+        }
+    });
+    tree.commitUpdate(recorder);
+}
+exports.removePackageJsonDependency = removePackageJsonDependency;
 function getPackageJsonDependency(tree, name) {
     const packageJson = _readPackageJson(tree);
     let dep = null;

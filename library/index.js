@@ -13,6 +13,7 @@ const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../utility/dependencies");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
+const paths_1 = require("../utility/paths");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
@@ -69,7 +70,7 @@ function addDependenciesToPackageJson() {
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: 'ng-packagr',
-                version: '^5.1.0',
+                version: latest_versions_1.latestVersions.ngPackagr,
             },
             {
                 type: dependencies_1.NodeDependencyType.Default,
@@ -85,7 +86,7 @@ function addDependenciesToPackageJson() {
         return host;
     };
 }
-function addAppToWorkspaceFile(options, projectRoot, projectName) {
+function addLibToWorkspaceFile(options, projectRoot, projectName) {
     return workspace_1.updateWorkspace(workspace => {
         if (workspace.projects.size === 0) {
             workspace.extensions.defaultProject = projectName;
@@ -95,13 +96,18 @@ function addAppToWorkspaceFile(options, projectRoot, projectName) {
             root: projectRoot,
             sourceRoot: `${projectRoot}/src`,
             projectType: workspace_models_1.ProjectType.Library,
-            prefix: options.prefix || 'lib',
+            prefix: options.prefix,
             targets: {
                 build: {
                     builder: workspace_models_1.Builders.NgPackagr,
                     options: {
                         tsConfig: `${projectRoot}/tsconfig.lib.json`,
                         project: `${projectRoot}/ng-package.json`,
+                    },
+                    configurations: {
+                        production: {
+                            tsConfig: `${projectRoot}/tsconfig.lib.prod.json`,
+                        },
                     },
                 },
                 test: {
@@ -133,7 +139,7 @@ function default_1(options) {
         if (!options.name) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
-        const prefix = options.prefix || 'lib';
+        const prefix = options.prefix;
         validation_1.validateProjectName(options.name);
         // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
         const projectName = options.name;
@@ -148,10 +154,9 @@ function default_1(options) {
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
         const scopeFolder = scopeName ? core_1.strings.dasherize(scopeName) + '/' : '';
         const folderName = `${scopeFolder}${core_1.strings.dasherize(options.name)}`;
-        const projectRoot = `${newProjectRoot}/${folderName}`;
+        const projectRoot = core_1.join(core_1.normalize(newProjectRoot), folderName);
         const distRoot = `dist/${folderName}`;
         const sourceDir = `${projectRoot}/src/lib`;
-        const relativePathToWorkspaceRoot = projectRoot.split('/').map(x => '..').join('/');
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             schematics_1.applyTemplates({
                 ...core_1.strings,
@@ -159,16 +164,17 @@ function default_1(options) {
                 packageName,
                 projectRoot,
                 distRoot,
-                relativePathToWorkspaceRoot,
+                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(projectRoot),
                 prefix,
                 angularLatestVersion: latest_versions_1.latestVersions.Angular.replace('~', '').replace('^', ''),
+                tsLibLatestVersion: latest_versions_1.latestVersions.TsLib.replace('~', '').replace('^', ''),
                 folderName,
             }),
             schematics_1.move(projectRoot),
         ]);
         return schematics_1.chain([
             schematics_1.mergeWith(templateSource),
-            addAppToWorkspaceFile(options, projectRoot, projectName),
+            addLibToWorkspaceFile(options, projectRoot, projectName),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(),
             options.skipTsConfig ? schematics_1.noop() : updateTsConfig(packageName, distRoot),
             schematics_1.schematic('module', {

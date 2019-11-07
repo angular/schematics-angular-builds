@@ -74,9 +74,11 @@ exports.insertImport = insertImport;
  * @param node
  * @param kind
  * @param max The maximum number of items to return.
+ * @param recursive Continue looking for nodes of kind recursive until end
+ * the last child even when node of kind has been found.
  * @return all nodes of kind, or [] if none is found
  */
-function findNodes(node, kind, max = Infinity) {
+function findNodes(node, kind, max = Infinity, recursive = false) {
     if (!node || max == 0) {
         return [];
     }
@@ -85,7 +87,7 @@ function findNodes(node, kind, max = Infinity) {
         arr.push(node);
         max--;
     }
-    if (max > 0) {
+    if (max > 0 && (recursive || node.kind !== kind)) {
         for (const child of node.getChildren()) {
             findNodes(child, kind, max).forEach(node => {
                 if (max > 0) {
@@ -154,12 +156,13 @@ function nodesByPosition(first, second) {
  * @throw Error if toInsert is first occurence but fall back is not set
  */
 function insertAfterLastOccurrence(nodes, toInsert, file, fallbackPos, syntaxKind) {
-    // sort() has a side effect, so make a copy so that we won't overwrite the parent's object.
-    let lastItem = [...nodes].sort(nodesByPosition).pop();
-    if (!lastItem) {
-        throw new Error();
+    let lastItem;
+    for (const node of nodes) {
+        if (!lastItem || lastItem.getStart() < node.getStart()) {
+            lastItem = node;
+        }
     }
-    if (syntaxKind) {
+    if (syntaxKind && lastItem) {
         lastItem = findNodes(lastItem, syntaxKind).sort(nodesByPosition).pop();
     }
     if (!lastItem && fallbackPos == undefined) {
@@ -243,8 +246,7 @@ function getDecoratorMetadata(source, identifier, module) {
         .filter(expr => {
         if (expr.expression.kind == ts.SyntaxKind.Identifier) {
             const id = expr.expression;
-            return id.getFullText(source) == identifier
-                && angularImports[id.getFullText(source)] === module;
+            return id.text == identifier && angularImports[id.text] === module;
         }
         else if (expr.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
             // This covers foo.NgModule when importing * as foo.
@@ -254,7 +256,7 @@ function getDecoratorMetadata(source, identifier, module) {
                 return false;
             }
             const id = paExpr.name.text;
-            const moduleId = paExpr.expression.getText(source);
+            const moduleId = paExpr.expression.text;
             return id === identifier && (angularImports[moduleId + '.'] === module);
         }
         return false;
@@ -292,6 +294,17 @@ function getFirstNgModuleName(source) {
     return moduleClass.name.text;
 }
 exports.getFirstNgModuleName = getFirstNgModuleName;
+function getMetadataField(node, metadataField) {
+    return node.properties
+        .filter(prop => ts.isPropertyAssignment(prop))
+        // Filter out every fields that's not "metadataField". Also handles string literals
+        // (but not expressions).
+        .filter(({ name }) => {
+        return (ts.isIdentifier(name) || ts.isStringLiteral(name))
+            && name.getText() === metadataField;
+    });
+}
+exports.getMetadataField = getMetadataField;
 function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbolName, importPath = null) {
     const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
     let node = nodes[0]; // tslint:disable-line:no-any
@@ -300,20 +313,7 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
         return [];
     }
     // Get all the children property assignment of object literals.
-    const matchingProperties = node.properties
-        .filter(prop => prop.kind == ts.SyntaxKind.PropertyAssignment)
-        // Filter out every fields that's not "metadataField". Also handles string literals
-        // (but not expressions).
-        .filter((prop) => {
-        const name = prop.name;
-        switch (name.kind) {
-            case ts.SyntaxKind.Identifier:
-                return name.getText(source) == metadataField;
-            case ts.SyntaxKind.StringLiteral:
-                return name.text == metadataField;
-        }
-        return false;
-    });
+    const matchingProperties = getMetadataField(node, metadataField);
     // Get the last node of the array literal.
     if (!matchingProperties) {
         return [];
@@ -364,6 +364,7 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
         node = arrLiteral.elements;
     }
     if (!node) {
+        // tslint:disable-next-line: no-console
         console.error('No app module found. Please add your new class to your component.');
         return [];
     }
@@ -458,6 +459,7 @@ function addBootstrapToModule(source, modulePath, classifiedName, importPath) {
 exports.addBootstrapToModule = addBootstrapToModule;
 /**
  * Custom function to insert an entryComponent into NgModule. It also imports it.
+ * @deprecated - Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
  */
 function addEntryComponentToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'entryComponents', classifiedName, importPath);
@@ -485,3 +487,71 @@ function isImported(source, classifiedName, importPath) {
     return matchingNodes.length > 0;
 }
 exports.isImported = isImported;
+/**
+ * Returns the RouterModule declaration from NgModule metadata, if any.
+ */
+function getRouterModuleDeclaration(source) {
+    const result = getDecoratorMetadata(source, 'NgModule', '@angular/core');
+    const node = result[0];
+    const matchingProperties = getMetadataField(node, 'imports');
+    if (!matchingProperties) {
+        return;
+    }
+    const assignment = matchingProperties[0];
+    if (assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+        return;
+    }
+    const arrLiteral = assignment.initializer;
+    return arrLiteral.elements
+        .filter(el => el.kind === ts.SyntaxKind.CallExpression)
+        .find(el => el.getText().startsWith('RouterModule'));
+}
+exports.getRouterModuleDeclaration = getRouterModuleDeclaration;
+/**
+ * Adds a new route declaration to a router module (i.e. has a RouterModule declaration)
+ */
+function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
+    const routerModuleExpr = getRouterModuleDeclaration(source);
+    if (!routerModuleExpr) {
+        throw new Error(`Couldn't find a route declaration in ${fileToAdd}.`);
+    }
+    const scopeConfigMethodArgs = routerModuleExpr.arguments;
+    if (!scopeConfigMethodArgs.length) {
+        const { line } = source.getLineAndCharacterOfPosition(routerModuleExpr.getStart());
+        throw new Error(`The router module method doesn't have arguments ` +
+            `at line ${line} in ${fileToAdd}`);
+    }
+    let routesArr;
+    const routesArg = scopeConfigMethodArgs[0];
+    // Check if the route declarations array is
+    // an inlined argument of RouterModule or a standalone variable
+    if (ts.isArrayLiteralExpression(routesArg)) {
+        routesArr = routesArg;
+    }
+    else {
+        const routesVarName = routesArg.getText();
+        let routesVar;
+        if (routesArg.kind === ts.SyntaxKind.Identifier) {
+            routesVar = source.statements
+                .filter((s) => s.kind === ts.SyntaxKind.VariableStatement)
+                .find((v) => {
+                return v.declarationList.declarations[0].name.getText() === routesVarName;
+            });
+        }
+        if (!routesVar) {
+            const { line } = source.getLineAndCharacterOfPosition(routesArg.getStart());
+            throw new Error(`No route declaration array was found that corresponds ` +
+                `to router module at line ${line} in ${fileToAdd}`);
+        }
+        routesArr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression, 1)[0];
+    }
+    const occurencesCount = routesArr.elements.length;
+    const text = routesArr.getFullText(source);
+    let route = routeLiteral;
+    if (occurencesCount > 0) {
+        const identation = text.match(/\r?\n(\r?)\s*/) || [];
+        route = `,${identation[0] || ' '}${routeLiteral}`;
+    }
+    return insertAfterLastOccurrence(routesArr.elements, route, fileToAdd, routesArr.elements.pos, ts.SyntaxKind.ObjectLiteralExpression);
+}
+exports.addRouteDeclarationToModule = addRouteDeclarationToModule;

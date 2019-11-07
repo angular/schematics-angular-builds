@@ -18,11 +18,6 @@
       },
       "x-prompt": "What name would you like to use for the new workspace and initial project?"
     },
-    "enableIvy": {
-      "description": "When true, creates a new app that uses the Ivy rendering engine.",
-      "type": "boolean",
-      "default": false
-    },
     "skipInstall": {
       "description": "When true, does not install dependency packages.",
       "type": "boolean",
@@ -58,10 +53,7 @@
               "type": "string"
             }
           },
-          "required": [
-            "name",
-            "email"
-          ]
+          "required": ["name", "email"]
         }
       ],
       "default": true
@@ -102,8 +94,6 @@
     "routing": {
       "type": "boolean",
       "description": "When true, generates a routing module for the initial project.",
-      "default": false,
-      "x-prompt": "Would you like to add Angular routing?",
       "x-user-analytics": 17
     },
     "prefix": {
@@ -117,25 +107,7 @@
     "style": {
       "description": "The file extension or preprocessor to use for style files.",
       "type": "string",
-      "default": "css",
-      "enum": [
-        "css",
-        "scss",
-        "sass",
-        "less",
-        "styl"
-      ],
-      "x-prompt": {
-        "message": "Which stylesheet format would you like to use?",
-        "type": "list",
-        "items": [
-          { "value": "css",  "label": "CSS" },
-          { "value": "scss", "label": "SCSS   [ http://sass-lang.com/documentation/file.SASS_REFERENCE.html#syntax ]" },
-          { "value": "sass", "label": "Sass   [ http://sass-lang.com/documentation/file.INDENTED_SYNTAX.html       ]" },
-          { "value": "less", "label": "Less   [ http://lesscss.org                                                 ]" },
-          { "value": "styl", "label": "Stylus [ http://stylus-lang.com                                             ] " }
-        ]
-      },
+      "enum": ["css", "scss", "sass", "less", "styl"],
       "x-user-analytics": 5
     },
     "skipTests": {
@@ -155,10 +127,17 @@
       "type": "boolean",
       "default": false,
       "x-user-analytics": 14
+    },
+    "strict": {
+      "description": "Creates a workspace with stricter TypeScript compiler options.",
+      "type": "boolean",
+      "default": false
+    },
+    "packageManager": {
+      "description": "The package manager used to install dependencies.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm", "cnpm"]
     }
   },
-  "required": [
-    "name",
-    "version"
-  ]
+  "required": ["name", "version"]
 }

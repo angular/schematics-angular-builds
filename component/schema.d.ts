@@ -8,6 +8,7 @@ export interface Schema {
     changeDetection?: ChangeDetection;
     /**
      * When true, the new component is the entry component of the declaring NgModule.
+     * @deprecated Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
      */
     entryComponent?: boolean;
     /**
@@ -63,23 +64,21 @@ export interface Schema {
      */
     skipImport?: boolean;
     /**
+     * Specifies if the component should have a selector or not.
+     */
+    skipSelector?: boolean;
+    /**
      * When true, does not create "spec.ts" test files for the new component.
      */
     skipTests?: boolean;
-    /**
-     * When true (the default), generates a  "spec.ts" test file for the new component.
-     * @deprecated Use "skipTests" instead.
-     */
-    spec?: boolean;
     /**
      * The file extension or preprocessor to use for style files.
      */
     style?: Style;
     /**
-     * The file extension to use for style files.
-     * @deprecated Use "style" instead.
+     * Adds a developer-defined type to the filename, in the format "name.type.ts".
      */
-    styleext?: string;
+    type?: string;
     /**
      * The view encapsulation strategy to use in the new component.
      */

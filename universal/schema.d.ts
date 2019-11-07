@@ -32,10 +32,12 @@ export interface Schema {
     skipInstall?: boolean;
     /**
      * The name of the test entry-point file.
+     * @deprecated This option has no effect.
      */
     test?: string;
     /**
      * The name of the TypeScript configuration file for tests.
+     * @deprecated This option has no effect.
      */
     testTsconfigFileName?: string;
     /**

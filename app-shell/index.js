@@ -25,15 +25,15 @@ function getSourceFile(host, path) {
     const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
     return source;
 }
-function getServerModulePath(host, projectRoot, mainPath) {
-    const mainSource = getSourceFile(host, mainPath);
+function getServerModulePath(host, sourceRoot, mainPath) {
+    const mainSource = getSourceFile(host, core_1.join(core_1.normalize(sourceRoot), mainPath));
     const allNodes = ast_utils_1.getSourceNodes(mainSource);
-    const expNode = allNodes.filter(node => node.kind === ts.SyntaxKind.ExportDeclaration)[0];
+    const expNode = allNodes.find(node => ts.isExportDeclaration(node));
     if (!expNode) {
         return null;
     }
     const relativePath = expNode.moduleSpecifier;
-    const modulePath = core_1.normalize(`/${projectRoot}/src/${relativePath.text}.ts`);
+    const modulePath = core_1.normalize(`/${sourceRoot}/${relativePath.text}.ts`);
     return modulePath;
 }
 function getComponentTemplateInfo(host, componentPath) {
@@ -185,7 +185,7 @@ function addServerRoutes(options) {
         if (!clientServerOptions) {
             throw new schematics_1.SchematicsException('Server target does not contain options.');
         }
-        const modulePath = getServerModulePath(host, clientProject.root, clientServerOptions.main);
+        const modulePath = getServerModulePath(host, clientProject.sourceRoot || 'src', options.main);
         if (modulePath === null) {
             throw new schematics_1.SchematicsException('Universal/server module not found.');
         }

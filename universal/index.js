@@ -27,22 +27,37 @@ function updateConfigFile(options, tsConfigDirectory) {
             if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
                 fileReplacements = buildTarget.configurations.production.fileReplacements;
             }
+            if (buildTarget && buildTarget.options) {
+                buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
+            }
+            // In case the browser builder hashes the assets
+            // we need to add this setting to the server builder
+            // as otherwise when assets it will be requested twice.
+            // One for the server which will be unhashed, and other on the client which will be hashed.
+            let outputHashing;
+            if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
+                switch (buildTarget.configurations.production.outputHashing) {
+                    case 'all':
+                    case 'media':
+                        outputHashing = 'media';
+                        break;
+                }
+            }
+            const mainPath = options.main;
             clientProject.targets.add({
                 name: 'server',
                 builder: workspace_models_1.Builders.Server,
                 options: {
-                    outputPath: `dist/${options.clientProject}-server`,
-                    main: `${clientProject.root}src/main.server.ts`,
+                    outputPath: `dist/${options.clientProject}/server`,
+                    main: core_1.join(core_1.normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
                     tsConfig: core_1.join(tsConfigDirectory, `${options.tsconfigFileName}.json`),
                 },
                 configurations: {
                     production: {
+                        outputHashing,
                         fileReplacements,
                         sourceMap: false,
-                        optimization: {
-                            scripts: false,
-                            styles: true,
-                        },
+                        optimization: true,
                     },
                 },
             });
@@ -155,7 +170,7 @@ function getTsConfigOutDir(host, tsConfigPath) {
         throw new schematics_1.SchematicsException(`Could not read ${tsConfigPath}`);
     }
     const tsConfigContent = tsConfigBuffer.toString();
-    const tsConfig = core_1.parseJson(tsConfigContent);
+    const tsConfig = core_1.parseJson(tsConfigContent, core_1.JsonParseMode.Loose);
     if (tsConfig === null || typeof tsConfig !== 'object' || Array.isArray(tsConfig) ||
         tsConfig.compilerOptions === null || typeof tsConfig.compilerOptions !== 'object' ||
         Array.isArray(tsConfig.compilerOptions)) {
@@ -191,6 +206,7 @@ function default_1(options) {
                 ...core_1.strings,
                 ...options,
                 stripTsExtension: (s) => s.replace(/\.ts$/, ''),
+                hasLocalizePackage: !!dependencies_1.getPackageJsonDependency(host, '@angular/localize'),
             }),
             schematics_1.move(core_1.join(core_1.normalize(clientProject.root), 'src')),
         ]);

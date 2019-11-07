@@ -39,6 +39,10 @@
       "description": "The scope for the new routing module.",
       "default": "Child"
     },
+    "route": {
+      "type": "string",
+      "description": "The route path for a lazy-loaded module. When supplied, creates a component in the new module, and adds the route to that component in the `Routes` array declared in the module provided in the `--module` option."
+    },
     "flat": {
       "type": "boolean",
       "description": "When true, creates the new files at the top level of the current project root. ",
