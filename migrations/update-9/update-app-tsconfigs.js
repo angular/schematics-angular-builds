@@ -8,22 +8,18 @@ const utils_1 = require("./utils");
  * Update the tsconfig files for applications
  * - Removes enableIvy: true
  * - Sets stricter file inclusions
- * - Sets module compiler option to esnext or commonjs
  */
 function updateApplicationTsConfigs() {
     return (tree, context) => {
         const workspace = utils_1.getWorkspace(tree);
-        const logger = context.logger;
-        // Add `module` option in the workspace tsconfig
-        updateModuleCompilerOption(tree, '/tsconfig.json');
         for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
-            updateTsConfig(tree, target, workspace_models_1.Builders.Browser, logger);
+            updateTsConfig(tree, target, workspace_models_1.Builders.Browser, context.logger);
         }
         for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
-            updateTsConfig(tree, target, workspace_models_1.Builders.Server, logger);
+            updateTsConfig(tree, target, workspace_models_1.Builders.Server, context.logger);
         }
         for (const { target } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
-            updateTsConfig(tree, target, workspace_models_1.Builders.Karma, logger);
+            updateTsConfig(tree, target, workspace_models_1.Builders.Karma, context.logger);
         }
         return tree;
     };
@@ -59,8 +55,6 @@ function updateTsConfig(tree, builderConfig, builderName, logger) {
                 tree.commitUpdate(recorder);
             }
         }
-        // Update 'module' compilerOption
-        updateModuleCompilerOption(tree, tsConfigPath, builderName);
         // Add stricter file inclusions to avoid unused file warning during compilation
         if (builderName !== workspace_models_1.Builders.Karma) {
             // Note: we need to re-read the tsconfig after very commit because
@@ -106,34 +100,4 @@ function updateTsConfig(tree, builderConfig, builderName, logger) {
             }
         }
     }
-}
-function updateModuleCompilerOption(tree, tsConfigPath, builderName) {
-    const tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigPath);
-    if (!tsConfigAst) {
-        return;
-    }
-    const compilerOptions = json_utils_1.findPropertyInAstObject(tsConfigAst, 'compilerOptions');
-    if (!compilerOptions || compilerOptions.kind !== 'object') {
-        return;
-    }
-    const configExtends = json_utils_1.findPropertyInAstObject(tsConfigAst, 'extends');
-    const isExtendedConfig = configExtends && configExtends.kind === 'string';
-    const recorder = tree.beginUpdate(tsConfigPath);
-    // Server tsconfig should have a module of commonjs
-    const moduleType = builderName === workspace_models_1.Builders.Server ? 'commonjs' : 'esnext';
-    if (isExtendedConfig && builderName !== workspace_models_1.Builders.Server) {
-        json_utils_1.removePropertyInAstObject(recorder, compilerOptions, 'module');
-    }
-    else {
-        const scriptModule = json_utils_1.findPropertyInAstObject(compilerOptions, 'module');
-        if (!scriptModule) {
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, compilerOptions, 'module', moduleType, 4);
-        }
-        else if (scriptModule.value !== moduleType) {
-            const { start, end } = scriptModule;
-            recorder.remove(start.offset, end.offset - start.offset);
-            recorder.insertLeft(start.offset, `"${moduleType}"`);
-        }
-    }
-    tree.commitUpdate(recorder);
 }
