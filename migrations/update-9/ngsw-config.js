@@ -14,12 +14,12 @@ function updateNGSWConfig() {
             for (const options of utils_1.getAllOptions(target)) {
                 const ngswConfigPath = json_utils_1.findPropertyInAstObject(options, 'ngswConfigPath');
                 if (!ngswConfigPath || ngswConfigPath.kind !== 'string') {
-                    logger.warn(`Cannot find file: ${ngswConfigPath}`);
                     continue;
                 }
                 const path = ngswConfigPath.value;
                 const ngswConfigAst = utils_1.readJsonFileAsAstObject(tree, path);
                 if (!ngswConfigAst || ngswConfigAst.kind !== 'object') {
+                    logger.warn(`Cannot find file: ${ngswConfigPath}`);
                     continue;
                 }
                 const assetGroups = json_utils_1.findPropertyInAstObject(ngswConfigAst, 'assetGroups');
