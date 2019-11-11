@@ -77,7 +77,7 @@ exports.getWorkspace = getWorkspace;
 function readJsonFileAsAstObject(host, path) {
     const configBuffer = host.read(path);
     if (!configBuffer) {
-        throw new schematics_1.SchematicsException(`Could not find (${path})`);
+        return undefined;
     }
     const content = configBuffer.toString();
     const astContent = core_1.parseJsonAst(content, core_1.JsonParseMode.Loose);
