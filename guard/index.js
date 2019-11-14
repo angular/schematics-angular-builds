@@ -21,8 +21,10 @@ function default_1(options) {
         if (!options.implements) {
             throw new schematics_1.SchematicsException('Option "implements" is required.');
         }
-        const implementations = options.implements.join(', ');
-        let implementationImports = `${implementations}, `;
+        const implementations = options.implements
+            .map(implement => implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement)
+            .join(', ');
+        let implementationImports = `${options.implements.join(', ')}, `;
         // As long as we aren't in IE... ;)
         if (options.implements.includes(schema_1.Implement.CanLoad)) {
             implementationImports = `${implementationImports}Route, UrlSegment, `;
