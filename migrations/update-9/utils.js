@@ -67,13 +67,17 @@ function getAllOptions(builderConfig, configurationsOnly = false) {
 exports.getAllOptions = getAllOptions;
 function getWorkspace(host) {
     const path = config_1.getWorkspacePath(host);
-    return readJsonFileAsAstObject(host, path);
+    const content = readJsonFileAsAstObject(host, path);
+    if (!content) {
+        throw new schematics_1.SchematicsException(`Could not find (${path})`);
+    }
+    return content;
 }
 exports.getWorkspace = getWorkspace;
 function readJsonFileAsAstObject(host, path) {
     const configBuffer = host.read(path);
     if (!configBuffer) {
-        throw new schematics_1.SchematicsException(`Could not find (${path})`);
+        return undefined;
     }
     const content = configBuffer.toString();
     const astContent = core_1.parseJsonAst(content, core_1.JsonParseMode.Loose);
