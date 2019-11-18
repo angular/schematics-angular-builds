@@ -6,5 +6,6 @@ var Implement;
 (function (Implement) {
     Implement["CanActivate"] = "CanActivate";
     Implement["CanActivateChild"] = "CanActivateChild";
+    Implement["CanDeactivate"] = "CanDeactivate";
     Implement["CanLoad"] = "CanLoad";
 })(Implement = exports.Implement || (exports.Implement = {}));
