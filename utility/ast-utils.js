@@ -459,6 +459,7 @@ function addBootstrapToModule(source, modulePath, classifiedName, importPath) {
 exports.addBootstrapToModule = addBootstrapToModule;
 /**
  * Custom function to insert an entryComponent into NgModule. It also imports it.
+ * @deprecated - Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
  */
 function addEntryComponentToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'entryComponents', classifiedName, importPath);
@@ -544,13 +545,33 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
         }
         routesArr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression, 1)[0];
     }
-    const occurencesCount = routesArr.elements.length;
+    const occurrencesCount = routesArr.elements.length;
     const text = routesArr.getFullText(source);
     let route = routeLiteral;
-    if (occurencesCount > 0) {
-        const identation = text.match(/\r?\n(\r?)\s*/) || [];
-        route = `,${identation[0] || ' '}${routeLiteral}`;
+    let insertPos = routesArr.elements.pos;
+    if (occurrencesCount > 0) {
+        const lastRouteLiteral = [...routesArr.elements].pop();
+        const lastRouteIsWildcard = ts.isObjectLiteralExpression(lastRouteLiteral)
+            && lastRouteLiteral
+                .properties
+                .some(n => (ts.isPropertyAssignment(n)
+                && ts.isIdentifier(n.name)
+                && n.name.text === 'path'
+                && ts.isStringLiteral(n.initializer)
+                && n.initializer.text === '**'));
+        const indentation = text.match(/\r?\n(\r?)\s*/) || [];
+        const routeText = `${indentation[0] || ' '}${routeLiteral}`;
+        // Add the new route before the wildcard route
+        // otherwise we'll always redirect to the wildcard route
+        if (lastRouteIsWildcard) {
+            insertPos = lastRouteLiteral.pos;
+            route = `${routeText},`;
+        }
+        else {
+            insertPos = lastRouteLiteral.end;
+            route = `,${routeText}`;
+        }
     }
-    return insertAfterLastOccurrence(routesArr.elements, route, fileToAdd, routesArr.elements.pos, ts.SyntaxKind.ObjectLiteralExpression);
+    return new change_1.InsertChange(fileToAdd, insertPos, route);
 }
 exports.addRouteDeclarationToModule = addRouteDeclarationToModule;

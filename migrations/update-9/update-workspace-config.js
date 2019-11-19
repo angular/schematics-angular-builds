@@ -18,7 +18,6 @@ function updateWorkspaceConfig() {
             updateStyleOrScriptOption('scripts', recorder, target);
             addAnyComponentStyleBudget(recorder, target);
             updateAotOption(tree, recorder, target);
-            addBuilderI18NOptions(recorder, target);
         }
         for (const { target } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
             updateStyleOrScriptOption('styles', recorder, target);
@@ -26,10 +25,6 @@ function updateWorkspaceConfig() {
         }
         for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
             updateOptimizationOption(recorder, target);
-            addBuilderI18NOptions(recorder, target);
-        }
-        for (const { target, project } of utils_1.getTargets(workspace, 'extract-i18n', workspace_models_1.Builders.ExtractI18n)) {
-            addProjectI18NOptions(recorder, target, project);
         }
         tree.commitUpdate(recorder);
         return tree;
