@@ -40,5 +40,6 @@ export interface Schema {
 export declare enum Implement {
     CanActivate = "CanActivate",
     CanActivateChild = "CanActivateChild",
+    CanDeactivate = "CanDeactivate",
     CanLoad = "CanLoad"
 }
