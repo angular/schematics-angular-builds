@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = require("../../utility/config");
+const dependencies_1 = require("../../utility/dependencies");
 const json_utils_1 = require("../../utility/json-utils");
+const latest_versions_1 = require("../../utility/latest-versions");
 const workspace_models_1 = require("../../utility/workspace-models");
 const utils_1 = require("./utils");
 exports.ANY_COMPONENT_STYLE_BUDGET = {
@@ -13,25 +15,31 @@ function updateWorkspaceConfig() {
         const workspacePath = config_1.getWorkspacePath(tree);
         const workspace = utils_1.getWorkspace(tree);
         const recorder = tree.beginUpdate(workspacePath);
-        for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
+        for (const { target, project } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
             updateStyleOrScriptOption('styles', recorder, target);
             updateStyleOrScriptOption('scripts', recorder, target);
             addAnyComponentStyleBudget(recorder, target);
             updateAotOption(tree, recorder, target);
+            addBuilderI18NOptions(recorder, target, project);
         }
-        for (const { target } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
+        for (const { target, project } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
             updateStyleOrScriptOption('styles', recorder, target);
             updateStyleOrScriptOption('scripts', recorder, target);
+            addBuilderI18NOptions(recorder, target, project);
         }
         for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
             updateOptimizationOption(recorder, target);
+        }
+        for (const { target, project } of utils_1.getTargets(workspace, 'extract-i18n', workspace_models_1.Builders.ExtractI18n)) {
+            addProjectI18NOptions(recorder, tree, target, project);
+            removeExtracti18nDeprecatedOptions(recorder, target);
         }
         tree.commitUpdate(recorder);
         return tree;
     };
 }
 exports.updateWorkspaceConfig = updateWorkspaceConfig;
-function addProjectI18NOptions(recorder, builderConfig, projectConfig) {
+function addProjectI18NOptions(recorder, tree, builderConfig, projectConfig) {
     const browserConfig = utils_1.getProjectTarget(projectConfig, 'build', workspace_models_1.Builders.Browser);
     if (!browserConfig || browserConfig.kind !== 'object') {
         return;
@@ -74,17 +82,48 @@ function addProjectI18NOptions(recorder, builderConfig, projectConfig) {
             // tslint:disable-next-line: no-any
             sourceLocale: sourceLocale,
         }, 6);
+        // Add @angular/localize if not already a dependency
+        if (!dependencies_1.getPackageJsonDependency(tree, '@angular/localize')) {
+            dependencies_1.addPackageJsonDependency(tree, {
+                name: '@angular/localize',
+                version: latest_versions_1.latestVersions.Angular,
+                type: dependencies_1.NodeDependencyType.Default,
+            });
+        }
     }
 }
-function addBuilderI18NOptions(recorder, builderConfig) {
+function addBuilderI18NOptions(recorder, builderConfig, projectConfig) {
     const options = utils_1.getAllOptions(builderConfig);
     for (const option of options) {
         const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
-        if (!localeId || localeId.kind !== 'string') {
-            continue;
+        if (localeId && localeId.kind === 'string') {
+            // add new localize option
+            json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'localize', [localeId.value], 12);
+            json_utils_1.removePropertyInAstObject(recorder, option, 'i18nLocale');
         }
-        // add new localize option
-        json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'localize', [localeId.value], 12);
+        const i18nFile = json_utils_1.findPropertyInAstObject(option, 'i18nFile');
+        if (i18nFile) {
+            json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFile');
+        }
+        const i18nFormat = json_utils_1.findPropertyInAstObject(option, 'i18nFormat');
+        if (i18nFormat) {
+            json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFormat');
+        }
+    }
+}
+function removeExtracti18nDeprecatedOptions(recorder, builderConfig) {
+    const options = utils_1.getAllOptions(builderConfig);
+    for (const option of options) {
+        // deprecated options
+        json_utils_1.removePropertyInAstObject(recorder, option, 'i18nLocale');
+        const i18nFormat = option.properties.find(({ key }) => key.value === 'i18nFormat');
+        if (i18nFormat) {
+            // i18nFormat has been changed to format
+            const key = i18nFormat.key;
+            const offset = key.start.offset + 1;
+            recorder.remove(offset, key.value.length);
+            recorder.insertLeft(offset, 'format');
+        }
     }
 }
 function updateAotOption(tree, recorder, builderConfig) {
