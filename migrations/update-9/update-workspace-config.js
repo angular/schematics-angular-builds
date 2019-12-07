@@ -58,13 +58,35 @@ function addProjectI18NOptions(recorder, tree, builderConfig, projectConfig) {
         }
         const localIdValue = localeId.value;
         const localeFileValue = localeFile.value;
+        const baseHref = json_utils_1.findPropertyInAstObject(option, 'baseHref');
+        let baseHrefValue;
+        if (baseHref) {
+            if (baseHref.kind === 'string' && baseHref.value !== `/${localIdValue}/`) {
+                baseHrefValue = baseHref.value;
+            }
+        }
+        else {
+            // If the configuration does not contain a baseHref, ensure the main option value is used.
+            baseHrefValue = '';
+        }
         if (!locales) {
             locales = {
-                [localIdValue]: localeFileValue,
+                [localIdValue]: baseHrefValue === undefined
+                    ? localeFileValue
+                    : {
+                        translation: localeFileValue,
+                        baseHref: baseHrefValue,
+                    },
             };
         }
         else {
-            locales[localIdValue] = localeFileValue;
+            locales[localIdValue] =
+                baseHrefValue === undefined
+                    ? localeFileValue
+                    : {
+                        translation: localeFileValue,
+                        baseHref: baseHrefValue,
+                    };
         }
     }
     if (locales) {
@@ -94,7 +116,11 @@ function addProjectI18NOptions(recorder, tree, builderConfig, projectConfig) {
 }
 function addBuilderI18NOptions(recorder, builderConfig, projectConfig) {
     const options = utils_1.getAllOptions(builderConfig);
-    let hasi18n = false;
+    const mainOptions = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
+    const mainBaseHref = mainOptions &&
+        mainOptions.kind === 'object' &&
+        json_utils_1.findPropertyInAstObject(mainOptions, 'baseHref');
+    const hasMainBaseHref = !!mainBaseHref && mainBaseHref.kind === 'string' && mainBaseHref.value !== '/';
     for (const option of options) {
         const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
         if (localeId && localeId.kind === 'string') {
@@ -110,30 +136,16 @@ function addBuilderI18NOptions(recorder, builderConfig, projectConfig) {
         if (i18nFormat) {
             json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFormat');
         }
-        hasi18n = !!(hasi18n || i18nFormat || i18nFile || localeId);
-    }
-    if (hasi18n) {
-        const options = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
-        if (!options || options.kind !== 'object') {
-            return;
+        // localize base HREF values are controlled by the i18n configuration
+        const baseHref = json_utils_1.findPropertyInAstObject(option, 'baseHref');
+        if (localeId && i18nFile && baseHref) {
+            json_utils_1.removePropertyInAstObject(recorder, option, 'baseHref');
+            // if the main option set has a non-default base href,
+            // ensure that the augmented base href has the correct base value
+            if (hasMainBaseHref) {
+                json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'baseHref', '/', 12);
+            }
         }
-        // Don't add localize option of it's already present in the main options
-        if (json_utils_1.findPropertyInAstObject(options, 'i18nLocale') || json_utils_1.findPropertyInAstObject(options, 'localize')) {
-            return;
-        }
-        // Get sourceLocale from extract-i18n builder
-        const extractI18nConfig = utils_1.getProjectTarget(projectConfig, 'extract-i18n', workspace_models_1.Builders.ExtractI18n);
-        let sourceLocale;
-        if (extractI18nConfig && extractI18nConfig.kind === 'object') {
-            const i18nOptions = utils_1.getAllOptions(extractI18nConfig);
-            sourceLocale = i18nOptions
-                .map(o => {
-                const sourceLocale = json_utils_1.findPropertyInAstObject(o, 'i18nLocale');
-                return sourceLocale && sourceLocale.value;
-            })
-                .find(x => !!x);
-        }
-        json_utils_1.insertPropertyInAstObjectInOrder(recorder, options, 'localize', [sourceLocale || 'en-US'], 12);
     }
 }
 function removeExtracti18nDeprecatedOptions(recorder, builderConfig) {
