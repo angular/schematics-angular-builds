@@ -96,7 +96,7 @@ function default_1(options) {
             options.module = find_module_1.findModuleFromOptions(host, options);
         }
         let routingModulePath;
-        const isLazyLoadedModuleGen = options.route && options.module;
+        const isLazyLoadedModuleGen = !!(options.route && options.module);
         if (isLazyLoadedModuleGen) {
             options.routingScope = schema_1.RoutingScope.Child;
             routingModulePath = getRoutingModulePath(host, options.module);
@@ -105,7 +105,7 @@ function default_1(options) {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            options.routing || isLazyLoadedModuleGen && !!routingModulePath
+            options.routing || (isLazyLoadedModuleGen && routingModulePath)
                 ? schematics_1.noop()
                 : schematics_1.filter(path => !path.endsWith('-routing.module.ts.template')),
             schematics_1.applyTemplates({
@@ -113,7 +113,7 @@ function default_1(options) {
                 'if-flat': (s) => options.flat ? '' : s,
                 lazyRoute: isLazyLoadedModuleGen,
                 lazyRouteWithoutRouteModule: isLazyLoadedModuleGen && !routingModulePath,
-                lazyRouteWithRouteModule: isLazyLoadedModuleGen && routingModulePath,
+                lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
                 ...options,
             }),
             schematics_1.move(parsedPath.path),
