@@ -58,13 +58,35 @@ function addProjectI18NOptions(recorder, tree, builderConfig, projectConfig) {
         }
         const localIdValue = localeId.value;
         const localeFileValue = localeFile.value;
+        const baseHref = json_utils_1.findPropertyInAstObject(option, 'baseHref');
+        let baseHrefValue;
+        if (baseHref) {
+            if (baseHref.kind === 'string' && baseHref.value !== `/${localIdValue}/`) {
+                baseHrefValue = baseHref.value;
+            }
+        }
+        else {
+            // If the configuration does not contain a baseHref, ensure the main option value is used.
+            baseHrefValue = '';
+        }
         if (!locales) {
             locales = {
-                [localIdValue]: localeFileValue,
+                [localIdValue]: baseHrefValue === undefined
+                    ? localeFileValue
+                    : {
+                        translation: localeFileValue,
+                        baseHref: baseHrefValue,
+                    },
             };
         }
         else {
-            locales[localIdValue] = localeFileValue;
+            locales[localIdValue] =
+                baseHrefValue === undefined
+                    ? localeFileValue
+                    : {
+                        translation: localeFileValue,
+                        baseHref: baseHrefValue,
+                    };
         }
     }
     if (locales) {
@@ -94,6 +116,11 @@ function addProjectI18NOptions(recorder, tree, builderConfig, projectConfig) {
 }
 function addBuilderI18NOptions(recorder, builderConfig, projectConfig) {
     const options = utils_1.getAllOptions(builderConfig);
+    const mainOptions = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
+    const mainBaseHref = mainOptions &&
+        mainOptions.kind === 'object' &&
+        json_utils_1.findPropertyInAstObject(mainOptions, 'baseHref');
+    const hasMainBaseHref = !!mainBaseHref && mainBaseHref.kind === 'string' && mainBaseHref.value !== '/';
     for (const option of options) {
         const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
         if (localeId && localeId.kind === 'string') {
@@ -108,6 +135,16 @@ function addBuilderI18NOptions(recorder, builderConfig, projectConfig) {
         const i18nFormat = json_utils_1.findPropertyInAstObject(option, 'i18nFormat');
         if (i18nFormat) {
             json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFormat');
+        }
+        // localize base HREF values are controlled by the i18n configuration
+        const baseHref = json_utils_1.findPropertyInAstObject(option, 'baseHref');
+        if (localeId && i18nFile && baseHref) {
+            json_utils_1.removePropertyInAstObject(recorder, option, 'baseHref');
+            // if the main option set has a non-default base href,
+            // ensure that the augmented base href has the correct base value
+            if (hasMainBaseHref) {
+                json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'baseHref', '/', 12);
+            }
         }
     }
 }
