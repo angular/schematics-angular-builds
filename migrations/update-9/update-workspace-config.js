@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const path_1 = require("path");
 const config_1 = require("../../utility/config");
 const dependencies_1 = require("../../utility/dependencies");
 const json_utils_1 = require("../../utility/json-utils");
@@ -11,21 +12,21 @@ exports.ANY_COMPONENT_STYLE_BUDGET = {
     maximumWarning: '6kb',
 };
 function updateWorkspaceConfig() {
-    return (tree) => {
+    return (tree, context) => {
         const workspacePath = config_1.getWorkspacePath(tree);
         const workspace = utils_1.getWorkspace(tree);
         const recorder = tree.beginUpdate(workspacePath);
-        for (const { target, project } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
+        for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
             updateStyleOrScriptOption('styles', recorder, target);
             updateStyleOrScriptOption('scripts', recorder, target);
             addAnyComponentStyleBudget(recorder, target);
             updateAotOption(tree, recorder, target);
-            addBuilderI18NOptions(recorder, target, project);
+            addBuilderI18NOptions(recorder, target, context.logger);
         }
-        for (const { target, project } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
+        for (const { target } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
             updateStyleOrScriptOption('styles', recorder, target);
             updateStyleOrScriptOption('scripts', recorder, target);
-            addBuilderI18NOptions(recorder, target, project);
+            addBuilderI18NOptions(recorder, target, context.logger);
         }
         for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
             updateOptimizationOption(recorder, target);
@@ -114,7 +115,7 @@ function addProjectI18NOptions(recorder, tree, builderConfig, projectConfig) {
         }
     }
 }
-function addBuilderI18NOptions(recorder, builderConfig, projectConfig) {
+function addBuilderI18NOptions(recorder, builderConfig, logger) {
     const options = utils_1.getAllOptions(builderConfig);
     const mainOptions = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
     const mainBaseHref = mainOptions &&
@@ -123,27 +124,61 @@ function addBuilderI18NOptions(recorder, builderConfig, projectConfig) {
     const hasMainBaseHref = !!mainBaseHref && mainBaseHref.kind === 'string' && mainBaseHref.value !== '/';
     for (const option of options) {
         const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
+        const i18nFile = json_utils_1.findPropertyInAstObject(option, 'i18nFile');
+        // The format is always auto-detected now
+        const i18nFormat = json_utils_1.findPropertyInAstObject(option, 'i18nFormat');
+        if (i18nFormat) {
+            json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFormat');
+        }
+        const outputPath = json_utils_1.findPropertyInAstObject(option, 'outputPath');
+        if (localeId &&
+            localeId.kind === 'string' &&
+            i18nFile &&
+            outputPath &&
+            outputPath.kind === 'string') {
+            // This first block was intended to remove the redundant output path field
+            // but due to defects in the recorder, removing the option will cause malformed json
+            // if (
+            //   mainOutputPathValue &&
+            //   outputPath.value.match(
+            //     new RegExp(`[/\\\\]?${mainOutputPathValue}[/\\\\]${localeId.value}[/\\\\]?$`),
+            //   )
+            // ) {
+            //   removePropertyInAstObject(recorder, option, 'outputPath');
+            // } else
+            if (outputPath.value.match(new RegExp(`[/\\\\]${localeId.value}[/\\\\]?$`))) {
+                const newOutputPath = outputPath.value.replace(new RegExp(`[/\\\\]${localeId.value}[/\\\\]?$`), '');
+                const { start, end } = outputPath;
+                recorder.remove(start.offset, end.offset - start.offset);
+                recorder.insertLeft(start.offset, `"${newOutputPath}"`);
+            }
+            else {
+                logger.warn(`Output path value "${outputPath.value}" for locale "${localeId.value}" is not supported with the new localization system. ` +
+                    `With the current value, the localized output would be written to "${path_1.posix.join(outputPath.value, localeId.value)}". ` +
+                    `Keeping existing options for the target configuration of locale "${localeId.value}".`);
+                continue;
+            }
+        }
         if (localeId && localeId.kind === 'string') {
             // add new localize option
             json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'localize', [localeId.value], 12);
             json_utils_1.removePropertyInAstObject(recorder, option, 'i18nLocale');
         }
-        const i18nFile = json_utils_1.findPropertyInAstObject(option, 'i18nFile');
         if (i18nFile) {
             json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFile');
-        }
-        const i18nFormat = json_utils_1.findPropertyInAstObject(option, 'i18nFormat');
-        if (i18nFormat) {
-            json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFormat');
         }
         // localize base HREF values are controlled by the i18n configuration
         const baseHref = json_utils_1.findPropertyInAstObject(option, 'baseHref');
         if (localeId && i18nFile && baseHref) {
-            json_utils_1.removePropertyInAstObject(recorder, option, 'baseHref');
             // if the main option set has a non-default base href,
             // ensure that the augmented base href has the correct base value
             if (hasMainBaseHref) {
-                json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'baseHref', '/', 12);
+                const { start, end } = baseHref;
+                recorder.remove(start.offset, end.offset - start.offset);
+                recorder.insertLeft(start.offset, `"/"`);
+            }
+            else {
+                json_utils_1.removePropertyInAstObject(recorder, option, 'baseHref');
             }
         }
     }
