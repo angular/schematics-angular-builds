@@ -15,14 +15,12 @@ const ngsw_config_1 = require("./ngsw-config");
 const remove_tsickle_1 = require("./remove-tsickle");
 const update_app_tsconfigs_1 = require("./update-app-tsconfigs");
 const update_dependencies_1 = require("./update-dependencies");
-const update_i18n_1 = require("./update-i18n");
 const update_server_main_file_1 = require("./update-server-main-file");
 const update_workspace_config_1 = require("./update-workspace-config");
 function default_1() {
     return () => {
         return schematics_1.chain([
             update_workspace_config_1.updateWorkspaceConfig(),
-            update_i18n_1.updateI18nConfig(),
             ivy_libraries_1.updateLibraries(),
             ngsw_config_1.updateNGSWConfig(),
             update_app_tsconfigs_1.updateApplicationTsConfigs(),
