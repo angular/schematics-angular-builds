@@ -38,9 +38,4 @@ export interface Schema {
      * When true, does not create "spec.ts" test files for the new pipe.
      */
     skipTests?: boolean;
-    /**
-     * When true (the default), generates a  "spec.ts" test file for the new pipe.
-     * @deprecated Use "skipTests" instead.
-     */
-    spec?: boolean;
 }

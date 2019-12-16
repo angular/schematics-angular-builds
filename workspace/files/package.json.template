@@ -7,8 +7,7 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e",
-    "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
+    "e2e": "ng e2e"
   },
   "private": true,
   "dependencies": {
@@ -28,8 +27,8 @@
     "@angular/cli": "<%= '~' + version %>",
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",
     "@angular/language-service": "<%= latestVersions.Angular %>",
-    "@types/node": "~10.14.0",<% if (!minimal) { %>
-    "@types/jasmine": "~3.4.0",
+    "@types/node": "^12.11.1",<% if (!minimal) { %>
+    "@types/jasmine": "~3.5.0",
     "@types/jasminewd2": "~2.0.3",
     "codelyzer": "^5.1.2",
     "jasmine-core": "~3.5.0",
