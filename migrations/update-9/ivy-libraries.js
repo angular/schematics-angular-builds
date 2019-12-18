@@ -1,13 +1,5 @@
 "use strict";
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@angular-devkit/core");
 const config_1 = require("../../utility/config");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
@@ -31,7 +23,7 @@ function updateLibraries() {
                 break;
             }
             const configurations = json_utils_1.findPropertyInAstObject(target, 'configurations');
-            const tsConfig = core_1.join(core_1.normalize(projectRoot.value), 'tsconfig.lib.prod.json');
+            const tsConfig = `${projectRoot.value}/tsconfig.lib.prod.json`;
             if (!configurations || configurations.kind !== 'object') {
                 // Configurations doesn't exist.
                 json_utils_1.appendPropertyInAstObject(recorder, target, 'configurations', { production: { tsConfig } }, 10);
