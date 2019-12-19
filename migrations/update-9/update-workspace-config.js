@@ -1,10 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const path_1 = require("path");
 const config_1 = require("../../utility/config");
-const dependencies_1 = require("../../utility/dependencies");
 const json_utils_1 = require("../../utility/json-utils");
-const latest_versions_1 = require("../../utility/latest-versions");
 const workspace_models_1 = require("../../utility/workspace-models");
 const utils_1 = require("./utils");
 exports.ANY_COMPONENT_STYLE_BUDGET = {
@@ -21,183 +18,19 @@ function updateWorkspaceConfig() {
             updateStyleOrScriptOption('scripts', recorder, target);
             addAnyComponentStyleBudget(recorder, target);
             updateAotOption(tree, recorder, target);
-            addBuilderI18NOptions(recorder, target, context.logger);
         }
         for (const { target } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
             updateStyleOrScriptOption('styles', recorder, target);
             updateStyleOrScriptOption('scripts', recorder, target);
-            addBuilderI18NOptions(recorder, target, context.logger);
         }
         for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
             updateOptimizationOption(recorder, target);
-        }
-        for (const { target, project } of utils_1.getTargets(workspace, 'extract-i18n', workspace_models_1.Builders.ExtractI18n)) {
-            addProjectI18NOptions(recorder, tree, target, project);
-            removeExtracti18nDeprecatedOptions(recorder, target);
         }
         tree.commitUpdate(recorder);
         return tree;
     };
 }
 exports.updateWorkspaceConfig = updateWorkspaceConfig;
-function addProjectI18NOptions(recorder, tree, builderConfig, projectConfig) {
-    const browserConfig = utils_1.getProjectTarget(projectConfig, 'build', workspace_models_1.Builders.Browser);
-    if (!browserConfig || browserConfig.kind !== 'object') {
-        return;
-    }
-    // browser builder options
-    let locales;
-    const options = utils_1.getAllOptions(browserConfig);
-    for (const option of options) {
-        const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
-        if (!localeId || localeId.kind !== 'string') {
-            continue;
-        }
-        const localeFile = json_utils_1.findPropertyInAstObject(option, 'i18nFile');
-        if (!localeFile || localeFile.kind !== 'string') {
-            continue;
-        }
-        const localIdValue = localeId.value;
-        const localeFileValue = localeFile.value;
-        const baseHref = json_utils_1.findPropertyInAstObject(option, 'baseHref');
-        let baseHrefValue;
-        if (baseHref) {
-            if (baseHref.kind === 'string' && baseHref.value !== `/${localIdValue}/`) {
-                baseHrefValue = baseHref.value;
-            }
-        }
-        else {
-            // If the configuration does not contain a baseHref, ensure the main option value is used.
-            baseHrefValue = '';
-        }
-        if (!locales) {
-            locales = {
-                [localIdValue]: baseHrefValue === undefined
-                    ? localeFileValue
-                    : {
-                        translation: localeFileValue,
-                        baseHref: baseHrefValue,
-                    },
-            };
-        }
-        else {
-            locales[localIdValue] =
-                baseHrefValue === undefined
-                    ? localeFileValue
-                    : {
-                        translation: localeFileValue,
-                        baseHref: baseHrefValue,
-                    };
-        }
-    }
-    if (locales) {
-        // Get sourceLocale from extract-i18n builder
-        const i18nOptions = utils_1.getAllOptions(builderConfig);
-        const sourceLocale = i18nOptions
-            .map(o => {
-            const sourceLocale = json_utils_1.findPropertyInAstObject(o, 'i18nLocale');
-            return sourceLocale && sourceLocale.value;
-        })
-            .find(x => !!x);
-        // Add i18n project configuration
-        json_utils_1.insertPropertyInAstObjectInOrder(recorder, projectConfig, 'i18n', {
-            locales,
-            // tslint:disable-next-line: no-any
-            sourceLocale: sourceLocale,
-        }, 6);
-        // Add @angular/localize if not already a dependency
-        if (!dependencies_1.getPackageJsonDependency(tree, '@angular/localize')) {
-            dependencies_1.addPackageJsonDependency(tree, {
-                name: '@angular/localize',
-                version: latest_versions_1.latestVersions.Angular,
-                type: dependencies_1.NodeDependencyType.Default,
-            });
-        }
-    }
-}
-function addBuilderI18NOptions(recorder, builderConfig, logger) {
-    const options = utils_1.getAllOptions(builderConfig);
-    const mainOptions = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
-    const mainBaseHref = mainOptions &&
-        mainOptions.kind === 'object' &&
-        json_utils_1.findPropertyInAstObject(mainOptions, 'baseHref');
-    const hasMainBaseHref = !!mainBaseHref && mainBaseHref.kind === 'string' && mainBaseHref.value !== '/';
-    for (const option of options) {
-        const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
-        const i18nFile = json_utils_1.findPropertyInAstObject(option, 'i18nFile');
-        // The format is always auto-detected now
-        const i18nFormat = json_utils_1.findPropertyInAstObject(option, 'i18nFormat');
-        if (i18nFormat) {
-            json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFormat');
-        }
-        const outputPath = json_utils_1.findPropertyInAstObject(option, 'outputPath');
-        if (localeId &&
-            localeId.kind === 'string' &&
-            i18nFile &&
-            outputPath &&
-            outputPath.kind === 'string') {
-            // This first block was intended to remove the redundant output path field
-            // but due to defects in the recorder, removing the option will cause malformed json
-            // if (
-            //   mainOutputPathValue &&
-            //   outputPath.value.match(
-            //     new RegExp(`[/\\\\]?${mainOutputPathValue}[/\\\\]${localeId.value}[/\\\\]?$`),
-            //   )
-            // ) {
-            //   removePropertyInAstObject(recorder, option, 'outputPath');
-            // } else
-            if (outputPath.value.match(new RegExp(`[/\\\\]${localeId.value}[/\\\\]?$`))) {
-                const newOutputPath = outputPath.value.replace(new RegExp(`[/\\\\]${localeId.value}[/\\\\]?$`), '');
-                const { start, end } = outputPath;
-                recorder.remove(start.offset, end.offset - start.offset);
-                recorder.insertLeft(start.offset, `"${newOutputPath}"`);
-            }
-            else {
-                logger.warn(`Output path value "${outputPath.value}" for locale "${localeId.value}" is not supported with the new localization system. ` +
-                    `With the current value, the localized output would be written to "${path_1.posix.join(outputPath.value, localeId.value)}". ` +
-                    `Keeping existing options for the target configuration of locale "${localeId.value}".`);
-                continue;
-            }
-        }
-        if (localeId && localeId.kind === 'string') {
-            // add new localize option
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'localize', [localeId.value], 12);
-            json_utils_1.removePropertyInAstObject(recorder, option, 'i18nLocale');
-        }
-        if (i18nFile) {
-            json_utils_1.removePropertyInAstObject(recorder, option, 'i18nFile');
-        }
-        // localize base HREF values are controlled by the i18n configuration
-        const baseHref = json_utils_1.findPropertyInAstObject(option, 'baseHref');
-        if (localeId && i18nFile && baseHref) {
-            // if the main option set has a non-default base href,
-            // ensure that the augmented base href has the correct base value
-            if (hasMainBaseHref) {
-                const { start, end } = baseHref;
-                recorder.remove(start.offset, end.offset - start.offset);
-                recorder.insertLeft(start.offset, `"/"`);
-            }
-            else {
-                json_utils_1.removePropertyInAstObject(recorder, option, 'baseHref');
-            }
-        }
-    }
-}
-function removeExtracti18nDeprecatedOptions(recorder, builderConfig) {
-    const options = utils_1.getAllOptions(builderConfig);
-    for (const option of options) {
-        // deprecated options
-        json_utils_1.removePropertyInAstObject(recorder, option, 'i18nLocale');
-        const i18nFormat = option.properties.find(({ key }) => key.value === 'i18nFormat');
-        if (i18nFormat) {
-            // i18nFormat has been changed to format
-            const key = i18nFormat.key;
-            const offset = key.start.offset + 1;
-            recorder.remove(offset, key.value.length);
-            recorder.insertLeft(offset, 'format');
-        }
-    }
-}
 function updateAotOption(tree, recorder, builderConfig) {
     const options = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
     if (!options || options.kind !== 'object') {
