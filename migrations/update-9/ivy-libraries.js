@@ -1,5 +1,13 @@
 "use strict";
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = require("@angular-devkit/core");
 const config_1 = require("../../utility/config");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
@@ -12,7 +20,8 @@ const utils_1 = require("./utils");
  * - Create a prod tsconfig for which disables Ivy and enables VE compilations.
  */
 function updateLibraries() {
-    return (tree) => {
+    return (tree, context) => {
+        const logger = context.logger;
         const workspacePath = config_1.getWorkspacePath(tree);
         const workspace = utils_1.getWorkspace(tree);
         const recorder = tree.beginUpdate(workspacePath);
@@ -22,7 +31,7 @@ function updateLibraries() {
                 break;
             }
             const configurations = json_utils_1.findPropertyInAstObject(target, 'configurations');
-            const tsConfig = `${projectRoot.value}/tsconfig.lib.prod.json`;
+            const tsConfig = core_1.join(core_1.normalize(projectRoot.value), 'tsconfig.lib.prod.json');
             if (!configurations || configurations.kind !== 'object') {
                 // Configurations doesn't exist.
                 json_utils_1.appendPropertyInAstObject(recorder, target, 'configurations', { production: { tsConfig } }, 10);
@@ -44,8 +53,13 @@ function updateLibraries() {
                 continue;
             }
             // tsConfig for production already exists.
-            const tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigOption.value);
-            const tsConfigRecorder = tree.beginUpdate(tsConfigOption.value);
+            const tsConfigPath = tsConfigOption.value;
+            const tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigPath);
+            if (!tsConfigAst) {
+                logger.warn(`Cannot find file: ${tsConfigPath}`);
+                continue;
+            }
+            const tsConfigRecorder = tree.beginUpdate(tsConfigPath);
             const ngCompilerOptions = json_utils_1.findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
             if (!ngCompilerOptions) {
                 // Add angularCompilerOptions to the production tsConfig
