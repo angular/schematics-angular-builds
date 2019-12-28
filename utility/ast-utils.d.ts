@@ -90,6 +90,12 @@ export declare function addEntryComponentToModule(source: ts.SourceFile, moduleP
  */
 export declare function isImported(source: ts.SourceFile, classifiedName: string, importPath: string): boolean;
 /**
+ * This function returns the name of the environment export
+ * whether this export is aliased or not. If the environment file
+ * is not imported, then it will return `null`.
+ */
+export declare function getEnvironmentExportName(source: ts.SourceFile): string | null;
+/**
  * Returns the RouterModule declaration from NgModule metadata, if any.
  */
 export declare function getRouterModuleDeclaration(source: ts.SourceFile): ts.Expression | undefined;
