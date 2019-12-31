@@ -53,10 +53,15 @@ function updateAppModule(mainPath) {
         // add import for environments
         // import { environment } from '../environments/environment';
         moduleSource = getTsSourceFile(host, modulePath);
-        importModule = 'environment';
+        const environmentExportName = ast_utils_1.getEnvironmentExportName(moduleSource);
+        // if environemnt import already exists then use the found one
+        // otherwise use the default name
+        importModule = environmentExportName || 'environment';
         // TODO: dynamically find environments relative path
         importPath = '../environments/environment';
-        if (!ast_utils_1.isImported(moduleSource, importModule, importPath)) {
+        if (!environmentExportName) {
+            // if environment import was not found then insert the new one
+            // with default path and default export name
             const change = ast_utils_1.insertImport(moduleSource, modulePath, importModule, importPath);
             if (change) {
                 const recorder = host.beginUpdate(modulePath);
@@ -65,7 +70,7 @@ function updateAppModule(mainPath) {
             }
         }
         // register SW in app module
-        const importText = `ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })`;
+        const importText = `ServiceWorkerModule.register('ngsw-worker.js', { enabled: ${importModule}.production })`;
         moduleSource = getTsSourceFile(host, modulePath);
         const metadataChanges = ast_utils_1.addSymbolToNgModuleMetadata(moduleSource, modulePath, 'imports', importText);
         if (metadataChanges) {
