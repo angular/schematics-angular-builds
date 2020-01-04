@@ -9,7 +9,7 @@ exports.ANY_COMPONENT_STYLE_BUDGET = {
     maximumWarning: '6kb',
 };
 function updateWorkspaceConfig() {
-    return (tree) => {
+    return (tree, context) => {
         const workspacePath = config_1.getWorkspacePath(tree);
         const workspace = utils_1.getWorkspace(tree);
         const recorder = tree.beginUpdate(workspacePath);
@@ -31,62 +31,6 @@ function updateWorkspaceConfig() {
     };
 }
 exports.updateWorkspaceConfig = updateWorkspaceConfig;
-function addProjectI18NOptions(recorder, builderConfig, projectConfig) {
-    const browserConfig = utils_1.getProjectTarget(projectConfig, 'build', workspace_models_1.Builders.Browser);
-    if (!browserConfig || browserConfig.kind !== 'object') {
-        return;
-    }
-    // browser builder options
-    let locales;
-    const options = utils_1.getAllOptions(browserConfig);
-    for (const option of options) {
-        const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
-        if (!localeId || localeId.kind !== 'string') {
-            continue;
-        }
-        const localeFile = json_utils_1.findPropertyInAstObject(option, 'i18nFile');
-        if (!localeFile || localeFile.kind !== 'string') {
-            continue;
-        }
-        const localIdValue = localeId.value;
-        const localeFileValue = localeFile.value;
-        if (!locales) {
-            locales = {
-                [localIdValue]: localeFileValue,
-            };
-        }
-        else {
-            locales[localIdValue] = localeFileValue;
-        }
-    }
-    if (locales) {
-        // Get sourceLocale from extract-i18n builder
-        const i18nOptions = utils_1.getAllOptions(builderConfig);
-        const sourceLocale = i18nOptions
-            .map(o => {
-            const sourceLocale = json_utils_1.findPropertyInAstObject(o, 'i18nLocale');
-            return sourceLocale && sourceLocale.value;
-        })
-            .find(x => !!x);
-        // Add i18n project configuration
-        json_utils_1.insertPropertyInAstObjectInOrder(recorder, projectConfig, 'i18n', {
-            locales,
-            // tslint:disable-next-line: no-any
-            sourceLocale: sourceLocale,
-        }, 6);
-    }
-}
-function addBuilderI18NOptions(recorder, builderConfig) {
-    const options = utils_1.getAllOptions(builderConfig);
-    for (const option of options) {
-        const localeId = json_utils_1.findPropertyInAstObject(option, 'i18nLocale');
-        if (!localeId || localeId.kind !== 'string') {
-            continue;
-        }
-        // add new localize option
-        json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'localize', [localeId.value], 12);
-    }
-}
 function updateAotOption(tree, recorder, builderConfig) {
     const options = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
     if (!options || options.kind !== 'object') {

@@ -488,6 +488,42 @@ function isImported(source, classifiedName, importPath) {
 }
 exports.isImported = isImported;
 /**
+ * This function returns the name of the environment export
+ * whether this export is aliased or not. If the environment file
+ * is not imported, then it will return `null`.
+ */
+function getEnvironmentExportName(source) {
+    // Initial value is `null` as we don't know yet if the user
+    // has imported `environment` into the root module or not.
+    let environmentExportName = null;
+    const allNodes = getSourceNodes(source);
+    allNodes
+        .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+        .filter((declaration) => declaration.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral &&
+        declaration.importClause !== undefined)
+        .map((declaration) => 
+    // If `importClause` property is defined then the first
+    // child will be `NamedImports` object (or `namedBindings`).
+    declaration.importClause.getChildAt(0))
+        // Find those `NamedImports` object that contains `environment` keyword
+        // in its text. E.g. `{ environment as env }`.
+        .filter((namedImports) => namedImports.getText().includes('environment'))
+        .forEach((namedImports) => {
+        for (const specifier of namedImports.elements) {
+            // `propertyName` is defined if the specifier
+            // has an aliased import.
+            const name = specifier.propertyName || specifier.name;
+            // Find specifier that contains `environment` keyword in its text.
+            // Whether it's `environment` or `environment as env`.
+            if (name.text.includes('environment')) {
+                environmentExportName = specifier.name.text;
+            }
+        }
+    });
+    return environmentExportName;
+}
+exports.getEnvironmentExportName = getEnvironmentExportName;
+/**
  * Returns the RouterModule declaration from NgModule metadata, if any.
  */
 function getRouterModuleDeclaration(source) {
@@ -545,13 +581,33 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
         }
         routesArr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression, 1)[0];
     }
-    const occurencesCount = routesArr.elements.length;
+    const occurrencesCount = routesArr.elements.length;
     const text = routesArr.getFullText(source);
     let route = routeLiteral;
-    if (occurencesCount > 0) {
-        const identation = text.match(/\r?\n(\r?)\s*/) || [];
-        route = `,${identation[0] || ' '}${routeLiteral}`;
+    let insertPos = routesArr.elements.pos;
+    if (occurrencesCount > 0) {
+        const lastRouteLiteral = [...routesArr.elements].pop();
+        const lastRouteIsWildcard = ts.isObjectLiteralExpression(lastRouteLiteral)
+            && lastRouteLiteral
+                .properties
+                .some(n => (ts.isPropertyAssignment(n)
+                && ts.isIdentifier(n.name)
+                && n.name.text === 'path'
+                && ts.isStringLiteral(n.initializer)
+                && n.initializer.text === '**'));
+        const indentation = text.match(/\r?\n(\r?)\s*/) || [];
+        const routeText = `${indentation[0] || ' '}${routeLiteral}`;
+        // Add the new route before the wildcard route
+        // otherwise we'll always redirect to the wildcard route
+        if (lastRouteIsWildcard) {
+            insertPos = lastRouteLiteral.pos;
+            route = `${routeText},`;
+        }
+        else {
+            insertPos = lastRouteLiteral.end;
+            route = `,${routeText}`;
+        }
     }
-    return insertAfterLastOccurrence(routesArr.elements, route, fileToAdd, routesArr.elements.pos, ts.SyntaxKind.ObjectLiteralExpression);
+    return new change_1.InsertChange(fileToAdd, insertPos, route);
 }
 exports.addRouteDeclarationToModule = addRouteDeclarationToModule;
