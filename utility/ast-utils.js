@@ -488,6 +488,42 @@ function isImported(source, classifiedName, importPath) {
 }
 exports.isImported = isImported;
 /**
+ * This function returns the name of the environment export
+ * whether this export is aliased or not. If the environment file
+ * is not imported, then it will return `null`.
+ */
+function getEnvironmentExportName(source) {
+    // Initial value is `null` as we don't know yet if the user
+    // has imported `environment` into the root module or not.
+    let environmentExportName = null;
+    const allNodes = getSourceNodes(source);
+    allNodes
+        .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+        .filter((declaration) => declaration.moduleSpecifier.kind === ts.SyntaxKind.StringLiteral &&
+        declaration.importClause !== undefined)
+        .map((declaration) => 
+    // If `importClause` property is defined then the first
+    // child will be `NamedImports` object (or `namedBindings`).
+    declaration.importClause.getChildAt(0))
+        // Find those `NamedImports` object that contains `environment` keyword
+        // in its text. E.g. `{ environment as env }`.
+        .filter((namedImports) => namedImports.getText().includes('environment'))
+        .forEach((namedImports) => {
+        for (const specifier of namedImports.elements) {
+            // `propertyName` is defined if the specifier
+            // has an aliased import.
+            const name = specifier.propertyName || specifier.name;
+            // Find specifier that contains `environment` keyword in its text.
+            // Whether it's `environment` or `environment as env`.
+            if (name.text.includes('environment')) {
+                environmentExportName = specifier.name.text;
+            }
+        }
+    });
+    return environmentExportName;
+}
+exports.getEnvironmentExportName = getEnvironmentExportName;
+/**
  * Returns the RouterModule declaration from NgModule metadata, if any.
  */
 function getRouterModuleDeclaration(source) {
