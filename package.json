@@ -1,6 +1,6 @@
 {
   "name": "@schematics/angular",
-  "version": "9.0.0-next.19+378.9a7d8e3",
+  "version": "9.0.0-next.19+379.5a1b190",
   "description": "Schematics specific to Angular",
   "keywords": [
     "angular",
@@ -14,8 +14,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#9a7d8e387",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#9a7d8e387"
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#5a1b190fd",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#5a1b190fd"
   },
   "repository": {
     "type": "git",
