@@ -27,7 +27,7 @@ function updateJsonFile(host, path, callback) {
     }
     return host;
 }
-function updateTsConfig(packageName, distRoot) {
+function updateTsConfig(packageName, ...paths) {
     return (host) => {
         if (!host.exists('tsconfig.json')) {
             return host;
@@ -39,7 +39,7 @@ function updateTsConfig(packageName, distRoot) {
             if (!tsconfig.compilerOptions.paths[packageName]) {
                 tsconfig.compilerOptions.paths[packageName] = [];
             }
-            tsconfig.compilerOptions.paths[packageName].push(distRoot);
+            tsconfig.compilerOptions.paths[packageName].push(...paths);
         });
     };
 }
@@ -150,6 +150,7 @@ function default_1(options) {
         const folderName = `${scopeFolder}${core_1.strings.dasherize(options.name)}`;
         const projectRoot = core_1.join(core_1.normalize(newProjectRoot), folderName);
         const distRoot = `dist/${folderName}`;
+        const pathImportLib = `${distRoot}/${folderName.replace('/', '-')}`;
         const sourceDir = `${projectRoot}/src/lib`;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             schematics_1.applyTemplates({
@@ -170,7 +171,7 @@ function default_1(options) {
             schematics_1.mergeWith(templateSource),
             addLibToWorkspaceFile(options, projectRoot, projectName),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(),
-            options.skipTsConfig ? schematics_1.noop() : updateTsConfig(packageName, distRoot),
+            options.skipTsConfig ? schematics_1.noop() : updateTsConfig(packageName, pathImportLib, distRoot),
             schematics_1.schematic('module', {
                 name: options.name,
                 commonModule: false,
