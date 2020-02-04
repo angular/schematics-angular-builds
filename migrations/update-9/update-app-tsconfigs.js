@@ -83,13 +83,14 @@ function updateTsConfig(tree, builderConfig, builderName, logger) {
             const files = json_utils_1.findPropertyInAstObject(tsConfigAst, 'files');
             if (!files) {
                 const newFiles = [];
+                const tsConfigDir = path_1.dirname(utils_1.forwardSlashPath(tsConfigPath));
                 const mainOption = json_utils_1.findPropertyInAstObject(option, 'main');
                 if (mainOption && mainOption.kind === 'string') {
-                    newFiles.push(path_1.posix.relative(path_1.posix.dirname(tsConfigPath), mainOption.value));
+                    newFiles.push(utils_1.forwardSlashPath(path_1.relative(tsConfigDir, utils_1.forwardSlashPath(mainOption.value))));
                 }
                 const polyfillsOption = json_utils_1.findPropertyInAstObject(option, 'polyfills');
                 if (polyfillsOption && polyfillsOption.kind === 'string') {
-                    newFiles.push(path_1.posix.relative(path_1.posix.dirname(tsConfigPath), polyfillsOption.value));
+                    newFiles.push(utils_1.forwardSlashPath(path_1.relative(tsConfigDir, utils_1.forwardSlashPath(polyfillsOption.value))));
                 }
                 if (newFiles.length) {
                     recorder = tree.beginUpdate(tsConfigPath);

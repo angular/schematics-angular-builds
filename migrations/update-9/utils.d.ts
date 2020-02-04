@@ -19,3 +19,4 @@ export declare function getAllOptions(builderConfig: JsonAstObject, configuratio
 export declare function getWorkspace(host: Tree): JsonAstObject;
 export declare function readJsonFileAsAstObject(host: Tree, path: string): JsonAstObject | undefined;
 export declare function isIvyEnabled(tree: Tree, tsConfigPath: string): boolean;
+export declare function forwardSlashPath(path: string): string;
