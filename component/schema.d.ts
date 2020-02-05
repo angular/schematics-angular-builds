@@ -7,6 +7,10 @@ export interface Schema {
      */
     changeDetection?: ChangeDetection;
     /**
+     * Specifies if the style will contain `:host { display: block; }`.
+     */
+    displayBlock?: boolean;
+    /**
      * When true, the new component is the entry component of the declaring NgModule.
      * @deprecated Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
      */
