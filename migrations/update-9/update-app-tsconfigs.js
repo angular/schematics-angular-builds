@@ -1,5 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+const core_1 = require("@angular-devkit/core");
 const path_1 = require("path");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
@@ -16,20 +24,21 @@ function updateApplicationTsConfigs() {
         const logger = context.logger;
         // Add `module` option in the workspace tsconfig
         updateModuleCompilerOption(tree, '/tsconfig.json');
-        for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
-            updateTsConfig(tree, target, workspace_models_1.Builders.Browser, logger);
+        for (const { target, project } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
+            updateTsConfig(tree, target, project, workspace_models_1.Builders.Browser, logger);
         }
-        for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
-            updateTsConfig(tree, target, workspace_models_1.Builders.Server, logger);
+        for (const { target, project } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
+            updateTsConfig(tree, target, project, workspace_models_1.Builders.Server, logger);
         }
-        for (const { target } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
-            updateTsConfig(tree, target, workspace_models_1.Builders.Karma, logger);
+        for (const { target, project } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
+            updateTsConfig(tree, target, project, workspace_models_1.Builders.Karma, logger);
         }
         return tree;
     };
 }
 exports.updateApplicationTsConfigs = updateApplicationTsConfigs;
-function updateTsConfig(tree, builderConfig, builderName, logger) {
+function updateTsConfig(tree, builderConfig, project, builderName, logger) {
+    var _a;
     const options = utils_1.getAllOptions(builderConfig);
     for (const option of options) {
         let recorder;
@@ -79,6 +88,18 @@ function updateTsConfig(tree, builderConfig, builderName, logger) {
                     recorder.insertLeft(start.offset, tsInclude.text.replace('.ts', '.d.ts'));
                     tree.commitUpdate(recorder);
                 }
+            }
+            else {
+                // Includes are not present, add includes to dts files
+                // By default when 'include' nor 'files' fields are used TypeScript
+                // will include all ts files.
+                const srcRootAst = json_utils_1.findPropertyInAstObject(project, 'sourceRoot');
+                const include = ((_a = srcRootAst) === null || _a === void 0 ? void 0 : _a.kind) === 'string'
+                    ? core_1.join(core_1.normalize(srcRootAst.value), '**/*.d.ts')
+                    : '**/*.d.ts';
+                recorder = tree.beginUpdate(tsConfigPath);
+                json_utils_1.insertPropertyInAstObjectInOrder(recorder, tsConfigAst, 'include', [include], 2);
+                tree.commitUpdate(recorder);
             }
             const files = json_utils_1.findPropertyInAstObject(tsConfigAst, 'files');
             if (!files) {
