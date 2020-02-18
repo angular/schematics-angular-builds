@@ -98,14 +98,15 @@ function addAppToWorkspaceFile(options, appDir) {
         projectRoot += '/';
     }
     const schematics = {};
-    if (options.inlineTemplate === true
-        || options.inlineStyle === true
+    if (options.inlineTemplate
+        || options.inlineStyle
+        || options.minimal
         || options.style !== schema_1.Style.Css) {
         const componentSchematicsOptions = {};
-        if (options.inlineTemplate === true) {
+        if (options.inlineTemplate || options.minimal) {
             componentSchematicsOptions.inlineTemplate = true;
         }
-        if (options.inlineStyle === true) {
+        if (options.inlineStyle || options.minimal) {
             componentSchematicsOptions.inlineStyle = true;
         }
         if (options.style && options.style !== schema_1.Style.Css) {
