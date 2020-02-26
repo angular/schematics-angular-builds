@@ -30,13 +30,13 @@ function addDeclarationToNgModule(options) {
         if (options.skipImport || !options.module) {
             return host;
         }
-        options.type = !!options.type ? options.type : 'Component';
+        options.type = options.type != null ? options.type : 'Component';
         const modulePath = options.module;
         const source = readIntoSourceFile(host, modulePath);
         const componentPath = `/${options.path}/`
             + (options.flat ? '' : core_1.strings.dasherize(options.name) + '/')
             + core_1.strings.dasherize(options.name)
-            + '.'
+            + (options.type ? '.' : '')
             + core_1.strings.dasherize(options.type);
         const relativePath = find_module_1.buildRelativePath(modulePath, componentPath);
         const classifiedName = core_1.strings.classify(options.name) + core_1.strings.classify(options.type);
@@ -108,6 +108,17 @@ function default_1(options) {
                 'if-flat': (s) => options.flat ? '' : s,
                 ...options,
             }),
+            !options.type ? schematics_1.forEach((file => {
+                if (!!file.path.match(new RegExp('..'))) {
+                    return {
+                        content: file.content,
+                        path: file.path.replace('..', '.'),
+                    };
+                }
+                else {
+                    return file;
+                }
+            })) : schematics_1.noop(),
             schematics_1.move(parsedPath.path),
         ]);
         return schematics_1.chain([
