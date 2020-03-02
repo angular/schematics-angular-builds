@@ -53,7 +53,7 @@ function updateServerMainFile() {
             // Add missing exports
             if (platformServerExports.length) {
                 const { exportClause } = platformServerExports[0];
-                if (!exportClause) {
+                if (!exportClause || ts.isNamespaceExport(exportClause)) {
                     continue;
                 }
                 exportSpecifiers = [...exportClause.elements];

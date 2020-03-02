@@ -38,7 +38,6 @@ function updateApplicationTsConfigs() {
 }
 exports.updateApplicationTsConfigs = updateApplicationTsConfigs;
 function updateTsConfig(tree, builderConfig, project, builderName, logger) {
-    var _a;
     const options = utils_1.getAllOptions(builderConfig);
     for (const option of options) {
         let recorder;
@@ -94,7 +93,7 @@ function updateTsConfig(tree, builderConfig, project, builderName, logger) {
                 // By default when 'include' nor 'files' fields are used TypeScript
                 // will include all ts files.
                 const srcRootAst = json_utils_1.findPropertyInAstObject(project, 'sourceRoot');
-                const include = ((_a = srcRootAst) === null || _a === void 0 ? void 0 : _a.kind) === 'string'
+                const include = (srcRootAst === null || srcRootAst === void 0 ? void 0 : srcRootAst.kind) === 'string'
                     ? core_1.join(core_1.normalize(srcRootAst.value), '**/*.d.ts')
                     : '**/*.d.ts';
                 recorder = tree.beginUpdate(tsConfigPath);
