@@ -4,34 +4,22 @@
     "codelyzer"
   ],
   "rules": {
-    "align": {
-      "options": [
-        "parameters",
-        "statements"
-      ]
-    },
     "array-type": false,
-    "arrow-return-shorthand": true,
-    "curly": true,
+    "arrow-parens": false,
     "deprecation": {
       "severity": "warning"
     },
-    "eofline": true,
     "import-blacklist": [
       true,
       "rxjs/Rx"
     ],
-    "import-spacing": true,
-    "indent": {
-      "options": [
-        "spaces"
-      ]
-    },
+    "interface-name": false,
     "max-classes-per-file": false,
     "max-line-length": [
       true,
       140
     ],
+    "member-access": false,
     "member-ordering": [
       true,
       {
@@ -43,6 +31,7 @@
         ]
       }
     ],
+    "no-consecutive-blank-lines": false,
     "no-console": [
       true,
       "debug",
@@ -64,59 +53,13 @@
       true,
       "as-needed"
     ],
+    "object-literal-sort-keys": false,
+    "ordered-imports": false,
     "quotemark": [
       true,
       "single"
     ],
-    "semicolon": {
-      "options": [
-        "always"
-      ]
-    },
-    "space-before-function-paren": {
-      "options": {
-        "anonymous": "never",
-        "asyncArrow": "always",
-        "constructor": "never",
-        "method": "never",
-        "named": "never"
-      }
-    },
-    "typedef-whitespace": {
-      "options": [
-        {
-          "call-signature": "nospace",
-          "index-signature": "nospace",
-          "parameter": "nospace",
-          "property-declaration": "nospace",
-          "variable-declaration": "nospace"
-        },
-        {
-          "call-signature": "onespace",
-          "index-signature": "onespace",
-          "parameter": "onespace",
-          "property-declaration": "onespace",
-          "variable-declaration": "onespace"
-        }
-      ]
-    },
-    "variable-name": {
-      "options": [
-        "ban-keywords",
-        "check-format",
-        "allow-pascal-case"
-      ]
-    },
-    "whitespace": {
-      "options": [
-        "check-branch",
-        "check-decl",
-        "check-operator",
-        "check-separator",
-        "check-type",
-        "check-typecast"
-      ]
-    },
+    "trailing-comma": false,
     "component-class-suffix": true,
     "contextual-lifecycle": true,
     "directive-class-suffix": true,
