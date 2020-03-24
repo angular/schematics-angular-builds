@@ -15,7 +15,6 @@ export interface ModuleOptions {
     skipImport?: boolean;
     moduleExt?: string;
     routingModuleExt?: string;
-    nameFormatter?: (str: string) => string;
 }
 /**
  * Find the module referred by a set of options passed to the schematics.
