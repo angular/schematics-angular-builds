@@ -108,8 +108,8 @@ function default_1() {
         if (!extendsAst ||
             (extendsAst.kind === 'string' && extendsAst.value !== 'tslint:recommended') ||
             (extendsAst.kind === 'array' && extendsAst.elements.some(e => e.value !== 'tslint:recommended'))) {
-            logger.warn(`tslint configuration does not extend "tslint:recommended".`
-                + '\nMigration will terminate as some rules might conflict.');
+            logger.warn(`tslint configuration does not extend "tslint:recommended" or it extends multiple configurations.`
+                + '\nSkipping rule changes as some rules might conflict.');
             return;
         }
         for (const [name, value] of Object.entries(RULES_TO_ADD)) {
