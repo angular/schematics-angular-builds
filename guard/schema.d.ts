@@ -31,11 +31,6 @@ export interface Schema {
      * When true, does not create "spec.ts" test files for the new guard.
      */
     skipTests?: boolean;
-    /**
-     * When true (the default), generates a  "spec.ts" test file for the new guard.
-     * @deprecated Use "skipTests" instead.
-     */
-    spec?: boolean;
 }
 export declare enum Implement {
     CanActivate = "CanActivate",
