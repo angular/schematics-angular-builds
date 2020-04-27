@@ -73,7 +73,12 @@ export interface ServerBuilderOptions {
         scripts?: boolean;
         styles?: boolean;
     };
-    sourceMap?: boolean;
+    sourceMap?: boolean | {
+        scripts?: boolean;
+        styles?: boolean;
+        hidden?: boolean;
+        vendor?: boolean;
+    };
 }
 export interface AppShellBuilderOptions {
     browserTarget: string;
