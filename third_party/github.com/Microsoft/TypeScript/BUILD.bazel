@@ -1,4 +1,4 @@
-load("@npm_bazel_typescript//:index.bzl", "ts_library")
+load("//tools:defaults.bzl", "ts_library")
 
 # files fetched on 2020-01-09 from
 # https://github.com/Microsoft/TypeScript/tree/v3.7.4
