@@ -38,6 +38,7 @@ function default_1(options) {
         // always 'skipInstall' here, so that we do it after the move
         skipInstall: true,
         minimal: options.minimal,
+        legacyBrowsers: options.legacyBrowsers,
     };
     return schematics_1.chain([
         schematics_1.mergeWith(schematics_1.apply(schematics_1.empty(), [
