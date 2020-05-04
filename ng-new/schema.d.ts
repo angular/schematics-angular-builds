@@ -24,10 +24,6 @@ export interface Schema {
      */
     inlineTemplate?: boolean;
     /**
-     * Add support for legacy browsers like Internet Explorer using differential loading.
-     */
-    legacyBrowsers?: boolean;
-    /**
      * When true, links the CLI to the global version (internal development only).
      */
     linkCli?: boolean;

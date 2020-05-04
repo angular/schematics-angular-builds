@@ -15,10 +15,6 @@ export interface Schema {
      */
     inlineTemplate?: boolean;
     /**
-     * Add support for legacy browsers like Internet Explorer using differential loading.
-     */
-    legacyBrowsers?: boolean;
-    /**
      * When true, applies lint fixes after generating the application.
      */
     lintFix?: boolean;

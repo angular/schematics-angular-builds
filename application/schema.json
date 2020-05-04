@@ -105,11 +105,6 @@
       "default": false,
       "description": "When true, applies lint fixes after generating the application.",
       "x-user-analytics": 15
-    },
-    "legacyBrowsers": {
-      "type": "boolean",
-      "description": "Add support for legacy browsers like Internet Explorer using differential loading.",
-      "default": false
     }
   },
   "required": [
