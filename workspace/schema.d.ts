@@ -17,7 +17,7 @@ export interface Schema {
      */
     packageManager?: PackageManager;
     /**
-     * Creates a workspace with stricter TypeScript compiler options.
+     * Creates a workspace with stricter type checking options.
      */
     strict?: boolean;
     /**

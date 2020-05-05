@@ -56,6 +56,10 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
+     * Creates an application with stricter build optimization options.
+     */
+    strict?: boolean;
+    /**
      * The file extension or preprocessor to use for style files.
      */
     style?: Style;
