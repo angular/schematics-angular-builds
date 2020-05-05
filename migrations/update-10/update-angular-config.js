@@ -21,13 +21,6 @@ function default_1() {
                 if (!(target === null || target === void 0 ? void 0 : target.builder.startsWith('@angular-devkit/build-angular'))) {
                     continue;
                 }
-                let extraOptionsToRemove = {};
-                if (target.builder === workspace_models_1.Builders.Server) {
-                    extraOptionsToRemove = {
-                        vendorChunk: undefined,
-                        commonChunk: undefined,
-                    };
-                }
                 // Check options
                 if (target.options) {
                     target.options = {
@@ -35,7 +28,6 @@ function default_1() {
                         evalSourceMap: undefined,
                         skipAppShell: undefined,
                         profile: undefined,
-                        ...extraOptionsToRemove,
                     };
                 }
                 // Go through each configuration entry
@@ -48,7 +40,6 @@ function default_1() {
                         evalSourceMap: undefined,
                         skipAppShell: undefined,
                         profile: undefined,
-                        ...extraOptionsToRemove,
                     };
                 }
             }
