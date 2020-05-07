@@ -7,11 +7,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = require("@angular-devkit/core");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
     return workspace_1.updateWorkspace(workspace => {
+        // Remove deprecated CLI root level options
+        removeDeprecatedCLIOptions(workspace.extensions);
         for (const [, project] of workspace.projects) {
+            // Project level
+            removeDeprecatedCLIOptions(project.extensions);
             if (project.extensions.projectType !== workspace_models_1.ProjectType.Application) {
                 // Only interested in application projects since these changes only effects application builders
                 continue;
@@ -89,4 +94,13 @@ function updateVendorSourceMap(options) {
         ...options,
         vendorSourceMap: undefined,
     };
+}
+function removeDeprecatedCLIOptions(extensions) {
+    const cliOptions = extensions === null || extensions === void 0 ? void 0 : extensions.cli;
+    if (cliOptions && core_1.isJsonObject(cliOptions) && core_1.isJsonObject(cliOptions.warnings)) {
+        cliOptions.warnings = {
+            ...cliOptions.warnings,
+            typescriptMismatch: undefined,
+        };
+    }
 }
