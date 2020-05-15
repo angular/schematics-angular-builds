@@ -26,9 +26,15 @@ function default_1() {
                 if (!(target === null || target === void 0 ? void 0 : target.builder.startsWith('@angular-devkit/build-angular'))) {
                     continue;
                 }
-                let extraOptionsToRemove = {};
+                let optionsToRemove = {
+                    evalSourceMap: undefined,
+                    skipAppShell: undefined,
+                    profile: undefined,
+                    elementExplorer: undefined,
+                };
                 if (target.builder === workspace_models_1.Builders.Server) {
-                    extraOptionsToRemove = {
+                    optionsToRemove = {
+                        ...optionsToRemove,
                         vendorChunk: undefined,
                         commonChunk: undefined,
                     };
@@ -37,10 +43,7 @@ function default_1() {
                 if (target.options) {
                     target.options = {
                         ...updateVendorSourceMap(target.options),
-                        evalSourceMap: undefined,
-                        skipAppShell: undefined,
-                        profile: undefined,
-                        ...extraOptionsToRemove,
+                        ...optionsToRemove,
                     };
                 }
                 // Go through each configuration entry
@@ -50,10 +53,7 @@ function default_1() {
                 for (const configurationName of Object.keys(target.configurations)) {
                     target.configurations[configurationName] = {
                         ...updateVendorSourceMap(target.configurations[configurationName]),
-                        evalSourceMap: undefined,
-                        skipAppShell: undefined,
-                        profile: undefined,
-                        ...extraOptionsToRemove,
+                        ...optionsToRemove,
                     };
                 }
             }

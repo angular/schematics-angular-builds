@@ -6,7 +6,7 @@ function default_1() {
     return (host, context) => {
         const dependenciesToUpdate = {
             'karma': '~5.0.0',
-            'protractor': '~5.4.4',
+            'protractor': '~7.0.0',
             'ng-packagr': latest_versions_1.latestVersions.ngPackagr,
         };
         for (const [name, version] of Object.entries(dependenciesToUpdate)) {
