@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getFileContent = void 0;
 function getFileContent(tree, path) {
     const fileEntry = tree.get(path);
     if (!fileEntry) {

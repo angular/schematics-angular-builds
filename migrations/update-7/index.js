@@ -4,11 +4,11 @@ const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../../utility/dependencies");
 const latest_versions_1 = require("../../utility/latest-versions");
 var polyfill_metadata_1 = require("./polyfill-metadata");
-exports.polyfillMetadataRule = polyfill_metadata_1.polyfillMetadataRule;
+Object.defineProperty(exports, "polyfillMetadataRule", { enumerable: true, get: function () { return polyfill_metadata_1.polyfillMetadataRule; } });
 var typescript_helpers_1 = require("./typescript-helpers");
-exports.typeScriptHelpersRule = typescript_helpers_1.typeScriptHelpersRule;
+Object.defineProperty(exports, "typeScriptHelpersRule", { enumerable: true, get: function () { return typescript_helpers_1.typeScriptHelpersRule; } });
 var devkit_ng_packagr_1 = require("./devkit-ng-packagr");
-exports.updateDevkitBuildNgPackagr = devkit_ng_packagr_1.updateDevkitBuildNgPackagr;
+Object.defineProperty(exports, "updateDevkitBuildNgPackagr", { enumerable: true, get: function () { return devkit_ng_packagr_1.updateDevkitBuildNgPackagr; } });
 function default_1() {
     return (tree, context) => {
         const existing = dependencies_1.getPackageJsonDependency(tree, '@angular-devkit/build-angular');

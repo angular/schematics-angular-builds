@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.addRouteDeclarationToModule = exports.getRouterModuleDeclaration = exports.getEnvironmentExportName = exports.isImported = exports.addEntryComponentToModule = exports.addBootstrapToModule = exports.addExportToModule = exports.addProviderToModule = exports.addImportToModule = exports.addDeclarationToModule = exports.addSymbolToNgModuleMetadata = exports.getMetadataField = exports.getFirstNgModuleName = exports.getDecoratorMetadata = exports.getContentOfKeyLiteral = exports.insertAfterLastOccurrence = exports.findNode = exports.getSourceNodes = exports.findNodes = exports.insertImport = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

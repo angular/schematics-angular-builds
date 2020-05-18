@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.relativePathToWorkspaceRoot = void 0;
 const core_1 = require("@angular-devkit/core");
 function relativePathToWorkspaceRoot(projectRoot) {
     const normalizedPath = core_1.split(core_1.normalize(projectRoot || ''));

@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Builders = exports.ProjectType = void 0;
 var ProjectType;
 (function (ProjectType) {
     ProjectType["Application"] = "application";

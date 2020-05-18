@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updatePackageJson = exports.updateTsLintConfig = void 0;
 const core_1 = require("@angular-devkit/core");
 const dependencies_1 = require("../../utility/dependencies");
 const json_utils_1 = require("../../utility/json-utils");

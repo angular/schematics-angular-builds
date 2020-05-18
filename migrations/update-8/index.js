@@ -15,7 +15,7 @@ const drop_es6_polyfills_1 = require("./drop-es6-polyfills");
 const remove_angular_http_1 = require("./remove-angular-http");
 const update_dependencies_1 = require("./update-dependencies");
 var update_lazy_module_paths_1 = require("./update-lazy-module-paths");
-exports.updateLazyModulePaths = update_lazy_module_paths_1.updateLazyModulePaths;
+Object.defineProperty(exports, "updateLazyModulePaths", { enumerable: true, get: function () { return update_lazy_module_paths_1.updateLazyModulePaths; } });
 function default_1() {
     return () => {
         return schematics_1.chain([

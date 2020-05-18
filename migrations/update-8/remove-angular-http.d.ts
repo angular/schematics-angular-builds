@@ -5,4 +5,5 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export declare const removeAngularHttp: () => (host: import("../../../../angular_devkit/schematics/src/tree/interface").Tree) => void;
+import { Tree } from '@angular-devkit/schematics';
+export declare const removeAngularHttp: () => (host: Tree) => void;

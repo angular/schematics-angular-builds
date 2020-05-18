@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateNGSWConfig = void 0;
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
 const utils_1 = require("./utils");

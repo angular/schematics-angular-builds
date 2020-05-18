@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateWorkspaceConfig = exports.ANY_COMPONENT_STYLE_BUDGET = void 0;
 const config_1 = require("../../utility/config");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateDevkitBuildNgPackagr = void 0;
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../../utility/dependencies");
 const latest_versions_1 = require("../../utility/latest-versions");

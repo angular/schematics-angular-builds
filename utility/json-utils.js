@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.findPropertyInAstObject = exports.appendValueInAstArray = exports.removePropertyInAstObject = exports.insertPropertyInAstObjectInOrder = exports.appendPropertyInAstObject = void 0;
 function appendPropertyInAstObject(recorder, node, propertyName, value, indent) {
     const indentStr = _buildIndent(indent);
     let index = node.start.offset + 1;

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.createDefaultPath = exports.buildDefaultPath = exports.getWorkspace = exports.updateWorkspace = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const core_1 = require("@angular-devkit/core");
+const workspace_models_1 = require("./workspace-models");
 function createHost(tree) {
     return {
         async readFile(path) {
@@ -58,7 +60,7 @@ exports.getWorkspace = getWorkspace;
  */
 function buildDefaultPath(project) {
     const root = project.sourceRoot ? `/${project.sourceRoot}/` : `/${project.root}/src/`;
-    const projectDirName = project.extensions['projectType'] === 'application' ? 'app' : 'lib';
+    const projectDirName = project.extensions['projectType'] === workspace_models_1.ProjectType.Application ? 'app' : 'lib';
     return `${root}${projectDirName}`;
 }
 exports.buildDefaultPath = buildDefaultPath;

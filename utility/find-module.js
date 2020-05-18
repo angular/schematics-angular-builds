@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.buildRelativePath = exports.findModule = exports.findModuleFromOptions = exports.ROUTING_MODULE_EXT = exports.MODULE_EXT = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

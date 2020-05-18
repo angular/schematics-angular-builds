@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateLazyModulePaths = void 0;
 const ts = require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 function* visit(directory) {
     for (const path of directory.subfiles) {

@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.removeAngularHttp = void 0;
 const dependencies_1 = require("../../utility/dependencies");
 exports.removeAngularHttp = () => {
     return (host) => {

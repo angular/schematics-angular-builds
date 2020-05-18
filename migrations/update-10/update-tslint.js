@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.TSLINT_VERSION = void 0;
 const dependencies_1 = require("../../utility/dependencies");
 const json_utils_1 = require("../../utility/json-utils");
 const utils_1 = require("../update-9/utils");

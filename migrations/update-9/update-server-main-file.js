@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateServerMainFile = void 0;
 const ts = require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 const ast_utils_1 = require("../../utility/ast-utils");
 const json_utils_1 = require("../../utility/json-utils");

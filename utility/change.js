@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReplaceChange = exports.RemoveChange = exports.InsertChange = exports.NoopChange = void 0;
 /**
  * An operation that does nothing.
  */

@@ -7,13 +7,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.latestVersions = void 0;
 exports.latestVersions = {
     // These versions should be kept up to date with latest Angular peer dependencies.
-    Angular: '~10.0.0-next.7',
+    Angular: '~10.0.0-next.8',
     RxJs: '~6.5.4',
     ZoneJs: '~0.10.2',
-    TypeScript: '~3.8.3',
-    TsLib: '^1.10.0',
+    TypeScript: '~3.9.2',
+    TsLib: '^1.12.0',
     // The versions below must be manually updated when making a new devkit release.
     // For our e2e tests, these versions must match the latest tag present on the branch.
     // During RC periods they will not match the latest RC until there's a new git tag, and

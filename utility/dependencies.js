@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getPackageJsonDependency = exports.removePackageJsonDependency = exports.addPackageJsonDependency = exports.NodeDependencyType = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

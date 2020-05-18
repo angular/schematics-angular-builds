@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateI18nConfig = void 0;
 const path_1 = require("path");
 const config_1 = require("../../utility/config");
 const dependencies_1 = require("../../utility/dependencies");
