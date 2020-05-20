@@ -11,6 +11,6 @@ export interface NodeDependency {
     version: string;
     overwrite?: boolean;
 }
-export declare function addPackageJsonDependency(tree: Tree, dependency: NodeDependency): void;
-export declare function removePackageJsonDependency(tree: Tree, name: string): void;
-export declare function getPackageJsonDependency(tree: Tree, name: string): NodeDependency | null;
+export declare function addPackageJsonDependency(tree: Tree, dependency: NodeDependency, pkgJsonPath?: string): void;
+export declare function removePackageJsonDependency(tree: Tree, name: string, pkgJsonPath?: string): void;
+export declare function getPackageJsonDependency(tree: Tree, name: string, pkgJsonPath?: string): NodeDependency | null;

@@ -8,6 +8,7 @@ function default_1() {
             'karma': '~5.0.0',
             'protractor': '~7.0.0',
             'ng-packagr': latest_versions_1.latestVersions.ngPackagr,
+            'tslib': '^2.0.0',
         };
         for (const [name, version] of Object.entries(dependenciesToUpdate)) {
             const current = dependencies_1.getPackageJsonDependency(host, name);

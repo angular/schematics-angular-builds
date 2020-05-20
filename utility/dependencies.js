@@ -11,7 +11,7 @@ exports.getPackageJsonDependency = exports.removePackageJsonDependency = exports
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const json_utils_1 = require("./json-utils");
-const pkgJsonPath = '/package.json';
+const PKG_JSON_PATH = '/package.json';
 var NodeDependencyType;
 (function (NodeDependencyType) {
     NodeDependencyType["Default"] = "dependencies";
@@ -19,8 +19,8 @@ var NodeDependencyType;
     NodeDependencyType["Peer"] = "peerDependencies";
     NodeDependencyType["Optional"] = "optionalDependencies";
 })(NodeDependencyType = exports.NodeDependencyType || (exports.NodeDependencyType = {}));
-function addPackageJsonDependency(tree, dependency) {
-    const packageJsonAst = _readPackageJson(tree);
+function addPackageJsonDependency(tree, dependency, pkgJsonPath = PKG_JSON_PATH) {
+    const packageJsonAst = _readPackageJson(tree, pkgJsonPath);
     const depsNode = json_utils_1.findPropertyInAstObject(packageJsonAst, dependency.type);
     const recorder = tree.beginUpdate(pkgJsonPath);
     if (!depsNode) {
@@ -46,8 +46,8 @@ function addPackageJsonDependency(tree, dependency) {
     tree.commitUpdate(recorder);
 }
 exports.addPackageJsonDependency = addPackageJsonDependency;
-function removePackageJsonDependency(tree, name) {
-    const packageJson = _readPackageJson(tree);
+function removePackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
+    const packageJson = _readPackageJson(tree, pkgJsonPath);
     const recorder = tree.beginUpdate(pkgJsonPath);
     [
         NodeDependencyType.Default,
@@ -63,8 +63,8 @@ function removePackageJsonDependency(tree, name) {
     tree.commitUpdate(recorder);
 }
 exports.removePackageJsonDependency = removePackageJsonDependency;
-function getPackageJsonDependency(tree, name) {
-    const packageJson = _readPackageJson(tree);
+function getPackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
+    const packageJson = _readPackageJson(tree, pkgJsonPath);
     let dep = null;
     [
         NodeDependencyType.Default,
@@ -91,15 +91,15 @@ function getPackageJsonDependency(tree, name) {
     return dep;
 }
 exports.getPackageJsonDependency = getPackageJsonDependency;
-function _readPackageJson(tree) {
+function _readPackageJson(tree, pkgJsonPath) {
     const buffer = tree.read(pkgJsonPath);
     if (buffer === null) {
-        throw new schematics_1.SchematicsException('Could not read package.json.');
+        throw new schematics_1.SchematicsException(`Could not read ${pkgJsonPath}.`);
     }
     const content = buffer.toString();
     const packageJson = core_1.parseJsonAst(content, core_1.JsonParseMode.Strict);
     if (packageJson.kind != 'object') {
-        throw new schematics_1.SchematicsException('Invalid package.json. Was expecting an object');
+        throw new schematics_1.SchematicsException(`Invalid ${pkgJsonPath}. Was expecting an object.`);
     }
     return packageJson;
 }
