@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const paths_1 = require("../utility/paths");
+const tsconfig_1 = require("../utility/tsconfig");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function default_1(options) {
@@ -20,6 +21,7 @@ function default_1(options) {
         if (!project) {
             throw new schematics_1.SchematicsException(`Project name "${appProject}" doesn't not exist.`);
         }
+        tsconfig_1.verifyBaseTsConfigExists(host);
         const root = core_1.join(core_1.normalize(project.root), 'e2e');
         project.targets.add({
             name: 'e2e',
@@ -34,10 +36,11 @@ function default_1(options) {
                 },
             },
         });
+        const e2eTsConfig = `${root}/tsconfig.json`;
         const lintTarget = project.targets.get('lint');
         if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
             lintTarget.options.tsConfig =
-                lintTarget.options.tsConfig.concat(`${root}/tsconfig.json`);
+                lintTarget.options.tsConfig.concat(e2eTsConfig);
         }
         return schematics_1.chain([
             workspace_1.updateWorkspace(workspace),
@@ -49,6 +52,9 @@ function default_1(options) {
                 }),
                 schematics_1.move(root),
             ])),
+            tsconfig_1.addTsConfigProjectReferences([
+                e2eTsConfig,
+            ]),
         ]);
     };
 }

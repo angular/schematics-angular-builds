@@ -1,7 +1,7 @@
 {
   "extends": "./<%= tsConfigExtends %>",
   "compilerOptions": {
-    "outDir": "<%= outDir %>-server",
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/server",
     "types": [
       "node"
     ]

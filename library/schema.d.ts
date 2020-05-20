@@ -27,9 +27,9 @@ export interface Schema {
      */
     skipPackageJson?: boolean;
     /**
-     * When true, does not update "tsconfig.json" to add a path mapping for the new library. The
-     * path mapping is needed to use the library in an app, but can be disabled here to simplify
-     * development.
+     * When true, does not update "tsconfig.base.json" to add a path mapping for the new
+     * library. The path mapping is needed to use the library in an app, but can be disabled
+     * here to simplify development.
      */
     skipTsConfig?: boolean;
 }

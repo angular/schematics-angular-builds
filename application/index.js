@@ -15,6 +15,7 @@ const json_utils_1 = require("../utility/json-utils");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
 const paths_1 = require("../utility/paths");
+const tsconfig_1 = require("../utility/tsconfig");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
@@ -258,11 +259,12 @@ function minimalPathFilter(path) {
     return !toRemoveList.test(path);
 }
 function default_1(options) {
-    return async (host, context) => {
+    return async (host) => {
         if (!options.name) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
         validation_1.validateProjectName(options.name);
+        tsconfig_1.verifyBaseTsConfigExists(host);
         const appRootSelector = `${options.prefix}-root`;
         const componentOptions = !options.minimal ?
             {
@@ -282,7 +284,7 @@ function default_1(options) {
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
         const isRootApp = options.projectRoot !== undefined;
         const appDir = isRootApp
-            ? options.projectRoot
+            ? core_1.normalize(options.projectRoot || '')
             : core_1.join(core_1.normalize(newProjectRoot), options.name);
         const sourceDir = `${appDir}/src/app`;
         const e2eOptions = {
@@ -336,6 +338,10 @@ function default_1(options) {
                 }),
                 schematics_1.move(sourceDir),
             ]), schematics_1.MergeStrategy.Overwrite),
+            tsconfig_1.addTsConfigProjectReferences([
+                core_1.join(appDir, 'tsconfig.app.json'),
+                core_1.join(appDir, 'tsconfig.spec.json'),
+            ]),
             options.minimal ? schematics_1.noop() : schematics_1.schematic('e2e', e2eOptions),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(options),
             options.lintFix ? lint_fix_1.applyLintFix(appDir) : schematics_1.noop(),

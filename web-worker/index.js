@@ -12,6 +12,7 @@ const schematics_1 = require("@angular-devkit/schematics");
 const json_utils_1 = require("../utility/json-utils");
 const parse_name_1 = require("../utility/parse-name");
 const paths_1 = require("../utility/paths");
+const tsconfig_1 = require("../utility/tsconfig");
 const workspace_1 = require("../utility/workspace");
 function addConfig(options, root, tsConfigPath) {
     return (host, context) => {
@@ -100,6 +101,7 @@ function default_1(options) {
         if (projectType !== 'application') {
             throw new schematics_1.SchematicsException(`Web Worker requires a project type of "application".`);
         }
+        tsconfig_1.verifyBaseTsConfigExists(host);
         const projectTarget = project.targets.get(options.target);
         if (!projectTarget) {
             throw new Error(`Target is not defined for this project.`);
@@ -135,6 +137,9 @@ function default_1(options) {
             options.snippet ? addSnippet(options) : schematics_1.noop(),
             // Add the worker.
             schematics_1.mergeWith(templateSource),
+            tsconfig_1.addTsConfigProjectReferences([
+                `${root}/tsconfig.worker.json`,
+            ]),
         ]);
     };
 }

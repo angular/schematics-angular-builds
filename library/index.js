@@ -14,6 +14,7 @@ const dependencies_1 = require("../utility/dependencies");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
 const paths_1 = require("../utility/paths");
+const tsconfig_1 = require("../utility/tsconfig");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
@@ -29,10 +30,10 @@ function updateJsonFile(host, path, callback) {
 }
 function updateTsConfig(packageName, ...paths) {
     return (host) => {
-        if (!host.exists('tsconfig.json')) {
+        if (!host.exists('tsconfig.base.json')) {
             return host;
         }
-        return updateJsonFile(host, 'tsconfig.json', (tsconfig) => {
+        return updateJsonFile(host, 'tsconfig.base.json', (tsconfig) => {
             if (!tsconfig.compilerOptions.paths) {
                 tsconfig.compilerOptions.paths = {};
             }
@@ -135,6 +136,7 @@ function default_1(options) {
         }
         const prefix = options.prefix;
         validation_1.validateProjectName(options.name);
+        tsconfig_1.verifyBaseTsConfigExists(host);
         // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
         const projectName = options.name;
         const packageName = core_1.strings.dasherize(projectName);
@@ -195,6 +197,10 @@ function default_1(options) {
                 path: sourceDir,
                 project: options.name,
             }),
+            tsconfig_1.addTsConfigProjectReferences([
+                `${projectRoot}/tsconfig.lib.json`,
+                `${projectRoot}/tsconfig.spec.json`,
+            ]),
             options.lintFix ? lint_fix_1.applyLintFix(sourceDir) : schematics_1.noop(),
             (_tree, context) => {
                 if (!options.skipPackageJson && !options.skipInstall) {
