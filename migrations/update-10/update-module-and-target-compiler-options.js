@@ -54,6 +54,9 @@ function default_1() {
                                 // This ensures that lazy-loaded works on the server.
                                 newModule: false,
                             });
+                            updateModuleAndTarget(host, p, {
+                                newTarget: 'es2016',
+                            });
                         });
                         break;
                     case workspace_models_1.Builders.Karma:
@@ -85,7 +88,10 @@ function updateModuleAndTarget(host, tsConfigPath, replacements) {
     const recorder = host.beginUpdate(tsConfigPath);
     if (newTarget) {
         const targetAst = json_utils_1.findPropertyInAstObject(compilerOptionsAst, 'target');
-        if ((targetAst === null || targetAst === void 0 ? void 0 : targetAst.kind) === 'string' && oldTarget === targetAst.value.toLowerCase()) {
+        if (!targetAst && !oldTarget) {
+            json_utils_1.appendPropertyInAstObject(recorder, compilerOptionsAst, 'target', newTarget, 4);
+        }
+        else if ((targetAst === null || targetAst === void 0 ? void 0 : targetAst.kind) === 'string' && (!oldTarget || oldTarget === targetAst.value.toLowerCase())) {
             const offset = targetAst.start.offset + 1;
             recorder.remove(offset, targetAst.value.length);
             recorder.insertLeft(offset, newTarget);
