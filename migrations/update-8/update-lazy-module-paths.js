@@ -16,7 +16,7 @@ function* visit(directory) {
         }
     }
     for (const path of directory.subdirs) {
-        if (path === 'node_modules') {
+        if (path === 'node_modules' || path.startsWith('.')) {
             continue;
         }
         yield* visit(directory.dir(path));
