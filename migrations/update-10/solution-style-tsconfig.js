@@ -35,7 +35,7 @@ function* visitExtendedJsonFiles(directory) {
         }
     }
     for (const path of directory.subdirs) {
-        if (path === 'node_modules') {
+        if (path === 'node_modules' || path.startsWith('.')) {
             continue;
         }
         yield* visitExtendedJsonFiles(directory.dir(path));
