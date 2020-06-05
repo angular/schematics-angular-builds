@@ -32,6 +32,7 @@ export interface Schema {
     route?: string;
     /**
      * The name of the TypeScript configuration file.
+     * @deprecated This option has no effect.
      */
     tsconfigFileName?: string;
 }
