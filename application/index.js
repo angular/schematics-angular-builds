@@ -123,12 +123,6 @@ function addAppToWorkspaceFile(options, appDir) {
             schematics[`@schematics/angular:${type}`].skipTests = true;
         });
     }
-    if (options.strict) {
-        if (!('@schematics/angular:application' in schematics)) {
-            schematics['@schematics/angular:application'] = {};
-        }
-        schematics['@schematics/angular:application'].strict = true;
-    }
     const sourceRoot = core_1.join(core_1.normalize(projectRoot), 'src');
     let budgets = [];
     if (options.strict) {
