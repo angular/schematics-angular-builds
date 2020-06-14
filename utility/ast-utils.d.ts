@@ -28,6 +28,16 @@ export declare function insertImport(source: ts.SourceFile, fileToEdit: string, 
  */
 export declare function findNodes(node: ts.Node, kind: ts.SyntaxKind, max?: number, recursive?: boolean): ts.Node[];
 /**
+ * Find all nodes from the AST in the subtree that satisfy a type guard.
+ * @param node
+ * @param guard
+ * @param max The maximum number of items to return.
+ * @param recursive Continue looking for nodes of kind recursive until end
+ * the last child even when node of kind has been found.
+ * @return all nodes that satisfy the type guard, or [] if none is found
+ */
+export declare function findNodes<T extends ts.Node>(node: ts.Node, guard: (node: ts.Node) => node is T, max?: number, recursive?: boolean): T[];
+/**
  * Get all the nodes from a source.
  * @param sourceFile The source file object.
  * @returns {Observable<ts.Node>} An observable of all the nodes in the source.
