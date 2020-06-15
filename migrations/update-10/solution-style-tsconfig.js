@@ -11,9 +11,13 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_1 = require("../../utility/workspace");
-const SOLUTIONS_TS_CONFIG_HEADER = '// This is a "Solution Style" tsconfig.json file, and is used by editors and TypeScript’s' +
-    'language server to improve development experience.\n' +
-    '// It is not intended to be used to perform a compilation.\n';
+const SOLUTIONS_TS_CONFIG_HEADER = `/*
+  This is a "Solution Style" tsconfig.json file, and is used by editors and TypeScript’s language server to improve development experience.
+  It is not intended to be used to perform a compilation.
+
+  To learn more about this file see: https://angular.io/config/solution-tsconfig.
+*/
+`;
 function* visitExtendedJsonFiles(directory) {
     for (const path of directory.subfiles) {
         if (!path.endsWith('.json')) {
