@@ -330,6 +330,9 @@ function default_1(options) {
                 ...componentOptions,
             }),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./other-files'), [
+                options.strict
+                    ? schematics_1.noop()
+                    : schematics_1.filter(path => path !== '/package.json.template'),
                 componentOptions.inlineTemplate
                     ? schematics_1.filter(path => !path.endsWith('.html.template'))
                     : schematics_1.noop(),
