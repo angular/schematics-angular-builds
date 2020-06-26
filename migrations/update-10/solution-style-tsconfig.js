@@ -24,10 +24,17 @@ function* visitExtendedJsonFiles(directory) {
             continue;
         }
         const entry = directory.file(path);
-        if (!entry) {
+        const content = entry === null || entry === void 0 ? void 0 : entry.content.toString();
+        if (!content) {
             continue;
         }
-        const jsonAst = core_1.parseJsonAst(entry.content.toString(), core_1.JsonParseMode.Loose);
+        let jsonAst;
+        try {
+            jsonAst = core_1.parseJsonAst(content, core_1.JsonParseMode.Loose);
+        }
+        catch (_a) {
+            throw new Error(`Invalid JSON AST Object (${path})`);
+        }
         if (jsonAst.kind !== 'object') {
             continue;
         }
