@@ -16,7 +16,7 @@ function default_1() {
     return async (host) => {
         var _a;
         // Workspace level tsconfig
-        updateModuleAndTarget(host, 'tsconfig.json', {
+        updateModuleAndTarget(host, 'tsconfig.base.json', {
             oldModule: 'esnext',
             newModule: 'es2020',
         });
