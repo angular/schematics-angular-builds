@@ -6,6 +6,7 @@ const latest_versions_1 = require("../../utility/latest-versions");
 function default_1() {
     return (host, context) => {
         const dependenciesToUpdate = {
+            'codelyzer': '^6.0.0',
             'jasmine-core': '~3.5.0',
             'jasmine-spec-reporter': '~5.0.0',
             'karma': '~5.0.0',
