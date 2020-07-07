@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const dependencies_1 = require("../../utility/dependencies");
-const json_utils_1 = require("../../utility/json-utils");
-const utils_1 = require("../update-9/utils");
+const json_file_1 = require("../../utility/json-file");
 const TSLINT_CONFIG_PATH = '/tslint.json';
 const RULES_TO_ADD = {
     deprecation: {
@@ -19,30 +18,22 @@ function default_1() {
             return;
         }
         // Update tslint config.
-        const tslintJsonAst = utils_1.readJsonFileAsAstObject(tree, TSLINT_CONFIG_PATH);
-        if (!tslintJsonAst) {
+        const json = new json_file_1.JSONFile(tree, TSLINT_CONFIG_PATH);
+        if (json.error) {
             const config = ['tslint.js', 'tslint.yaml'].find(c => tree.exists(c));
             if (config) {
-                logger.warn(`Skipping: Expected a JSON configuration file but found "${config}".`);
+                logger.warn(`Expected a JSON configuration file but found "${config}".`);
             }
             else {
-                logger.warn('Skipping: Cannot find "tslint.json" configuration file.');
+                logger.warn('Cannot find "tslint.json" configuration file.');
             }
             return;
         }
         for (const [name, value] of Object.entries(RULES_TO_ADD)) {
-            const tslintJsonAst = utils_1.readJsonFileAsAstObject(tree, TSLINT_CONFIG_PATH);
-            const rulesAst = json_utils_1.findPropertyInAstObject(tslintJsonAst, 'rules');
-            if ((rulesAst === null || rulesAst === void 0 ? void 0 : rulesAst.kind) !== 'object') {
-                break;
+            const ruleName = ['rules', name];
+            if (json.get(ruleName) === undefined) {
+                json.modify(ruleName, value);
             }
-            if (json_utils_1.findPropertyInAstObject(rulesAst, name)) {
-                // Skip as rule already exists.
-                continue;
-            }
-            const recorder = tree.beginUpdate(TSLINT_CONFIG_PATH);
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, rulesAst, name, value, 4);
-            tree.commitUpdate(recorder);
         }
     };
 }

@@ -9,7 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const json_utils_1 = require("../utility/json-utils");
+const json_file_1 = require("../utility/json-file");
 const parse_name_1 = require("../utility/parse-name");
 const paths_1 = require("../utility/paths");
 const tsconfig_1 = require("../utility/tsconfig");
@@ -21,20 +21,11 @@ function addConfig(options, root, tsConfigPath) {
         // Projects pre version 8 should to have tsconfig.app.json inside their application
         const isInSrc = core_1.dirname(core_1.normalize(tsConfigPath)).endsWith('src');
         const workerGlob = `${isInSrc ? '' : 'src/'}**/*.worker.ts`;
-        const buffer = host.read(tsConfigPath);
-        if (buffer) {
-            const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
-            if (tsCfgAst.kind != 'object') {
-                throw new schematics_1.SchematicsException('Invalid tsconfig. Was expecting an object');
-            }
-            const filesAstNode = json_utils_1.findPropertyInAstObject(tsCfgAst, 'exclude');
-            if (filesAstNode && filesAstNode.kind != 'array') {
-                throw new schematics_1.SchematicsException('Invalid tsconfig "exclude" property; expected an array.');
-            }
-            if (filesAstNode && !filesAstNode.value.includes(workerGlob)) {
-                const recorder = host.beginUpdate(tsConfigPath);
-                json_utils_1.appendValueInAstArray(recorder, filesAstNode, workerGlob);
-                host.commitUpdate(recorder);
+        const json = new json_file_1.JSONFile(host, tsConfigPath);
+        if (!json.error) {
+            const exclude = json.get(['exclude']);
+            if (exclude && Array.isArray(exclude) && !exclude.includes(workerGlob)) {
+                json.modify(['exclude'], [...exclude, workerGlob]);
             }
         }
         return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [

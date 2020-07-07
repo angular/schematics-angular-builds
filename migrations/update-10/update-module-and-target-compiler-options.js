@@ -8,10 +8,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * found in the LICENSE file at https://angular.io/license
  */
 const core_1 = require("@angular-devkit/core");
-const json_utils_1 = require("../../utility/json-utils");
+const json_file_1 = require("../../utility/json-file");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
-const utils_1 = require("../update-9/utils");
 function default_1() {
     return async (host) => {
         var _a;
@@ -76,37 +75,24 @@ function default_1() {
 }
 exports.default = default_1;
 function updateModuleAndTarget(host, tsConfigPath, replacements) {
-    const jsonAst = utils_1.readJsonFileAsAstObject(host, tsConfigPath);
-    if (!jsonAst) {
-        return;
-    }
-    const compilerOptionsAst = json_utils_1.findPropertyInAstObject(jsonAst, 'compilerOptions');
-    if ((compilerOptionsAst === null || compilerOptionsAst === void 0 ? void 0 : compilerOptionsAst.kind) !== 'object') {
+    const json = new json_file_1.JSONFile(host, tsConfigPath);
+    if (json.error) {
         return;
     }
     const { oldTarget, newTarget, newModule, oldModule } = replacements;
-    const recorder = host.beginUpdate(tsConfigPath);
     if (newTarget) {
-        const targetAst = json_utils_1.findPropertyInAstObject(compilerOptionsAst, 'target');
-        if (!targetAst && !oldTarget) {
-            json_utils_1.appendPropertyInAstObject(recorder, compilerOptionsAst, 'target', newTarget, 4);
-        }
-        else if ((targetAst === null || targetAst === void 0 ? void 0 : targetAst.kind) === 'string' && (!oldTarget || oldTarget === targetAst.value.toLowerCase())) {
-            const offset = targetAst.start.offset + 1;
-            recorder.remove(offset, targetAst.value.length);
-            recorder.insertLeft(offset, newTarget);
+        const target = json.get(['compilerOptions', 'target']);
+        if ((typeof target === 'string' && (!oldTarget || oldTarget === target.toLowerCase())) || !target) {
+            json.modify(['compilerOptions', 'target'], newTarget);
         }
     }
     if (newModule === false) {
-        json_utils_1.removePropertyInAstObject(recorder, compilerOptionsAst, 'module');
+        json.remove(['compilerOptions', 'module']);
     }
     else if (newModule) {
-        const moduleAst = json_utils_1.findPropertyInAstObject(compilerOptionsAst, 'module');
-        if ((moduleAst === null || moduleAst === void 0 ? void 0 : moduleAst.kind) === 'string' && oldModule === moduleAst.value.toLowerCase()) {
-            const offset = moduleAst.start.offset + 1;
-            recorder.remove(offset, moduleAst.value.length);
-            recorder.insertLeft(offset, newModule);
+        const module = json.get(['compilerOptions', 'module']);
+        if (typeof module === 'string' && oldModule === module.toLowerCase()) {
+            json.modify(['compilerOptions', 'module'], newModule);
         }
     }
-    host.commitUpdate(recorder);
 }

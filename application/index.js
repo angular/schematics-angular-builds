@@ -11,7 +11,7 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../utility/dependencies");
-const json_utils_1 = require("../utility/json-utils");
+const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
 const paths_1 = require("../utility/paths");
@@ -68,29 +68,17 @@ function mergeWithRootTsLint(parentHost) {
         if (!host.exists(tsLintPath)) {
             return;
         }
-        const rootTslintConfig = readTsLintConfig(parentHost, tsLintPath);
-        const appTslintConfig = readTsLintConfig(host, tsLintPath);
-        const recorder = host.beginUpdate(tsLintPath);
-        rootTslintConfig.properties.forEach(prop => {
-            if (json_utils_1.findPropertyInAstObject(appTslintConfig, prop.key.value)) {
-                // property already exists. Skip!
-                return;
+        const rootTslintConfig = new json_file_1.JSONFile(parentHost, tsLintPath);
+        const appTslintConfig = new json_file_1.JSONFile(host, tsLintPath);
+        for (const [pKey, pValue] of Object.entries(rootTslintConfig.get([]))) {
+            if (typeof pValue !== 'object' || Array.isArray(pValue)) {
+                appTslintConfig.modify([pKey], pValue);
+                continue;
             }
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, appTslintConfig, prop.key.value, prop.value.value, 2);
-        });
-        const rootRules = json_utils_1.findPropertyInAstObject(rootTslintConfig, 'rules');
-        const appRules = json_utils_1.findPropertyInAstObject(appTslintConfig, 'rules');
-        if (!appRules || appRules.kind !== 'object' || !rootRules || rootRules.kind !== 'object') {
-            // rules are not valid. Skip!
-            return;
+            for (const [key, value] of Object.entries(rootTslintConfig.get([pKey]))) {
+                appTslintConfig.modify([pKey, key], value);
+            }
         }
-        rootRules.properties.forEach(prop => {
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, appRules, prop.key.value, prop.value.value, 4);
-        });
-        host.commitUpdate(recorder);
-        // this shouldn't be needed but at the moment without this formatting is not correct.
-        const content = readTsLintConfig(host, tsLintPath);
-        host.overwrite(tsLintPath, JSON.stringify(content.value, undefined, 2));
     };
 }
 function addAppToWorkspaceFile(options, appDir) {
