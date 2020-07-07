@@ -9,10 +9,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
+const validation_1 = require("../utility/validation");
 function default_1(options) {
     if (!options.name) {
         throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
     }
+    validation_1.validateProjectName(options.name);
     if (!options.directory) {
         options.directory = options.name;
     }

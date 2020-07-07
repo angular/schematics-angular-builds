@@ -18,7 +18,7 @@ const SOLUTIONS_TS_CONFIG_HEADER = `/*
   To learn more about this file see: https://angular.io/config/solution-tsconfig.
 */
 `;
-function* visitExtendedJsonFiles(directory) {
+function* visitExtendedJsonFiles(directory, logger) {
     for (const path of directory.subfiles) {
         if (!path.endsWith('.json')) {
             continue;
@@ -32,8 +32,13 @@ function* visitExtendedJsonFiles(directory) {
         try {
             jsonAst = core_1.parseJsonAst(content, core_1.JsonParseMode.Loose);
         }
-        catch (_a) {
-            throw new Error(`Invalid JSON AST Object (${path})`);
+        catch (error) {
+            let jsonFilePath = `${core_1.join(directory.path, path)}`;
+            jsonFilePath = jsonFilePath.startsWith('/') ? jsonFilePath.substr(1) : jsonFilePath;
+            const msg = error instanceof Error ? error.message : error;
+            logger.warn(`Failed to parse "${jsonFilePath}" as JSON AST Object. ${msg}\n` +
+                'If this is a TypeScript configuration file you will need to update the "extends" value manually.');
+            continue;
         }
         if (jsonAst.kind !== 'object') {
             continue;
@@ -49,18 +54,18 @@ function* visitExtendedJsonFiles(directory) {
         if (path === 'node_modules' || path.startsWith('.')) {
             continue;
         }
-        yield* visitExtendedJsonFiles(directory.dir(path));
+        yield* visitExtendedJsonFiles(directory.dir(path), logger);
     }
 }
 function updateTsconfigExtendsRule() {
-    return host => {
+    return (host, context) => {
         if (!host.exists('tsconfig.json')) {
             return;
         }
         // Rename workspace tsconfig to base tsconfig.
         host.rename('tsconfig.json', 'tsconfig.base.json');
         // Iterate over all tsconfig files and change the extends from 'tsconfig.json' 'tsconfig.base.json'
-        for (const [tsconfigPath, extendsAst] of visitExtendedJsonFiles(host.root)) {
+        for (const [tsconfigPath, extendsAst] of visitExtendedJsonFiles(host.root, context.logger)) {
             const tsConfigDir = core_1.dirname(core_1.normalize(tsconfigPath));
             if ('/tsconfig.json' !== core_1.resolve(tsConfigDir, core_1.normalize(extendsAst.value))) {
                 // tsconfig extends doesn't refer to the workspace tsconfig path.
