@@ -52,9 +52,6 @@ function default_1(options) {
                 }),
                 schematics_1.move(root),
             ])),
-            tsconfig_1.addTsConfigProjectReferences([
-                e2eTsConfig,
-            ]),
         ]);
     };
 }
