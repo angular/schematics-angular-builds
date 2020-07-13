@@ -7,17 +7,18 @@
  */
 import { JsonValue } from '@angular-devkit/core';
 import { Tree } from '@angular-devkit/schematics';
+export declare type InsertionIndex = (properties: string[]) => number;
 export declare type JSONPath = (string | number)[];
 /** @internal */
 export declare class JSONFile {
     private readonly host;
     private readonly path;
-    private content;
+    content: string;
     error: undefined | Error;
     constructor(host: Tree, path: string);
     private _jsonAst;
     private get JsonAst();
     get(jsonPath: JSONPath): unknown;
-    modify(jsonPath: JSONPath, value: JsonValue | undefined, getInsertionIndex?: (properties: string[]) => number): void;
+    modify(jsonPath: JSONPath, value: JsonValue | undefined, insertInOrder?: InsertionIndex | false): void;
     remove(jsonPath: JSONPath): void;
 }

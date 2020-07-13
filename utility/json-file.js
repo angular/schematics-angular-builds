@@ -36,10 +36,14 @@ class JSONFile {
         const node = jsonc_parser_1.findNodeAtLocation(this.JsonAst, jsonPath);
         return node === undefined ? undefined : jsonc_parser_1.getNodeValue(node);
     }
-    modify(jsonPath, value, getInsertionIndex) {
-        if (!getInsertionIndex) {
+    modify(jsonPath, value, insertInOrder) {
+        let getInsertionIndex;
+        if (insertInOrder === undefined) {
             const property = jsonPath.slice(-1)[0];
             getInsertionIndex = properties => [...properties, property].sort().findIndex(p => p === property);
+        }
+        else if (insertInOrder !== false) {
+            getInsertionIndex = insertInOrder;
         }
         const edits = jsonc_parser_1.modify(this.content, jsonPath, value, {
             getInsertionIndex,

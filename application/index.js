@@ -65,20 +65,15 @@ function readTsLintConfig(host, path) {
 function mergeWithRootTsLint(parentHost) {
     return (host) => {
         const tsLintPath = '/tslint.json';
+        const rulesPath = ['rules'];
         if (!host.exists(tsLintPath)) {
             return;
         }
-        const rootTslintConfig = new json_file_1.JSONFile(parentHost, tsLintPath);
-        const appTslintConfig = new json_file_1.JSONFile(host, tsLintPath);
-        for (const [pKey, pValue] of Object.entries(rootTslintConfig.get([]))) {
-            if (typeof pValue !== 'object' || Array.isArray(pValue)) {
-                appTslintConfig.modify([pKey], pValue);
-                continue;
-            }
-            for (const [key, value] of Object.entries(rootTslintConfig.get([pKey]))) {
-                appTslintConfig.modify([pKey, key], value);
-            }
-        }
+        const rootTsLintFile = new json_file_1.JSONFile(parentHost, tsLintPath);
+        const rootRules = rootTsLintFile.get(rulesPath);
+        const appRules = new json_file_1.JSONFile(host, tsLintPath).get(rulesPath);
+        rootTsLintFile.modify(rulesPath, { ...rootRules, ...appRules });
+        host.overwrite(tsLintPath, rootTsLintFile.content);
     };
 }
 function addAppToWorkspaceFile(options, appDir) {
