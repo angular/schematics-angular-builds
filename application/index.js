@@ -349,7 +349,7 @@ function default_1(options) {
             ]), schematics_1.MergeStrategy.Overwrite),
             tsconfig_1.addTsConfigProjectReferences([
                 core_1.join(appDir, 'tsconfig.app.json'),
-                core_1.join(appDir, 'tsconfig.spec.json'),
+                ...options.minimal ? [] : [core_1.join(appDir, 'tsconfig.spec.json')],
             ]),
             options.minimal ? schematics_1.noop() : schematics_1.schematic('e2e', e2eOptions),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(options),
