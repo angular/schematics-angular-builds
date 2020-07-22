@@ -15,10 +15,10 @@ exports.latestVersions = {
     TypeScript: '~3.5.3',
     TsLib: '^1.10.0',
     // The versions below must be manually updated when making a new devkit release.
-    DevkitBuildAngular: '~0.803.28',
-    DevkitBuildNgPackagr: '~0.803.28',
-    DevkitBuildWebpack: '~0.803.28',
-    AngularPWA: '~0.803.28',
+    DevkitBuildAngular: '~0.803.29',
+    DevkitBuildNgPackagr: '~0.803.29',
+    DevkitBuildWebpack: '~0.803.29',
+    AngularPWA: '~0.803.29',
     tsickle: '^0.37.0',
     ngPackagr: '^5.4.0',
 };
