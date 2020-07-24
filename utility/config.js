@@ -27,7 +27,7 @@ function getWorkspace(host) {
 }
 exports.getWorkspace = getWorkspace;
 function addProjectToWorkspace(workspace, name, project) {
-    return (host, context) => {
+    return () => {
         if (workspace.projects[name]) {
             throw new Error(`Project '${name}' already exists in workspace.`);
         }
@@ -42,7 +42,7 @@ function addProjectToWorkspace(workspace, name, project) {
 }
 exports.addProjectToWorkspace = addProjectToWorkspace;
 function updateWorkspace(workspace) {
-    return (host, context) => {
+    return (host) => {
         host.overwrite(getWorkspacePath(host), JSON.stringify(workspace, null, 2));
     };
 }

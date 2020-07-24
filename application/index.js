@@ -45,17 +45,6 @@ function addDependenciesToPackageJson(options) {
         return host;
     };
 }
-function readTsLintConfig(host, path) {
-    const buffer = host.read(path);
-    if (!buffer) {
-        throw new schematics_1.SchematicsException(`Could not read ${path}.`);
-    }
-    const config = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
-    if (config.kind !== 'object') {
-        throw new schematics_1.SchematicsException(`Invalid ${path}. Was expecting an object.`);
-    }
-    return config;
-}
 /**
  * Merges the application tslint.json with the workspace tslint.json
  * when the application being created is a root application
