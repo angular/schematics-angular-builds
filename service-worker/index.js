@@ -12,6 +12,7 @@ const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const ts = require("../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 const ast_utils_1 = require("../utility/ast-utils");
+const change_1 = require("../utility/change");
 const dependencies_1 = require("../utility/dependencies");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const paths_1 = require("../utility/paths");
@@ -46,7 +47,7 @@ function updateAppModule(mainPath) {
             const change = ast_utils_1.insertImport(moduleSource, modulePath, importModule, importPath);
             if (change) {
                 const recorder = host.beginUpdate(modulePath);
-                recorder.insertLeft(change.pos, change.toAdd);
+                change_1.applyToUpdateRecorder(recorder, [change]);
                 host.commitUpdate(recorder);
             }
         }
@@ -65,7 +66,7 @@ function updateAppModule(mainPath) {
             const change = ast_utils_1.insertImport(moduleSource, modulePath, importModule, importPath);
             if (change) {
                 const recorder = host.beginUpdate(modulePath);
-                recorder.insertLeft(change.pos, change.toAdd);
+                change_1.applyToUpdateRecorder(recorder, [change]);
                 host.commitUpdate(recorder);
             }
         }
@@ -75,9 +76,7 @@ function updateAppModule(mainPath) {
         const metadataChanges = ast_utils_1.addSymbolToNgModuleMetadata(moduleSource, modulePath, 'imports', importText);
         if (metadataChanges) {
             const recorder = host.beginUpdate(modulePath);
-            metadataChanges.forEach((change) => {
-                recorder.insertRight(change.pos, change.toAdd);
-            });
+            change_1.applyToUpdateRecorder(recorder, metadataChanges);
             host.commitUpdate(recorder);
         }
         return host;

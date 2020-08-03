@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { UpdateRecorder } from '@angular-devkit/schematics';
 export interface Host {
     write(path: string, content: string): Promise<void>;
     read(path: string): Promise<string>;
@@ -45,7 +46,7 @@ export declare class InsertChange implements Change {
 export declare class RemoveChange implements Change {
     path: string;
     private pos;
-    private toRemove;
+    toRemove: string;
     order: number;
     description: string;
     constructor(path: string, pos: number, toRemove: string);
@@ -57,10 +58,11 @@ export declare class RemoveChange implements Change {
 export declare class ReplaceChange implements Change {
     path: string;
     private pos;
-    private oldText;
-    private newText;
+    oldText: string;
+    newText: string;
     order: number;
     description: string;
     constructor(path: string, pos: number, oldText: string, newText: string);
     apply(host: Host): Promise<void>;
 }
+export declare function applyToUpdateRecorder(recorder: UpdateRecorder, changes: Change[]): void;

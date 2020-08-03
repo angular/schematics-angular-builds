@@ -54,11 +54,11 @@ function findBootstrapModulePath(host, mainPath) {
     const source = ts.createSourceFile(mainPath, mainText, ts.ScriptTarget.Latest, true);
     const allNodes = ast_utils_1.getSourceNodes(source);
     const bootstrapModuleRelativePath = allNodes
-        .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+        .filter(ts.isImportDeclaration)
         .filter(imp => {
         return ast_utils_1.findNode(imp, ts.SyntaxKind.Identifier, bootstrapModule.getText());
     })
-        .map((imp) => {
+        .map(imp => {
         const modulePathStringLiteral = imp.moduleSpecifier;
         return modulePathStringLiteral.text;
     })[0];

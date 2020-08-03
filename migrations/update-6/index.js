@@ -222,6 +222,13 @@ function extractProjectsConfig(config, tree, logger) {
             `);
                     return null;
                 }
+                else if (!asset.glob) {
+                    logger.warn(core_1.tags.oneLine `
+              Asset with input '${asset.input}' was not migrated because it
+              does not contain a glob property.
+            `);
+                    return null;
+                }
                 else if (asset.output) {
                     return {
                         glob: asset.glob,

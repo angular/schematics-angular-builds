@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ReplaceChange = exports.RemoveChange = exports.InsertChange = exports.NoopChange = void 0;
+exports.applyToUpdateRecorder = exports.ReplaceChange = exports.RemoveChange = exports.InsertChange = exports.NoopChange = void 0;
 /**
  * An operation that does nothing.
  */
@@ -92,3 +92,21 @@ class ReplaceChange {
     }
 }
 exports.ReplaceChange = ReplaceChange;
+function applyToUpdateRecorder(recorder, changes) {
+    for (const change of changes) {
+        if (change instanceof InsertChange) {
+            recorder.insertLeft(change.pos, change.toAdd);
+        }
+        else if (change instanceof RemoveChange) {
+            recorder.remove(change.order, change.toRemove.length);
+        }
+        else if (change instanceof ReplaceChange) {
+            recorder.remove(change.order, change.oldText.length);
+            recorder.insertLeft(change.order, change.newText);
+        }
+        else if (!(change instanceof NoopChange)) {
+            throw new Error('Unknown Change type encountered when updating a recorder.');
+        }
+    }
+}
+exports.applyToUpdateRecorder = applyToUpdateRecorder;

@@ -69,11 +69,11 @@ function getBootstrapComponentPath(host, mainPath) {
         .initializer;
     const componentSymbol = arrLiteral.elements[0].getText();
     const relativePath = ast_utils_1.getSourceNodes(moduleSource)
-        .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+        .filter(ts.isImportDeclaration)
         .filter(imp => {
         return ast_utils_1.findNode(imp, ts.SyntaxKind.Identifier, componentSymbol);
     })
-        .map((imp) => {
+        .map(imp => {
         const pathStringLiteral = imp.moduleSpecifier;
         return pathStringLiteral.text;
     })[0];
@@ -138,11 +138,7 @@ function addRouterModule(mainPath) {
         const moduleSource = getSourceFile(host, modulePath);
         const changes = ast_utils_1.addImportToModule(moduleSource, modulePath, 'RouterModule', '@angular/router');
         const recorder = host.beginUpdate(modulePath);
-        changes.forEach((change) => {
-            if (change instanceof change_1.InsertChange) {
-                recorder.insertLeft(change.pos, change.toAdd);
-            }
-        });
+        change_1.applyToUpdateRecorder(recorder, changes);
         host.commitUpdate(recorder);
         return host;
     };
@@ -150,7 +146,7 @@ function addRouterModule(mainPath) {
 function getMetadataProperty(metadata, propertyName) {
     const properties = metadata.properties;
     const property = properties
-        .filter(prop => prop.kind === ts.SyntaxKind.PropertyAssignment)
+        .filter(ts.isPropertyAssignment)
         .filter((prop) => {
         const name = prop.name;
         switch (name.kind) {
@@ -187,8 +183,8 @@ function addServerRoutes(options) {
         if (!ast_utils_1.isImported(moduleSource, 'Routes', '@angular/router')) {
             const recorder = host.beginUpdate(modulePath);
             const routesChange = ast_utils_1.insertImport(moduleSource, modulePath, 'Routes', '@angular/router');
-            if (routesChange.toAdd) {
-                recorder.insertLeft(routesChange.pos, routesChange.toAdd);
+            if (routesChange) {
+                change_1.applyToUpdateRecorder(recorder, [routesChange]);
             }
             const imports = ast_utils_1.getSourceNodes(moduleSource)
                 .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
@@ -202,14 +198,12 @@ function addServerRoutes(options) {
         if (!ast_utils_1.isImported(moduleSource, 'RouterModule', '@angular/router')) {
             const recorder = host.beginUpdate(modulePath);
             const routerModuleChange = ast_utils_1.insertImport(moduleSource, modulePath, 'RouterModule', '@angular/router');
-            if (routerModuleChange.toAdd) {
-                recorder.insertLeft(routerModuleChange.pos, routerModuleChange.toAdd);
+            if (routerModuleChange) {
+                change_1.applyToUpdateRecorder(recorder, [routerModuleChange]);
             }
             const metadataChange = ast_utils_1.addSymbolToNgModuleMetadata(moduleSource, modulePath, 'imports', 'RouterModule.forRoot(routes)');
             if (metadataChange) {
-                metadataChange.forEach((change) => {
-                    recorder.insertRight(change.pos, change.toAdd);
-                });
+                change_1.applyToUpdateRecorder(recorder, metadataChange);
             }
             host.commitUpdate(recorder);
         }
