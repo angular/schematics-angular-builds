@@ -12,18 +12,13 @@ const json_file_1 = require("../../utility/json-file");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
-    return async (host, { logger }) => {
+    return async (host) => {
         var _a;
         // Workspace level tsconfig
-        try {
-            updateModuleAndTarget(host, 'tsconfig.base.json', {
-                oldModule: 'esnext',
-                newModule: 'es2020',
-            });
-        }
-        catch (error) {
-            logger.warn(`Unable to update 'tsconfig.base.json' module option from 'esnext' to 'es2020': ${error.message || error}`);
-        }
+        updateModuleAndTarget(host, 'tsconfig.base.json', {
+            oldModule: 'esnext',
+            newModule: 'es2020',
+        });
         const workspace = await workspace_1.getWorkspace(host);
         // Find all tsconfig which are refereces used by builders
         for (const [, project] of workspace.projects) {
@@ -31,15 +26,10 @@ function default_1() {
                 // E2E builder doesn't reference a tsconfig but it uses one found in the root folder.
                 if (target.builder === workspace_models_1.Builders.Protractor && typeof ((_a = target.options) === null || _a === void 0 ? void 0 : _a.protractorConfig) === 'string') {
                     const tsConfigPath = core_1.join(core_1.dirname(core_1.normalize(target.options.protractorConfig)), 'tsconfig.json');
-                    try {
-                        updateModuleAndTarget(host, tsConfigPath, {
-                            oldTarget: 'es5',
-                            newTarget: 'es2018',
-                        });
-                    }
-                    catch (error) {
-                        logger.warn(`Unable to update '${tsConfigPath}' target option from 'es5' to 'es2018': ${error.message || error}`);
-                    }
+                    updateModuleAndTarget(host, tsConfigPath, {
+                        oldTarget: 'es5',
+                        newTarget: 'es2018',
+                    });
                     continue;
                 }
                 // Update all other known CLI builders that use a tsconfig
@@ -56,41 +46,26 @@ function default_1() {
                 switch (target.builder) {
                     case workspace_models_1.Builders.Server:
                         uniqueTsConfigs.forEach(p => {
-                            try {
-                                updateModuleAndTarget(host, p, {
-                                    oldModule: 'commonjs',
-                                    // False will remove the module
-                                    // NB: For server we no longer use commonjs because it is bundled using webpack which has it's own module system.
-                                    // This ensures that lazy-loaded works on the server.
-                                    newModule: false,
-                                });
-                            }
-                            catch (error) {
-                                logger.warn(`Unable to remove '${p}' module option (was 'commonjs'): ${error.message || error}`);
-                            }
-                            try {
-                                updateModuleAndTarget(host, p, {
-                                    newTarget: 'es2016',
-                                });
-                            }
-                            catch (error) {
-                                logger.warn(`Unable to update '${p}' target option to 'es2016': ${error.message || error}`);
-                            }
+                            updateModuleAndTarget(host, p, {
+                                oldModule: 'commonjs',
+                                // False will remove the module
+                                // NB: For server we no longer use commonjs because it is bundled using webpack which has it's own module system.
+                                // This ensures that lazy-loaded works on the server.
+                                newModule: false,
+                            });
+                            updateModuleAndTarget(host, p, {
+                                newTarget: 'es2016',
+                            });
                         });
                         break;
                     case workspace_models_1.Builders.Karma:
                     case workspace_models_1.Builders.Browser:
                     case workspace_models_1.Builders.NgPackagr:
                         uniqueTsConfigs.forEach(p => {
-                            try {
-                                updateModuleAndTarget(host, p, {
-                                    oldModule: 'esnext',
-                                    newModule: 'es2020',
-                                });
-                            }
-                            catch (error) {
-                                logger.warn(`Unable to update '${p}' module option from 'esnext' to 'es2020': ${error.message || error}`);
-                            }
+                            updateModuleAndTarget(host, p, {
+                                oldModule: 'esnext',
+                                newModule: 'es2020',
+                            });
                         });
                         break;
                 }
@@ -101,6 +76,9 @@ function default_1() {
 exports.default = default_1;
 function updateModuleAndTarget(host, tsConfigPath, replacements) {
     const json = new json_file_1.JSONFile(host, tsConfigPath);
+    if (json.error) {
+        return;
+    }
     const { oldTarget, newTarget, newModule, oldModule } = replacements;
     if (newTarget) {
         const target = json.get(['compilerOptions', 'target']);

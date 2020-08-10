@@ -18,6 +18,9 @@ const ALL_DEPENDENCY_TYPE = [
 ];
 function addPackageJsonDependency(tree, dependency, pkgJsonPath = PKG_JSON_PATH) {
     const json = new json_file_1.JSONFile(tree, pkgJsonPath);
+    if (json.error) {
+        throw json.error;
+    }
     const { overwrite, type, name, version } = dependency;
     const path = [type, name];
     if (overwrite || !json.get(path)) {
@@ -27,6 +30,9 @@ function addPackageJsonDependency(tree, dependency, pkgJsonPath = PKG_JSON_PATH)
 exports.addPackageJsonDependency = addPackageJsonDependency;
 function removePackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
     const json = new json_file_1.JSONFile(tree, pkgJsonPath);
+    if (json.error) {
+        throw json.error;
+    }
     for (const depType of ALL_DEPENDENCY_TYPE) {
         json.remove([depType, name]);
     }
@@ -34,6 +40,9 @@ function removePackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
 exports.removePackageJsonDependency = removePackageJsonDependency;
 function getPackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
     const json = new json_file_1.JSONFile(tree, pkgJsonPath);
+    if (json.error) {
+        throw json.error;
+    }
     for (const depType of ALL_DEPENDENCY_TYPE) {
         const version = json.get([depType, name]);
         if (typeof version === 'string') {

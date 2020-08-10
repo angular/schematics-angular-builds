@@ -21,14 +21,13 @@ function addConfig(options, root, tsConfigPath) {
         // Projects pre version 8 should to have tsconfig.app.json inside their application
         const isInSrc = core_1.dirname(core_1.normalize(tsConfigPath)).endsWith('src');
         const workerGlob = `${isInSrc ? '' : 'src/'}**/*.worker.ts`;
-        try {
-            const json = new json_file_1.JSONFile(host, tsConfigPath);
+        const json = new json_file_1.JSONFile(host, tsConfigPath);
+        if (!json.error) {
             const exclude = json.get(['exclude']);
             if (exclude && Array.isArray(exclude) && !exclude.includes(workerGlob)) {
                 json.modify(['exclude'], [...exclude, workerGlob]);
             }
         }
-        catch (_a) { }
         return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [
             schematics_1.applyTemplates({
                 ...options,
