@@ -10,7 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const paths_1 = require("../utility/paths");
-const tsconfig_1 = require("../utility/tsconfig");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function default_1(options) {
@@ -21,7 +20,6 @@ function default_1(options) {
         if (!project) {
             throw new schematics_1.SchematicsException(`Project name "${appProject}" doesn't not exist.`);
         }
-        tsconfig_1.verifyBaseTsConfigExists(host);
         const root = core_1.join(core_1.normalize(project.root), 'e2e');
         project.targets.add({
             name: 'e2e',

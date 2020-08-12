@@ -17,7 +17,6 @@ const dependencies_1 = require("../utility/dependencies");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const paths_1 = require("../utility/paths");
 const project_targets_1 = require("../utility/project-targets");
-const tsconfig_1 = require("../utility/tsconfig");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function updateConfigFile(options, tsConfigDirectory) {
@@ -183,7 +182,6 @@ function default_1(options) {
         if (!clientBuildTarget) {
             throw project_targets_1.targetBuildNotFoundError();
         }
-        tsconfig_1.verifyBaseTsConfigExists(host);
         const clientBuildOptions = (clientBuildTarget.options || {});
         const clientTsConfig = core_1.normalize(clientBuildOptions.tsConfig);
         const tsConfigExtends = core_1.basename(clientTsConfig);
@@ -221,9 +219,6 @@ function default_1(options) {
             updateConfigFile(options, tsConfigDirectory),
             wrapBootstrapCall(clientBuildOptions.main),
             addServerTransition(options, clientBuildOptions.main, clientProject.root),
-            tsconfig_1.addTsConfigProjectReferences([
-                core_1.join(tsConfigDirectory, 'tsconfig.server.json'),
-            ]),
         ]);
     };
 }

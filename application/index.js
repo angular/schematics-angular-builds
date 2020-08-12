@@ -15,7 +15,6 @@ const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
 const paths_1 = require("../utility/paths");
-const tsconfig_1 = require("../utility/tsconfig");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
@@ -242,7 +241,6 @@ function default_1(options) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
         validation_1.validateProjectName(options.name);
-        tsconfig_1.verifyBaseTsConfigExists(host);
         const appRootSelector = `${options.prefix}-root`;
         const componentOptions = !options.minimal ?
             {
@@ -319,10 +317,6 @@ function default_1(options) {
                 }),
                 schematics_1.move(sourceDir),
             ]), schematics_1.MergeStrategy.Overwrite),
-            tsconfig_1.addTsConfigProjectReferences([
-                core_1.join(appDir, 'tsconfig.app.json'),
-                ...options.minimal ? [] : [core_1.join(appDir, 'tsconfig.spec.json')],
-            ]),
             options.minimal ? schematics_1.noop() : schematics_1.schematic('e2e', e2eOptions),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(options),
             options.lintFix ? lint_fix_1.applyLintFix(appDir) : schematics_1.noop(),

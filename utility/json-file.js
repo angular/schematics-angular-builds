@@ -19,14 +19,19 @@ class JSONFile {
             this.content = buffer.toString();
         }
         else {
-            this.error = new Error(`Could not read ${path}.`);
+            throw new Error(`Could not read '${path}'.`);
         }
     }
     get JsonAst() {
         if (this._jsonAst) {
             return this._jsonAst;
         }
-        this._jsonAst = jsonc_parser_1.parseTree(this.content);
+        const errors = [];
+        this._jsonAst = jsonc_parser_1.parseTree(this.content, errors);
+        if (errors.length) {
+            const { error, offset } = errors[0];
+            throw new Error(`Failed to parse "${this.path}" as JSON AST Object. ${jsonc_parser_1.printParseErrorCode(error)} at location: ${offset}.`);
+        }
         return this._jsonAst;
     }
     get(jsonPath) {
