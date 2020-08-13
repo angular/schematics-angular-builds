@@ -11,7 +11,7 @@ function default_1() {
             'karma': '~5.0.0',
             'karma-chrome-launcher': '~3.1.0',
             'karma-coverage-istanbul-reporter': '~3.0.2',
-            'karma-jasmine': '~3.3.0',
+            'karma-jasmine': '~4.0.0',
             'karma-jasmine-html-reporter': '^1.5.0',
             'protractor': '~7.0.0',
             'ng-packagr': latest_versions_1.latestVersions.ngPackagr,
