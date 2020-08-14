@@ -13,7 +13,7 @@ function removeTsickle() {
         dependencies_1.removePackageJsonDependency(tree, 'tsickle');
         const logger = context.logger;
         const workspace = utils_1.getWorkspace(tree);
-        for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.NgPackagr)) {
+        for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.DeprecatedNgPackagr)) {
             for (const options of utils_1.getAllOptions(target)) {
                 const tsConfigOption = json_utils_1.findPropertyInAstObject(options, 'tsConfig');
                 if (!tsConfigOption || tsConfigOption.kind !== 'string') {

@@ -53,11 +53,6 @@ function addDependenciesToPackageJson() {
             },
             {
                 type: dependencies_1.NodeDependencyType.Dev,
-                name: '@angular-devkit/build-ng-packagr',
-                version: latest_versions_1.latestVersions.DevkitBuildNgPackagr,
-            },
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
                 name: '@angular-devkit/build-angular',
                 version: latest_versions_1.latestVersions.DevkitBuildAngular,
             },

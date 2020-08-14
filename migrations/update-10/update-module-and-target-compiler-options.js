@@ -80,7 +80,7 @@ function default_1() {
                         break;
                     case workspace_models_1.Builders.Karma:
                     case workspace_models_1.Builders.Browser:
-                    case workspace_models_1.Builders.NgPackagr:
+                    case workspace_models_1.Builders.DeprecatedNgPackagr:
                         uniqueTsConfigs.forEach(p => {
                             try {
                                 updateModuleAndTarget(host, p, {

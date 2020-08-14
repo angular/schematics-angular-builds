@@ -26,7 +26,7 @@ function updateLibraries() {
         const workspacePath = config_1.getWorkspacePath(tree);
         const workspace = utils_1.getWorkspace(tree);
         const recorder = tree.beginUpdate(workspacePath);
-        for (const { target, project } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.NgPackagr)) {
+        for (const { target, project } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.DeprecatedNgPackagr)) {
             const projectRoot = json_utils_1.findPropertyInAstObject(project, 'root');
             if (!projectRoot || projectRoot.kind !== 'string') {
                 break;
