@@ -9,9 +9,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
+const json_file_1 = require("../utility/json-file");
 const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
+function addScriptsToPackageJson() {
+    return host => {
+        const pkgJson = new json_file_1.JSONFile(host, 'package.json');
+        const e2eScriptPath = ['scripts', 'e2e'];
+        if (!pkgJson.get(e2eScriptPath)) {
+            pkgJson.modify(e2eScriptPath, 'ng e2e', false);
+        }
+    };
+}
 function default_1(options) {
     return async (host) => {
         const appProject = options.relatedAppName;
@@ -50,6 +60,7 @@ function default_1(options) {
                 }),
                 schematics_1.move(root),
             ])),
+            addScriptsToPackageJson(),
         ]);
     };
 }
