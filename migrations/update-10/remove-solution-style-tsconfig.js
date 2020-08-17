@@ -30,8 +30,7 @@ function* visitExtendedJsonFiles(directory) {
 function default_1() {
     return (host, context) => {
         const logger = context.logger;
-        const tsConfig = new json_file_1.JSONFile(host, 'tsconfig.json');
-        const files = tsConfig.get(['files']);
+        const files = new json_file_1.JSONFile(host, 'tsconfig.json').get(['files']);
         if (!(Array.isArray(files) && files.length === 0)) {
             logger.info('Migration has already been executed.');
             return;
@@ -43,14 +42,13 @@ function default_1() {
         // Iterate over all tsconfig files and change the extends from 'tsconfig.base.json' to 'tsconfig.json'.
         const extendsJsonPath = ['extends'];
         for (const path of visitExtendedJsonFiles(host.root)) {
-            const tsConfigDir = core_1.dirname(core_1.normalize(path));
-            let tsConfigJson;
             try {
-                tsConfigJson = new json_file_1.JSONFile(host, path);
+                const tsConfigDir = core_1.dirname(core_1.normalize(path));
+                const tsConfigJson = new json_file_1.JSONFile(host, path);
                 const extendsValue = tsConfigJson.get(extendsJsonPath);
                 if (typeof extendsValue === 'string' && '/tsconfig.base.json' === core_1.resolve(tsConfigDir, core_1.normalize(extendsValue))) {
                     // tsconfig extends the workspace tsconfig path.
-                    tsConfig.modify(extendsJsonPath, extendsValue.replace('tsconfig.base.json', 'tsconfig.json'));
+                    tsConfigJson.modify(extendsJsonPath, extendsValue.replace('tsconfig.base.json', 'tsconfig.json'));
                 }
             }
             catch (error) {
