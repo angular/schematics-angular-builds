@@ -164,7 +164,6 @@ function addAppToWorkspaceFile(options, appDir) {
                         optimization: true,
                         outputHashing: 'all',
                         sourceMap: false,
-                        extractCss: true,
                         namedChunks: false,
                         extractLicenses: true,
                         vendorChunk: false,

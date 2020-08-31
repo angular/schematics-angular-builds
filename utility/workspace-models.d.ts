@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { experimental } from '@angular-devkit/core';
 export declare enum ProjectType {
     Application = "application",
     Library = "library"
@@ -117,16 +116,27 @@ export declare type TestBuilderTarget = BuilderTarget<Builders.Karma, TestBuilde
 export declare type ServeBuilderTarget = BuilderTarget<Builders.DevServer, ServeBuilderOptions>;
 export declare type ExtractI18nBuilderTarget = BuilderTarget<Builders.ExtractI18n, ExtractI18nOptions>;
 export declare type E2EBuilderTarget = BuilderTarget<Builders.Protractor, E2EOptions>;
-export interface WorkspaceSchema extends experimental.workspace.WorkspaceSchema {
+export interface WorkspaceSchema {
+    version: 1;
+    defaultProject?: string;
+    cli?: {
+        warnings?: Record<string, boolean>;
+    };
     projects: {
         [key: string]: WorkspaceProject<ProjectType.Application | ProjectType.Library>;
     };
 }
-export interface WorkspaceProject<TProjectType extends ProjectType = ProjectType.Application> extends experimental.workspace.WorkspaceProject {
+export interface WorkspaceProject<TProjectType extends ProjectType = ProjectType.Application> {
     /**
     * Project type.
     */
     projectType: ProjectType;
+    root: string;
+    sourceRoot: string;
+    prefix: string;
+    cli?: {
+        warnings?: Record<string, boolean>;
+    };
     /**
      * Tool options.
      */

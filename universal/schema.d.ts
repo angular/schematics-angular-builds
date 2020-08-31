@@ -30,9 +30,4 @@ export interface Schema {
      * When true, does not install packages for dependencies.
      */
     skipInstall?: boolean;
-    /**
-     * The name of the TypeScript configuration file.
-     * @deprecated This option has no effect.
-     */
-    tsconfigFileName?: string;
 }
