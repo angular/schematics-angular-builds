@@ -9,6 +9,7 @@ exports.createDefaultPath = exports.buildDefaultPath = exports.getWorkspace = ex
  * found in the LICENSE file at https://angular.io/license
  */
 const core_1 = require("@angular-devkit/core");
+const schematics_1 = require("@angular-devkit/schematics");
 const workspace_models_1 = require("./workspace-models");
 function createHost(tree) {
     return {
@@ -36,14 +37,13 @@ function updateWorkspace(updaterOrWorkspace) {
         const host = createHost(tree);
         if (typeof updaterOrWorkspace === 'function') {
             const { workspace } = await core_1.workspaces.readWorkspace('/', host);
-            const result = updaterOrWorkspace(workspace);
-            if (result !== undefined) {
-                await result;
-            }
+            const result = await updaterOrWorkspace(workspace);
             await core_1.workspaces.writeWorkspace(workspace, host);
+            return result || schematics_1.noop;
         }
         else {
             await core_1.workspaces.writeWorkspace(updaterOrWorkspace, host);
+            return schematics_1.noop;
         }
     };
 }

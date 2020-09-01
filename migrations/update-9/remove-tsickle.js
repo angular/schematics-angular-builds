@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeTsickle = void 0;
 const dependencies_1 = require("../../utility/dependencies");
+const json_file_1 = require("../../utility/json-file");
 const json_utils_1 = require("../../utility/json-utils");
 const workspace_models_1 = require("../../utility/workspace-models");
 const utils_1 = require("./utils");
@@ -20,21 +21,17 @@ function removeTsickle() {
                     continue;
                 }
                 const tsConfigPath = tsConfigOption.value;
-                const tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigPath);
-                if (!tsConfigAst) {
+                let tsConfigJson;
+                try {
+                    tsConfigJson = new json_file_1.JSONFile(tree, tsConfigPath);
+                }
+                catch (_a) {
                     logger.warn(`Cannot find file: ${tsConfigPath}`);
                     continue;
                 }
-                const ngCompilerOptions = json_utils_1.findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
-                if (ngCompilerOptions && ngCompilerOptions.kind === 'object') {
-                    // remove annotateForClosureCompiler option
-                    const recorder = tree.beginUpdate(tsConfigPath);
-                    json_utils_1.removePropertyInAstObject(recorder, ngCompilerOptions, 'annotateForClosureCompiler');
-                    tree.commitUpdate(recorder);
-                }
+                tsConfigJson.remove(['angularCompilerOptions', 'annotateForClosureCompiler']);
             }
         }
-        return tree;
     };
 }
 exports.removeTsickle = removeTsickle;

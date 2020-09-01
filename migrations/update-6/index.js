@@ -11,7 +11,7 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../../utility/dependencies");
-const json_utils_1 = require("../../utility/json-utils");
+const json_file_1 = require("../../utility/json-file");
 const latest_versions_1 = require("../../utility/latest-versions");
 const defaults = {
     appRoot: 'src',
@@ -526,35 +526,32 @@ function extractDefaultProject(config) {
     return null;
 }
 function updateSpecTsConfig(config) {
-    return (host, context) => {
+    return (host) => {
         const apps = config.apps || [];
-        apps.forEach((app, idx) => {
+        apps.forEach((app) => {
             const testTsConfig = app.testTsconfig || defaults.testTsConfig;
             const tsSpecConfigPath = core_1.join(core_1.normalize(app.root || ''), testTsConfig);
-            const buffer = host.read(tsSpecConfigPath);
-            if (!buffer) {
+            let tsConfigJson;
+            try {
+                tsConfigJson = new json_file_1.JSONFile(host, tsSpecConfigPath);
+            }
+            catch (_a) {
                 return;
             }
-            const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
-            if (tsCfgAst.kind != 'object') {
-                throw new schematics_1.SchematicsException('Invalid tsconfig. Was expecting an object');
-            }
-            const filesAstNode = json_utils_1.findPropertyInAstObject(tsCfgAst, 'files');
-            if (filesAstNode && filesAstNode.kind != 'array') {
-                throw new schematics_1.SchematicsException('Invalid tsconfig "files" property; expected an array.');
-            }
-            const recorder = host.beginUpdate(tsSpecConfigPath);
-            const polyfills = app.polyfills || defaults.polyfills;
-            if (!filesAstNode) {
+            const files = tsConfigJson.get(['files']);
+            if (files === undefined) {
                 // Do nothing if the files array does not exist. This means exclude or include are
                 // set and we shouldn't mess with that.
+                return;
             }
-            else {
-                if (filesAstNode.value.indexOf(polyfills) == -1) {
-                    json_utils_1.appendValueInAstArray(recorder, filesAstNode, polyfills);
-                }
+            if (!Array.isArray(files)) {
+                throw new schematics_1.SchematicsException('Invalid tsconfig "files" property; expected an array.');
             }
-            host.commitUpdate(recorder);
+            const polyfills = app.polyfills || defaults.polyfills;
+            if (polyfills && !files.includes(polyfills)) {
+                // Append polyfills file to the files array
+                tsConfigJson.modify(['files', -1], polyfills);
+            }
         });
     };
 }
@@ -574,89 +571,56 @@ function updatePackageJson(config) {
     };
 }
 function updateTsLintConfig() {
-    return (host, context) => {
+    return (host) => {
         const tsLintPath = '/tslint.json';
-        const buffer = host.read(tsLintPath);
-        if (!buffer) {
-            return host;
+        let tsLintJson;
+        try {
+            tsLintJson = new json_file_1.JSONFile(host, tsLintPath);
         }
-        const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
-        if (tsCfgAst.kind != 'object') {
-            return host;
+        catch (_a) {
+            return;
         }
-        const rulesNode = json_utils_1.findPropertyInAstObject(tsCfgAst, 'rules');
-        if (!rulesNode || rulesNode.kind != 'object') {
-            return host;
+        const rulePath = ['rules', 'import-blacklist'];
+        const currentRuleItems = tsLintJson.get(rulePath);
+        if (!currentRuleItems || !Array.isArray(currentRuleItems)) {
+            return;
         }
-        const importBlacklistNode = json_utils_1.findPropertyInAstObject(rulesNode, 'import-blacklist');
-        if (!importBlacklistNode || importBlacklistNode.kind != 'array') {
-            return host;
-        }
-        const recorder = host.beginUpdate(tsLintPath);
-        for (let i = 0; i < importBlacklistNode.elements.length; i++) {
-            const element = importBlacklistNode.elements[i];
-            if (element.kind == 'string' && element.value == 'rxjs') {
-                const { start, end } = element;
-                // Remove this element.
-                if (i == importBlacklistNode.elements.length - 1) {
-                    // Last element.
-                    if (i > 0) {
-                        // Not first, there's a comma to remove before.
-                        const previous = importBlacklistNode.elements[i - 1];
-                        recorder.remove(previous.end.offset, end.offset - previous.end.offset);
-                    }
-                    else {
-                        // Only element, just remove the whole rule.
-                        const { start, end } = importBlacklistNode;
-                        recorder.remove(start.offset, end.offset - start.offset);
-                        recorder.insertLeft(start.offset, '[]');
-                    }
-                }
-                else {
-                    // Middle, just remove the whole node (up to next node start).
-                    const next = importBlacklistNode.elements[i + 1];
-                    recorder.remove(start.offset, next.start.offset - start.offset);
-                }
-            }
-        }
-        host.commitUpdate(recorder);
-        return host;
+        // Remove all occurences of rxjs
+        const newRuleItems = currentRuleItems.filter(value => value !== 'rxjs');
+        tsLintJson.modify(rulePath, newRuleItems);
     };
 }
 function updateRootTsConfig() {
     return (host, context) => {
         const tsConfigPath = '/tsconfig.json';
-        const buffer = host.read(tsConfigPath);
-        if (!buffer) {
+        let tsConfigJson;
+        try {
+            tsConfigJson = new json_file_1.JSONFile(host, tsConfigPath);
+        }
+        catch (_a) {
             return;
         }
-        const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
-        if (tsCfgAst.kind !== 'object') {
-            throw new schematics_1.SchematicsException('Invalid root tsconfig. Was expecting an object');
+        const baseUrlPath = ['compilerOptions', 'baseUrl'];
+        const baseUrl = tsConfigJson.get(baseUrlPath);
+        if (baseUrl === undefined || typeof baseUrl !== 'string') {
+            tsConfigJson.modify(baseUrlPath, './');
         }
-        const compilerOptionsAstNode = json_utils_1.findPropertyInAstObject(tsCfgAst, 'compilerOptions');
-        if (!compilerOptionsAstNode || compilerOptionsAstNode.kind != 'object') {
-            throw new schematics_1.SchematicsException('Invalid root tsconfig "compilerOptions" property; expected an object.');
+        else {
+            const validBaseUrl = ['./', '', '.'];
+            if (!validBaseUrl.includes(baseUrl)) {
+                const formattedBaseUrl = validBaseUrl.map(x => `'${x}'`).join(', ');
+                context.logger.warn(core_1.tags.oneLine `Root tsconfig option 'baseUrl' is not one of: ${formattedBaseUrl}.
+          This might cause unexpected behaviour when generating libraries.`);
+            }
         }
-        if (json_utils_1.findPropertyInAstObject(compilerOptionsAstNode, 'baseUrl') &&
-            json_utils_1.findPropertyInAstObject(compilerOptionsAstNode, 'module')) {
-            return host;
+        const modulePath = ['compilerOptions', 'module'];
+        const module = tsConfigJson.get(modulePath);
+        if (module === undefined || typeof module !== 'string') {
+            tsConfigJson.modify(modulePath, 'es2015');
         }
-        const compilerOptions = compilerOptionsAstNode.value;
-        const { baseUrl = './', module = 'es2015' } = compilerOptions;
-        const validBaseUrl = ['./', '', '.'];
-        if (!validBaseUrl.includes(baseUrl)) {
-            const formattedBaseUrl = validBaseUrl.map(x => `'${x}'`).join(', ');
-            context.logger.warn(core_1.tags.oneLine `Root tsconfig option 'baseUrl' is not one of: ${formattedBaseUrl}.
-        This might cause unexpected behaviour when generating libraries.`);
-        }
-        if (module !== 'es2015') {
+        else if (module.toLowerCase() !== 'es2015') {
             context.logger.warn(`Root tsconfig option 'module' is not 'es2015'. This might cause unexpected behaviour.`);
         }
-        compilerOptions.module = module;
-        compilerOptions.baseUrl = baseUrl;
-        host.overwrite(tsConfigPath, JSON.stringify(tsCfgAst.value, null, 2));
-        return host;
     };
 }
 function default_1() {

@@ -9,10 +9,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateLibraries = void 0;
 const core_1 = require("@angular-devkit/core");
-const config_1 = require("../../utility/config");
-const json_utils_1 = require("../../utility/json-utils");
+const schematics_1 = require("@angular-devkit/schematics");
+const json_file_1 = require("../../utility/json-file");
+const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
-const utils_1 = require("./utils");
 /**
  * Updates a pre version 9 library to version 9 Ivy library.
  *
@@ -21,72 +21,35 @@ const utils_1 = require("./utils");
  * - Create a prod tsconfig for which disables Ivy and enables VE compilations.
  */
 function updateLibraries() {
-    return (tree, context) => {
-        const logger = context.logger;
-        const workspacePath = config_1.getWorkspacePath(tree);
-        const workspace = utils_1.getWorkspace(tree);
-        const recorder = tree.beginUpdate(workspacePath);
-        for (const { target, project } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.DeprecatedNgPackagr)) {
-            const projectRoot = json_utils_1.findPropertyInAstObject(project, 'root');
-            if (!projectRoot || projectRoot.kind !== 'string') {
-                break;
-            }
-            const configurations = json_utils_1.findPropertyInAstObject(target, 'configurations');
-            const tsConfig = core_1.join(core_1.normalize(projectRoot.value), 'tsconfig.lib.prod.json');
-            if (!configurations || configurations.kind !== 'object') {
-                // Configurations doesn't exist.
-                json_utils_1.appendPropertyInAstObject(recorder, target, 'configurations', { production: { tsConfig } }, 10);
-                createTsConfig(tree, tsConfig);
+    return workspace_1.updateWorkspace(workspace => {
+        const followupRules = [];
+        for (const [, project] of workspace.projects) {
+            if (typeof project.root !== 'string') {
                 continue;
             }
-            const prodConfig = json_utils_1.findPropertyInAstObject(configurations, 'production');
-            if (!prodConfig || prodConfig.kind !== 'object') {
-                // Production configuration doesn't exist.
-                json_utils_1.insertPropertyInAstObjectInOrder(recorder, configurations, 'production', { tsConfig }, 12);
-                createTsConfig(tree, tsConfig);
-                continue;
-            }
-            const tsConfigOption = json_utils_1.findPropertyInAstObject(prodConfig, 'tsConfig');
-            if (!tsConfigOption || tsConfigOption.kind !== 'string') {
-                // No tsconfig for production has been defined.
-                json_utils_1.insertPropertyInAstObjectInOrder(recorder, prodConfig, 'tsConfig', tsConfig, 14);
-                createTsConfig(tree, tsConfig);
-                continue;
-            }
-            // tsConfig for production already exists.
-            const tsConfigPath = tsConfigOption.value;
-            const tsConfigAst = utils_1.readJsonFileAsAstObject(tree, tsConfigPath);
-            if (!tsConfigAst) {
-                logger.warn(`Cannot find file: ${tsConfigPath}`);
-                continue;
-            }
-            const tsConfigRecorder = tree.beginUpdate(tsConfigPath);
-            const ngCompilerOptions = json_utils_1.findPropertyInAstObject(tsConfigAst, 'angularCompilerOptions');
-            if (!ngCompilerOptions) {
-                // Add angularCompilerOptions to the production tsConfig
-                json_utils_1.appendPropertyInAstObject(tsConfigRecorder, tsConfigAst, 'angularCompilerOptions', { enableIvy: false }, 2);
-                tree.commitUpdate(tsConfigRecorder);
-                continue;
-            }
-            if (ngCompilerOptions.kind === 'object') {
-                const enableIvy = json_utils_1.findPropertyInAstObject(ngCompilerOptions, 'enableIvy');
-                // Add enableIvy false
-                if (!enableIvy) {
-                    json_utils_1.appendPropertyInAstObject(tsConfigRecorder, ngCompilerOptions, 'enableIvy', false, 4);
-                    tree.commitUpdate(tsConfigRecorder);
+            for (const [, target] of project.targets) {
+                if (target.builder !== workspace_models_1.Builders.DeprecatedNgPackagr) {
                     continue;
                 }
-                if (enableIvy.kind !== 'false') {
-                    const { start, end } = enableIvy;
-                    tsConfigRecorder.remove(start.offset, end.offset - start.offset);
-                    tsConfigRecorder.insertLeft(start.offset, 'false');
-                    tree.commitUpdate(tsConfigRecorder);
+                const tsConfig = core_1.join(core_1.normalize(project.root), 'tsconfig.lib.prod.json');
+                if (!target.configurations || !target.configurations.production) {
+                    // Production configuration does not exist
+                    target.configurations = { ...target.configurations, production: { tsConfig } };
+                    followupRules.push((tree) => createTsConfig(tree, tsConfig));
+                    continue;
                 }
+                const existingTsconfig = target.configurations.production.tsConfig;
+                if (!existingTsconfig || typeof existingTsconfig !== 'string') {
+                    // Production configuration TS configuration does not exist or malformed
+                    target.configurations.production.tsConfig = tsConfig;
+                    followupRules.push((tree) => createTsConfig(tree, tsConfig));
+                    continue;
+                }
+                followupRules.push(updateTsConfig(existingTsconfig));
             }
         }
-        tree.commitUpdate(recorder);
-        return tree;
-    };
+        return schematics_1.chain(followupRules);
+    });
 }
 exports.updateLibraries = updateLibraries;
 function createTsConfig(tree, tsConfigPath) {
@@ -99,4 +62,21 @@ function createTsConfig(tree, tsConfigPath) {
     if (!tree.exists(tsConfigPath)) {
         tree.create(tsConfigPath, JSON.stringify(tsConfigContent, undefined, 2));
     }
+}
+function updateTsConfig(tsConfigPath) {
+    return (tree, { logger }) => {
+        let json;
+        try {
+            json = new json_file_1.JSONFile(tree, tsConfigPath);
+        }
+        catch (_a) {
+            logger.warn(`Cannot find file: ${tsConfigPath}`);
+            return;
+        }
+        const enableIvyPath = ['angularCompilerOptions', 'enableIvy'];
+        if (json.get(enableIvyPath) === false) {
+            return;
+        }
+        json.modify(enableIvyPath, false);
+    };
 }
