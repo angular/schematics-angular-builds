@@ -1,6 +1,9 @@
-import { Rule } from '@angular-devkit/schematics';
 /**
- * Move the import reflect metadata polyfill from the polyfill file to the dev environment. This is
- * not guaranteed to work, but if it doesn't it will result in no changes made.
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
  */
+import { Rule } from '@angular-devkit/schematics';
 export declare function polyfillMetadataRule(): Rule;
