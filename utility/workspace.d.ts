@@ -7,7 +7,7 @@
  */
 import { workspaces } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-export declare function updateWorkspace(updater: (workspace: workspaces.WorkspaceDefinition) => void | PromiseLike<void>): Rule;
+export declare function updateWorkspace(updater: (workspace: workspaces.WorkspaceDefinition) => void | Rule | PromiseLike<void | Rule>): Rule;
 export declare function updateWorkspace(workspace: workspaces.WorkspaceDefinition): Rule;
 export declare function getWorkspace(tree: Tree, path?: string): Promise<workspaces.WorkspaceDefinition>;
 /**
