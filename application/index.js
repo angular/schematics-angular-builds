@@ -261,7 +261,7 @@ function default_1(options) {
         const isRootApp = options.projectRoot !== undefined;
         const appDir = isRootApp
             ? core_1.normalize(options.projectRoot || '')
-            : core_1.join(core_1.normalize(newProjectRoot), options.name);
+            : core_1.join(core_1.normalize(newProjectRoot), core_1.strings.dasherize(options.name));
         const sourceDir = `${appDir}/src/app`;
         const e2eOptions = {
             relatedAppName: options.name,
