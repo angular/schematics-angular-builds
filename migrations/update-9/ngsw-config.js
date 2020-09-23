@@ -1,58 +1,53 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateNGSWConfig = void 0;
-const json_utils_1 = require("../../utility/json-utils");
+const json_file_1 = require("../../utility/json-file");
+const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
-const utils_1 = require("./utils");
 /**
  * Update ngsw-config.json to fix issue https://github.com/angular/angular-cli/pull/15277
  */
 function updateNGSWConfig() {
-    return (tree, context) => {
-        const workspace = utils_1.getWorkspace(tree);
-        const logger = context.logger;
-        for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
-            for (const options of utils_1.getAllOptions(target)) {
-                const ngswConfigPath = json_utils_1.findPropertyInAstObject(options, 'ngswConfigPath');
-                if (!ngswConfigPath || ngswConfigPath.kind !== 'string') {
+    return async (tree, { logger }) => {
+        const workspace = await workspace_1.getWorkspace(tree);
+        for (const [targetName, target] of workspace_1.allWorkspaceTargets(workspace)) {
+            if (targetName !== 'build' || target.builder !== workspace_models_1.Builders.Browser) {
+                continue;
+            }
+            for (const [, options] of workspace_1.allTargetOptions(target)) {
+                const ngswConfigPath = options.ngswConfigPath;
+                if (!ngswConfigPath || typeof ngswConfigPath !== 'string') {
                     continue;
                 }
-                const path = ngswConfigPath.value;
-                const ngswConfigAst = utils_1.readJsonFileAsAstObject(tree, path);
-                if (!ngswConfigAst || ngswConfigAst.kind !== 'object') {
+                let ngswConfigJson;
+                try {
+                    ngswConfigJson = new json_file_1.JSONFile(tree, ngswConfigPath);
+                }
+                catch (_a) {
                     logger.warn(`Cannot find file: ${ngswConfigPath}`);
                     continue;
                 }
-                const assetGroups = json_utils_1.findPropertyInAstObject(ngswConfigAst, 'assetGroups');
-                if (!assetGroups || assetGroups.kind !== 'array') {
+                const assetGroups = ngswConfigJson.get(['assetGroups']);
+                if (!assetGroups || !Array.isArray(assetGroups)) {
                     continue;
                 }
-                const prefetchElement = assetGroups.elements.find(element => {
-                    const installMode = element.kind === 'object' && json_utils_1.findPropertyInAstObject(element, 'installMode');
-                    return installMode && installMode.value === 'prefetch';
-                });
-                if (!prefetchElement || prefetchElement.kind !== 'object') {
+                const prefetchElementIndex = assetGroups.findIndex((element) => (element === null || element === void 0 ? void 0 : element.installMode) === 'prefetch');
+                if (prefetchElementIndex === -1) {
                     continue;
                 }
-                const resources = json_utils_1.findPropertyInAstObject(prefetchElement, 'resources');
-                if (!resources || resources.kind !== 'object') {
+                const filesPath = ['assetGroups', prefetchElementIndex, 'resources', 'files'];
+                const files = ngswConfigJson.get(filesPath);
+                if (!files || !Array.isArray(files)) {
                     continue;
                 }
-                const files = json_utils_1.findPropertyInAstObject(resources, 'files');
-                if (!files || files.kind !== 'array') {
-                    continue;
-                }
-                const hasManifest = files.elements
-                    .some(({ value }) => typeof value === 'string' && value.endsWith('manifest.webmanifest'));
+                const hasManifest = files.some((value) => typeof value === 'string' && value.endsWith('manifest.webmanifest'));
                 if (hasManifest) {
                     continue;
                 }
-                const recorder = tree.beginUpdate(path);
-                json_utils_1.appendValueInAstArray(recorder, files, '/manifest.webmanifest', 10);
-                tree.commitUpdate(recorder);
+                // Append to files array
+                ngswConfigJson.modify([...filesPath, -1], '/manifest.webmanifest');
             }
         }
-        return tree;
     };
 }
 exports.updateNGSWConfig = updateNGSWConfig;

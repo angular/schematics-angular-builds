@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateWorkspaceConfig = exports.ANY_COMPONENT_STYLE_BUDGET = void 0;
-const config_1 = require("../../utility/config");
-const json_utils_1 = require("../../utility/json-utils");
+const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 const utils_1 = require("./utils");
 exports.ANY_COMPONENT_STYLE_BUDGET = {
@@ -10,115 +9,105 @@ exports.ANY_COMPONENT_STYLE_BUDGET = {
     maximumWarning: '6kb',
 };
 function updateWorkspaceConfig() {
-    return (tree, context) => {
-        const workspacePath = config_1.getWorkspacePath(tree);
-        const workspace = utils_1.getWorkspace(tree);
-        const recorder = tree.beginUpdate(workspacePath);
-        for (const { target } of utils_1.getTargets(workspace, 'build', workspace_models_1.Builders.Browser)) {
-            updateStyleOrScriptOption('styles', recorder, target);
-            updateStyleOrScriptOption('scripts', recorder, target);
-            addAnyComponentStyleBudget(recorder, target);
-            updateAotOption(tree, recorder, target);
+    return (tree) => workspace_1.updateWorkspace((workspace) => {
+        for (const [targetName, target] of workspace_1.allWorkspaceTargets(workspace)) {
+            switch (targetName) {
+                case 'build':
+                    if (target.builder !== workspace_models_1.Builders.Browser) {
+                        break;
+                    }
+                    updateStyleOrScriptOption('styles', target);
+                    updateStyleOrScriptOption('scripts', target);
+                    addAnyComponentStyleBudget(target);
+                    updateAotOption(tree, target);
+                    break;
+                case 'test':
+                    if (target.builder !== workspace_models_1.Builders.Karma) {
+                        break;
+                    }
+                    updateStyleOrScriptOption('styles', target);
+                    updateStyleOrScriptOption('scripts', target);
+                    break;
+                case 'server':
+                    if (target.builder !== workspace_models_1.Builders.Server) {
+                        break;
+                    }
+                    updateOptimizationOption(target);
+                    break;
+            }
         }
-        for (const { target } of utils_1.getTargets(workspace, 'test', workspace_models_1.Builders.Karma)) {
-            updateStyleOrScriptOption('styles', recorder, target);
-            updateStyleOrScriptOption('scripts', recorder, target);
-        }
-        for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
-            updateOptimizationOption(recorder, target);
-        }
-        tree.commitUpdate(recorder);
-        return tree;
-    };
+    });
 }
 exports.updateWorkspaceConfig = updateWorkspaceConfig;
-function updateAotOption(tree, recorder, builderConfig) {
-    const options = json_utils_1.findPropertyInAstObject(builderConfig, 'options');
-    if (!options || options.kind !== 'object') {
+function updateAotOption(tree, builderConfig) {
+    if (!builderConfig.options) {
         return;
     }
-    const tsConfig = json_utils_1.findPropertyInAstObject(options, 'tsConfig');
-    // Do not add aot option if the users already opted out from Ivy.
-    if (tsConfig && tsConfig.kind === 'string' && !utils_1.isIvyEnabled(tree, tsConfig.value)) {
+    const tsConfig = builderConfig.options.tsConfig;
+    // Do not add aot option if the users already opted out from Ivy
+    if (tsConfig && typeof tsConfig === 'string' && !utils_1.isIvyEnabled(tree, tsConfig)) {
         return;
     }
-    // Add aot to options.
-    const aotOption = json_utils_1.findPropertyInAstObject(options, 'aot');
-    if (!aotOption) {
-        json_utils_1.insertPropertyInAstObjectInOrder(recorder, options, 'aot', true, 12);
+    // Add aot to options
+    const aotOption = builderConfig.options.aot;
+    if (aotOption === undefined || aotOption === false) {
+        builderConfig.options.aot = true;
+    }
+    if (!builderConfig.configurations) {
         return;
     }
-    if (aotOption.kind !== 'true') {
-        const { start, end } = aotOption;
-        recorder.remove(start.offset, end.offset - start.offset);
-        recorder.insertLeft(start.offset, 'true');
-    }
-    // Remove aot properties from other configurations as they are no redundant
-    const configOptions = utils_1.getAllOptions(builderConfig, true);
-    for (const options of configOptions) {
-        json_utils_1.removePropertyInAstObject(recorder, options, 'aot');
+    for (const configurationOptions of Object.values(builderConfig.configurations)) {
+        configurationOptions === null || configurationOptions === void 0 ? true : delete configurationOptions.aot;
     }
 }
-function updateStyleOrScriptOption(property, recorder, builderConfig) {
-    const options = utils_1.getAllOptions(builderConfig);
-    for (const option of options) {
-        const propertyOption = json_utils_1.findPropertyInAstObject(option, property);
-        if (!propertyOption || propertyOption.kind !== 'array') {
+function updateStyleOrScriptOption(property, builderConfig) {
+    for (const [, options] of workspace_1.allTargetOptions(builderConfig)) {
+        const propertyOption = options[property];
+        if (!propertyOption || !Array.isArray(propertyOption)) {
             continue;
         }
-        for (const node of propertyOption.elements) {
-            if (!node || node.kind !== 'object') {
+        for (const node of propertyOption) {
+            if (!node || typeof node !== 'object' || Array.isArray(node)) {
                 // skip non complex objects
                 continue;
             }
-            const lazy = json_utils_1.findPropertyInAstObject(node, 'lazy');
-            json_utils_1.removePropertyInAstObject(recorder, node, 'lazy');
-            // if lazy was not true, it is redundant hence, don't add it
-            if (lazy && lazy.kind === 'true') {
-                json_utils_1.insertPropertyInAstObjectInOrder(recorder, node, 'inject', false, 0);
+            const lazy = node.lazy;
+            if (lazy !== undefined) {
+                delete node.lazy;
+                // if lazy was not true, it is redundant hence, don't add it
+                if (lazy) {
+                    node.inject = false;
+                }
             }
         }
     }
 }
-function addAnyComponentStyleBudget(recorder, builderConfig) {
-    const options = utils_1.getAllOptions(builderConfig, true);
-    for (const option of options) {
-        const budgetOption = json_utils_1.findPropertyInAstObject(option, 'budgets');
-        if (!budgetOption) {
-            // add
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'budgets', [exports.ANY_COMPONENT_STYLE_BUDGET], 14);
+function addAnyComponentStyleBudget(builderConfig) {
+    for (const [, options] of workspace_1.allTargetOptions(builderConfig, /* skipBaseOptions */ true)) {
+        if (options.budgets === undefined) {
+            options.budgets = [exports.ANY_COMPONENT_STYLE_BUDGET];
             continue;
         }
-        if (budgetOption.kind !== 'array') {
+        if (!Array.isArray(options.budgets)) {
             continue;
         }
-        // if 'anyComponentStyle' budget already exists don't add.
-        const hasAnyComponentStyle = budgetOption.elements.some(node => {
-            if (!node || node.kind !== 'object') {
+        // If 'anyComponentStyle' budget already exists, don't add
+        const hasAnyComponentStyle = options.budgets.some((node) => {
+            if (!node || typeof node !== 'object' || Array.isArray(node)) {
                 // skip non complex objects
                 return false;
             }
-            const budget = json_utils_1.findPropertyInAstObject(node, 'type');
-            return !!budget && budget.kind === 'string' && budget.value === 'anyComponentStyle';
+            return node.type === 'anyComponentStyle';
         });
         if (!hasAnyComponentStyle) {
-            json_utils_1.appendValueInAstArray(recorder, budgetOption, exports.ANY_COMPONENT_STYLE_BUDGET, 16);
+            options.budgets.push(exports.ANY_COMPONENT_STYLE_BUDGET);
         }
     }
 }
-function updateOptimizationOption(recorder, builderConfig) {
-    const options = utils_1.getAllOptions(builderConfig, true);
-    for (const option of options) {
-        const optimizationOption = json_utils_1.findPropertyInAstObject(option, 'optimization');
-        if (!optimizationOption) {
-            // add
-            json_utils_1.insertPropertyInAstObjectInOrder(recorder, option, 'optimization', true, 14);
-            continue;
-        }
-        if (optimizationOption.kind !== 'true') {
-            const { start, end } = optimizationOption;
-            recorder.remove(start.offset, end.offset - start.offset);
-            recorder.insertLeft(start.offset, 'true');
+function updateOptimizationOption(builderConfig) {
+    for (const [, options] of workspace_1.allTargetOptions(builderConfig, /* skipBaseOptions */ true)) {
+        if (options.optimization !== true) {
+            options.optimization = true;
         }
     }
 }
