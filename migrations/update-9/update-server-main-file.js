@@ -3,27 +3,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateServerMainFile = void 0;
 const ts = require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 const ast_utils_1 = require("../../utility/ast-utils");
-const json_utils_1 = require("../../utility/json-utils");
+const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
-const utils_1 = require("./utils");
 /**
  * Update the `main.server.ts` file by adding exports to `renderModule` and `renderModuleFactory` which are
  * now required for Universal and App-Shell for Ivy and `bundleDependencies`.
  */
 function updateServerMainFile() {
-    return tree => {
-        const workspace = utils_1.getWorkspace(tree);
-        for (const { target } of utils_1.getTargets(workspace, 'server', workspace_models_1.Builders.Server)) {
-            const options = json_utils_1.findPropertyInAstObject(target, 'options');
-            if (!options || options.kind !== 'object') {
+    return async (tree) => {
+        var _a;
+        const workspace = await workspace_1.getWorkspace(tree);
+        for (const [targetName, target] of workspace_1.allWorkspaceTargets(workspace)) {
+            if (targetName !== 'server' || target.builder !== workspace_models_1.Builders.Server) {
                 continue;
             }
             // find the main server file
-            const mainFile = json_utils_1.findPropertyInAstObject(options, 'main');
-            if (!mainFile || typeof mainFile.value !== 'string') {
+            const mainFilePath = (_a = target.options) === null || _a === void 0 ? void 0 : _a.main;
+            if (!mainFilePath || typeof mainFilePath !== 'string') {
                 continue;
             }
-            const mainFilePath = mainFile.value;
             const content = tree.read(mainFilePath);
             if (!content) {
                 continue;
@@ -87,7 +85,6 @@ function updateServerMainFile() {
             }
             tree.commitUpdate(recorder);
         }
-        return tree;
     };
 }
 exports.updateServerMainFile = updateServerMainFile;
