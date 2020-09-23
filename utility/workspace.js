@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allTargetOptions = exports.allWorkspaceTargets = exports.createDefaultPath = exports.buildDefaultPath = exports.getWorkspace = exports.updateWorkspace = void 0;
+exports.createDefaultPath = exports.buildDefaultPath = exports.getWorkspace = exports.updateWorkspace = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -73,25 +73,3 @@ async function createDefaultPath(tree, projectName) {
     return buildDefaultPath(project);
 }
 exports.createDefaultPath = createDefaultPath;
-function* allWorkspaceTargets(workspace) {
-    for (const [, project] of workspace.projects) {
-        for (const targetEntry of project.targets) {
-            yield targetEntry;
-        }
-    }
-}
-exports.allWorkspaceTargets = allWorkspaceTargets;
-function* allTargetOptions(target, skipBaseOptions = false) {
-    if (!skipBaseOptions && target.options) {
-        yield [undefined, target.options];
-    }
-    if (!target.configurations) {
-        return;
-    }
-    for (const [name, options] of Object.entries(target.configurations)) {
-        if (options !== undefined) {
-            yield [name, options];
-        }
-    }
-}
-exports.allTargetOptions = allTargetOptions;
