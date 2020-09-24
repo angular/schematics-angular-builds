@@ -16,5 +16,5 @@ export declare function getWorkspace(tree: Tree, path?: string): Promise<workspa
  */
 export declare function buildDefaultPath(project: workspaces.ProjectDefinition): string;
 export declare function createDefaultPath(tree: Tree, projectName: string): Promise<string>;
-export declare function allWorkspaceTargets(workspace: workspaces.WorkspaceDefinition): Iterable<[string, workspaces.TargetDefinition]>;
+export declare function allWorkspaceTargets(workspace: workspaces.WorkspaceDefinition): Iterable<[string, workspaces.TargetDefinition, string, workspaces.ProjectDefinition]>;
 export declare function allTargetOptions(target: workspaces.TargetDefinition, skipBaseOptions?: boolean): Iterable<[string | undefined, Record<string, json.JsonValue | undefined>]>;

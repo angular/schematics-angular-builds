@@ -74,9 +74,9 @@ async function createDefaultPath(tree, projectName) {
 }
 exports.createDefaultPath = createDefaultPath;
 function* allWorkspaceTargets(workspace) {
-    for (const [, project] of workspace.projects) {
-        for (const targetEntry of project.targets) {
-            yield targetEntry;
+    for (const [projectName, project] of workspace.projects) {
+        for (const [targetName, target] of project.targets) {
+            yield [targetName, target, projectName, project];
         }
     }
 }
