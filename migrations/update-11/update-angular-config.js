@@ -12,6 +12,7 @@ const workspace_1 = require("../../utility/workspace");
 function default_1() {
     return workspace_1.updateWorkspace(workspace => {
         const optionsToRemove = {
+            environment: undefined,
             extractCss: undefined,
             tsconfigFileName: undefined,
         };
