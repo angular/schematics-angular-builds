@@ -56,7 +56,7 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * Creates an application with stricter build optimization options.
+     * Creates an application with stricter bundle budgets settings.
      */
     strict?: boolean;
     /**

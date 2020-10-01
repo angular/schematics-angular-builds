@@ -70,7 +70,7 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * Creates a workspace with stricter type checking and build optimization options.
+     * Creates a workspace with stricter type checking and stricter bundle budgets settings.
      */
     strict?: boolean;
     /**
