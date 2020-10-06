@@ -84,7 +84,7 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
     }
     if (max > 0 && (recursive || !test(node))) {
         for (const child of node.getChildren()) {
-            findNodes(child, test, max).forEach((node) => {
+            findNodes(child, test, max, recursive).forEach((node) => {
                 if (max > 0) {
                     arr.push(node);
                 }
