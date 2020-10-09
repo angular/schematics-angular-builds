@@ -19,7 +19,7 @@ export interface Schema {
     /**
      * Creates a workspace with stricter type checking options. This setting helps improve
      * maintainability and catch bugs ahead of time. For more information, see
-     * https://angular.io/strict
+     * https://angular.io/guide/strict-mode
      */
     strict?: boolean;
     /**
