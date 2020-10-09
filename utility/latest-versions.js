@@ -22,5 +22,5 @@ exports.latestVersions = {
     DevkitBuildAngular: '~0.1100.0-next.6',
     DevkitBuildNgPackagr: '~0.1100.0-next.6',
     DevkitBuildWebpack: '~0.1100.0-next.6',
-    ngPackagr: '^10.1.0',
+    ngPackagr: '^11.0.0-next.0',
 };
