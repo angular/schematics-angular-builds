@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.latestVersions = void 0;
 exports.latestVersions = {
     // These versions should be kept up to date with latest Angular peer dependencies.
-    Angular: '~10.1.5',
+    Angular: '~10.1.6',
     RxJs: '~6.6.0',
     ZoneJs: '~0.10.2',
     TypeScript: '~4.0.2',
@@ -19,8 +19,8 @@ exports.latestVersions = {
     // For our e2e tests, these versions must match the latest tag present on the branch.
     // During RC periods they will not match the latest RC until there's a new git tag, and
     // should not be updated.
-    DevkitBuildAngular: '~0.1001.5',
-    DevkitBuildNgPackagr: '~0.1001.5',
-    DevkitBuildWebpack: '~0.1001.5',
+    DevkitBuildAngular: '~0.1001.7',
+    DevkitBuildNgPackagr: '~0.1001.7',
+    DevkitBuildWebpack: '~0.1001.7',
     ngPackagr: '^10.1.0',
 };
