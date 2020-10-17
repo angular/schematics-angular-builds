@@ -65,6 +65,7 @@ function mergeWithRootTsLint(parentHost) {
     };
 }
 function addAppToWorkspaceFile(options, appDir) {
+    var _a, _b;
     let projectRoot = appDir;
     if (projectRoot) {
         projectRoot += '/';
@@ -75,10 +76,10 @@ function addAppToWorkspaceFile(options, appDir) {
         || options.minimal
         || options.style !== schema_1.Style.Css) {
         const componentSchematicsOptions = {};
-        if (options.inlineTemplate || options.minimal) {
+        if ((_a = options.inlineTemplate) !== null && _a !== void 0 ? _a : options.minimal) {
             componentSchematicsOptions.inlineTemplate = true;
         }
-        if (options.inlineStyle || options.minimal) {
+        if ((_b = options.inlineStyle) !== null && _b !== void 0 ? _b : options.minimal) {
             componentSchematicsOptions.inlineStyle = true;
         }
         if (options.style && options.style !== schema_1.Style.Css) {
@@ -236,6 +237,7 @@ function minimalPathFilter(path) {
 }
 function default_1(options) {
     return async (host) => {
+        var _a, _b;
         if (!options.name) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
@@ -250,10 +252,11 @@ function default_1(options) {
                 viewEncapsulation: options.viewEncapsulation,
             } :
             {
-                inlineStyle: true,
-                inlineTemplate: true,
+                inlineStyle: (_a = options.inlineStyle) !== null && _a !== void 0 ? _a : true,
+                inlineTemplate: (_b = options.inlineTemplate) !== null && _b !== void 0 ? _b : true,
                 skipTests: true,
                 style: options.style,
+                viewEncapsulation: options.viewEncapsulation,
             };
         const workspace = await workspace_1.getWorkspace(host);
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
