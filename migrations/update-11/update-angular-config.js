@@ -15,6 +15,7 @@ function default_1() {
             environment: undefined,
             extractCss: undefined,
             tsconfigFileName: undefined,
+            rebaseRootRelativeCssUrls: undefined,
         };
         for (const [, project] of workspace.projects) {
             for (const [, target] of project.targets) {
