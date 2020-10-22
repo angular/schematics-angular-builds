@@ -4,7 +4,6 @@
 export interface Schema {
     /**
      * When true, applies lint fixes after generating the class.
-     * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
     /**

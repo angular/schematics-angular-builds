@@ -1,49 +1,68 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-const core_1 = require("@angular-devkit/core");
-const workspace_1 = require("../../utility/workspace");
+const config_1 = require("../../utility/config");
+const json_utils_1 = require("../../utility/json-utils");
+const utils_1 = require("./utils");
 function default_1() {
-    return workspace_1.updateWorkspace(workspace => {
-        // Update root level schematics options if present
-        const rootSchematics = workspace.extensions.schematics;
-        if (rootSchematics && core_1.json.isJsonObject(rootSchematics)) {
-            updateSchematicsField(rootSchematics);
+    return tree => {
+        const workspacePath = config_1.getWorkspacePath(tree);
+        const workspace = utils_1.getWorkspace(tree);
+        const recorder = tree.beginUpdate(workspacePath);
+        const rootSchematics = findSchematicsField(workspace);
+        if (rootSchematics) {
+            updateSchematicsField(rootSchematics, recorder);
         }
-        // Update project level schematics options if present
-        for (const [, project] of workspace.projects) {
-            const projectSchematics = project.extensions.schematics;
-            if (projectSchematics && core_1.json.isJsonObject(projectSchematics)) {
-                updateSchematicsField(projectSchematics);
+        const projects = json_utils_1.findPropertyInAstObject(workspace, 'projects');
+        if (!projects || projects.kind !== 'object' || !projects.properties) {
+            return;
+        }
+        for (const { value } of projects.properties) {
+            if (value.kind !== 'object') {
+                continue;
             }
+            const projectSchematics = findSchematicsField(value);
+            if (!projectSchematics) {
+                continue;
+            }
+            updateSchematicsField(projectSchematics, recorder);
         }
-    });
+        tree.commitUpdate(recorder);
+        return tree;
+    };
 }
 exports.default = default_1;
-function updateSchematicsField(schematics) {
-    for (const [schematicName, schematicOptions] of Object.entries(schematics)) {
-        if (!core_1.json.isJsonObject(schematicOptions)) {
+function findSchematicsField(value) {
+    const schematics = json_utils_1.findPropertyInAstObject(value, 'schematics');
+    if (schematics && schematics.kind == 'object') {
+        return schematics;
+    }
+    return null;
+}
+function updateSchematicsField(schematics, recorder) {
+    for (const { key: { value: schematicName }, value: schematicValue, } of schematics.properties) {
+        if (schematicValue.kind !== 'object') {
             continue;
         }
         if (!schematicName.startsWith('@schematics/angular:')) {
             continue;
         }
-        // Replace `styleext` with `style`
-        if (schematicOptions.styleext !== undefined) {
-            schematicOptions.style = schematicOptions.styleext;
-            delete schematicOptions.styleext;
-        }
-        // Replace `spec` with `skipTests`
-        if (schematicOptions.spec !== undefined) {
-            // skipTests value is inverted
-            schematicOptions.skipTests = !schematicOptions.spec;
-            delete schematicOptions.spec;
+        for (const { key: optionKey, value: optionValue } of schematicValue.properties) {
+            if (optionKey.value === 'styleext') {
+                // Rename `styleext` to `style
+                const offset = optionKey.start.offset + 1;
+                recorder.remove(offset, optionKey.value.length);
+                recorder.insertLeft(offset, 'style');
+            }
+            else if (optionKey.value === 'spec') {
+                // Rename `spec` to `skipTests`
+                const offset = optionKey.start.offset + 1;
+                recorder.remove(offset, optionKey.value.length);
+                recorder.insertLeft(offset, 'skipTests');
+                // invert value
+                const { start, end } = optionValue;
+                recorder.remove(start.offset, end.offset - start.offset);
+                recorder.insertLeft(start.offset, `${!optionValue.value}`);
+            }
         }
     }
 }

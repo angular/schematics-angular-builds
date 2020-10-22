@@ -104,21 +104,6 @@
       "version": "10.1.0-next.5",
       "factory": "./update-10/remove-solution-style-tsconfig",
       "description": "Removing \"Solution Style\" TypeScript configuration file support."
-    },
-    "replace-ng-packagr-builder": {
-      "version": "11.0.0-next.0",
-      "factory": "./update-11/replace-ng-packagr-builder",
-      "description": "Replace deprecated library builder '@angular-devkit/build-ng-packagr'."
-    },
-    "add-declaration-map-compiler-option": {
-      "version": "11.0.0-next.2",
-      "factory": "./update-11/add-declaration-map-compiler-option",
-      "description": "Add 'declarationMap' compiler options for non production library builds."
-    },
-    "update-angular-config-v11": {
-      "version": "11.0.0-next.8",
-      "factory": "./update-11/update-angular-config",
-      "description": "Remove deprecated options from 'angular.json' that are no longer present in v11."
     }
   }
 }

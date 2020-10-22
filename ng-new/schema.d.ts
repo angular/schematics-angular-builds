@@ -70,9 +70,7 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * Creates a workspace with stricter type checking and stricter bundle budgets settings.
-     * This setting helps improve maintainability and catch bugs ahead of time. For more
-     * information, see https://angular.io/strict
+     * Creates a workspace with stricter type checking and build optimization options.
      */
     strict?: boolean;
     /**

@@ -12,7 +12,6 @@ export interface Schema {
     implements?: Implement[];
     /**
      * When true, applies lint fixes after generating the guard.
-     * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
     /**

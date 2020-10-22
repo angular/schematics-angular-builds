@@ -1,5 +1,5 @@
-import { Tree } from '@angular-devkit/schematics';
-import { WorkspaceSchema } from './workspace-models';
+import { Rule, Tree } from '@angular-devkit/schematics';
+import { ProjectType, WorkspaceProject, WorkspaceSchema } from './workspace-models';
 export interface AppConfig {
     /**
      * Name of the app.
@@ -448,3 +448,8 @@ export interface CliConfig {
 }
 export declare function getWorkspacePath(host: Tree): string;
 export declare function getWorkspace(host: Tree): WorkspaceSchema;
+export declare function addProjectToWorkspace<TProjectType extends ProjectType = ProjectType.Application>(workspace: WorkspaceSchema, name: string, project: WorkspaceProject<TProjectType>): Rule;
+export declare function updateWorkspace(workspace: WorkspaceSchema): Rule;
+export declare const configPath = "/.angular-cli.json";
+export declare function getConfig(host: Tree): CliConfig;
+export declare function getAppFromConfig(config: CliConfig, appIndexOrName: string): AppConfig | null;

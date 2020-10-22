@@ -1,8 +1,16 @@
 "use strict";
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updatePackageJson = exports.updateTsLintConfig = void 0;
+const core_1 = require("@angular-devkit/core");
 const dependencies_1 = require("../../utility/dependencies");
-const json_file_1 = require("../../utility/json-file");
+const json_utils_1 = require("../../utility/json-utils");
 const ruleMapping = {
     'contextual-life-cycle': 'contextual-lifecycle',
     'no-conflicting-life-cycle-hooks': 'no-conflicting-lifecycle',
@@ -28,20 +36,28 @@ const ruleMapping = {
 exports.updateTsLintConfig = () => {
     return (host) => {
         const tsLintPath = '/tslint.json';
-        let tsLintJson;
-        try {
-            tsLintJson = new json_file_1.JSONFile(host, tsLintPath);
+        const buffer = host.read(tsLintPath);
+        if (!buffer) {
+            return host;
         }
-        catch (_a) {
-            return;
+        const tsCfgAst = core_1.parseJsonAst(buffer.toString(), core_1.JsonParseMode.Loose);
+        if (tsCfgAst.kind != 'object') {
+            return host;
         }
-        for (const [existingRule, newRule] of Object.entries(ruleMapping)) {
-            const ruleValue = tsLintJson.get(['rules', existingRule]);
-            if (ruleValue !== undefined) {
-                tsLintJson.remove(['rules', existingRule]);
-                tsLintJson.modify(['rules', newRule], ruleValue);
+        const rulesNode = json_utils_1.findPropertyInAstObject(tsCfgAst, 'rules');
+        if (!rulesNode || rulesNode.kind != 'object') {
+            return host;
+        }
+        const recorder = host.beginUpdate(tsLintPath);
+        rulesNode.properties.forEach(prop => {
+            const mapping = ruleMapping[prop.key.value];
+            if (mapping) {
+                recorder.remove(prop.key.start.offset + 1, prop.key.value.length);
+                recorder.insertLeft(prop.key.start.offset + 1, mapping);
             }
-        }
+        });
+        host.commitUpdate(recorder);
+        return host;
     };
 };
 exports.updatePackageJson = () => {

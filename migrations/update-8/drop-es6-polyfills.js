@@ -8,10 +8,10 @@ exports.dropES2015Polyfills = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const crypto_1 = require("crypto");
 const ts = require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript");
-const workspace_1 = require("../../utility/workspace");
 const toDrop = {
     'core-js/es6/symbol': true,
     'core-js/es6/object': true,
@@ -117,25 +117,36 @@ function dropES2015PolyfillsFromFile(polyfillPath) {
  * Drop ES2015 polyfills from all application projects
  */
 function dropES2015Polyfills() {
-    return async (tree) => {
-        var _a;
-        let workspace;
-        try {
-            workspace = await workspace_1.getWorkspace(tree);
-        }
-        catch (_b) {
+    return (tree) => {
+        // Simple. Take the ast of polyfills (if it exists) and find the import metadata. Remove it.
+        const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
+        const rules = [];
+        if (!angularConfigContent) {
+            // Is this even an angular project?
             return;
         }
-        const rules = [];
-        for (const [, project] of workspace.projects) {
-            if (project.extensions.projectType !== 'application') {
+        const angularJson = core_1.parseJson(angularConfigContent.toString(), core_1.JsonParseMode.Loose);
+        if (!core_1.isJsonObject(angularJson) || !core_1.isJsonObject(angularJson.projects)) {
+            // If that field isn't there, no use...
+            return;
+        }
+        // For all projects
+        for (const projectName of Object.keys(angularJson.projects)) {
+            const project = angularJson.projects[projectName];
+            if (!core_1.isJsonObject(project)) {
                 continue;
             }
-            const buildTarget = project.targets.get('build');
-            const polyfills = (_a = buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) === null || _a === void 0 ? void 0 : _a.polyfills;
-            if (polyfills && typeof polyfills === 'string') {
-                rules.push(dropES2015PolyfillsFromFile(polyfills));
+            if (project.projectType !== 'application') {
+                continue;
             }
+            const architect = project.architect;
+            if (!core_1.isJsonObject(architect)
+                || !core_1.isJsonObject(architect.build)
+                || !core_1.isJsonObject(architect.build.options)
+                || typeof architect.build.options.polyfills !== 'string') {
+                continue;
+            }
+            rules.push(dropES2015PolyfillsFromFile(architect.build.options.polyfills));
         }
         return schematics_1.chain(rules);
     };

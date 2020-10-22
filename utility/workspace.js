@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allTargetOptions = exports.allWorkspaceTargets = exports.createDefaultPath = exports.buildDefaultPath = exports.getWorkspace = exports.updateWorkspace = void 0;
+exports.createDefaultPath = exports.buildDefaultPath = exports.getWorkspace = exports.updateWorkspace = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9,7 +9,6 @@ exports.allTargetOptions = exports.allWorkspaceTargets = exports.createDefaultPa
  * found in the LICENSE file at https://angular.io/license
  */
 const core_1 = require("@angular-devkit/core");
-const schematics_1 = require("@angular-devkit/schematics");
 const workspace_models_1 = require("./workspace-models");
 function createHost(tree) {
     return {
@@ -37,13 +36,14 @@ function updateWorkspace(updaterOrWorkspace) {
         const host = createHost(tree);
         if (typeof updaterOrWorkspace === 'function') {
             const { workspace } = await core_1.workspaces.readWorkspace('/', host);
-            const result = await updaterOrWorkspace(workspace);
+            const result = updaterOrWorkspace(workspace);
+            if (result !== undefined) {
+                await result;
+            }
             await core_1.workspaces.writeWorkspace(workspace, host);
-            return result || schematics_1.noop;
         }
         else {
             await core_1.workspaces.writeWorkspace(updaterOrWorkspace, host);
-            return schematics_1.noop;
         }
     };
 }
@@ -73,25 +73,3 @@ async function createDefaultPath(tree, projectName) {
     return buildDefaultPath(project);
 }
 exports.createDefaultPath = createDefaultPath;
-function* allWorkspaceTargets(workspace) {
-    for (const [projectName, project] of workspace.projects) {
-        for (const [targetName, target] of project.targets) {
-            yield [targetName, target, projectName, project];
-        }
-    }
-}
-exports.allWorkspaceTargets = allWorkspaceTargets;
-function* allTargetOptions(target, skipBaseOptions = false) {
-    if (!skipBaseOptions && target.options) {
-        yield [undefined, target.options];
-    }
-    if (!target.configurations) {
-        return;
-    }
-    for (const [name, options] of Object.entries(target.configurations)) {
-        if (options !== undefined) {
-            yield [name, options];
-        }
-    }
-}
-exports.allTargetOptions = allTargetOptions;

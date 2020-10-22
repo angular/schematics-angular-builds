@@ -17,9 +17,7 @@ export interface Schema {
      */
     packageManager?: PackageManager;
     /**
-     * Creates a workspace with stricter type checking options. This setting helps improve
-     * maintainability and catch bugs ahead of time. For more information, see
-     * https://angular.io/strict
+     * Creates a workspace with stricter type checking options.
      */
     strict?: boolean;
     /**

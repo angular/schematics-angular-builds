@@ -65,7 +65,6 @@ function mergeWithRootTsLint(parentHost) {
     };
 }
 function addAppToWorkspaceFile(options, appDir) {
-    var _a, _b;
     let projectRoot = appDir;
     if (projectRoot) {
         projectRoot += '/';
@@ -76,10 +75,10 @@ function addAppToWorkspaceFile(options, appDir) {
         || options.minimal
         || options.style !== schema_1.Style.Css) {
         const componentSchematicsOptions = {};
-        if ((_a = options.inlineTemplate) !== null && _a !== void 0 ? _a : options.minimal) {
+        if (options.inlineTemplate || options.minimal) {
             componentSchematicsOptions.inlineTemplate = true;
         }
-        if ((_b = options.inlineStyle) !== null && _b !== void 0 ? _b : options.minimal) {
+        if (options.inlineStyle || options.minimal) {
             componentSchematicsOptions.inlineStyle = true;
         }
         if (options.style && options.style !== schema_1.Style.Css) {
@@ -165,6 +164,7 @@ function addAppToWorkspaceFile(options, appDir) {
                         optimization: true,
                         outputHashing: 'all',
                         sourceMap: false,
+                        extractCss: true,
                         namedChunks: false,
                         extractLicenses: true,
                         vendorChunk: false,
@@ -237,7 +237,6 @@ function minimalPathFilter(path) {
 }
 function default_1(options) {
     return async (host) => {
-        var _a, _b;
         if (!options.name) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
@@ -252,11 +251,10 @@ function default_1(options) {
                 viewEncapsulation: options.viewEncapsulation,
             } :
             {
-                inlineStyle: (_a = options.inlineStyle) !== null && _a !== void 0 ? _a : true,
-                inlineTemplate: (_b = options.inlineTemplate) !== null && _b !== void 0 ? _b : true,
+                inlineStyle: true,
+                inlineTemplate: true,
                 skipTests: true,
                 style: options.style,
-                viewEncapsulation: options.viewEncapsulation,
             };
         const workspace = await workspace_1.getWorkspace(host);
         const newProjectRoot = workspace.extensions.newProjectRoot || '';

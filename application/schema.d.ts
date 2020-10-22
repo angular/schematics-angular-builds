@@ -20,7 +20,6 @@ export interface Schema {
     legacyBrowsers?: boolean;
     /**
      * When true, applies lint fixes after generating the application.
-     * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
     /**
@@ -57,7 +56,7 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * Creates an application with stricter bundle budgets settings.
+     * Creates an application with stricter build optimization options.
      */
     strict?: boolean;
     /**

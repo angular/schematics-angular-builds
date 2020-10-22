@@ -12,7 +12,6 @@ export interface Schema {
     flat?: boolean;
     /**
      * When true, applies lint fixes after generating the module.
-     * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
     /**

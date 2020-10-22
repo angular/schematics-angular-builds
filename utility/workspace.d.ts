@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { json, workspaces } from '@angular-devkit/core';
+import { workspaces } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-export declare function updateWorkspace(updater: (workspace: workspaces.WorkspaceDefinition) => void | Rule | PromiseLike<void | Rule>): Rule;
+export declare function updateWorkspace(updater: (workspace: workspaces.WorkspaceDefinition) => void | PromiseLike<void>): Rule;
 export declare function updateWorkspace(workspace: workspaces.WorkspaceDefinition): Rule;
 export declare function getWorkspace(tree: Tree, path?: string): Promise<workspaces.WorkspaceDefinition>;
 /**
@@ -16,5 +16,3 @@ export declare function getWorkspace(tree: Tree, path?: string): Promise<workspa
  */
 export declare function buildDefaultPath(project: workspaces.ProjectDefinition): string;
 export declare function createDefaultPath(tree: Tree, projectName: string): Promise<string>;
-export declare function allWorkspaceTargets(workspace: workspaces.WorkspaceDefinition): Iterable<[string, workspaces.TargetDefinition, string, workspaces.ProjectDefinition]>;
-export declare function allTargetOptions(target: workspaces.TargetDefinition, skipBaseOptions?: boolean): Iterable<[string | undefined, Record<string, json.JsonValue | undefined>]>;

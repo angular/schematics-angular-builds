@@ -30,4 +30,9 @@ export interface Schema {
      * Route path used to produce the app shell.
      */
     route?: string;
+    /**
+     * The name of the TypeScript configuration file.
+     * @deprecated This option has no effect.
+     */
+    tsconfigFileName?: string;
 }

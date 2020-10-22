@@ -22,12 +22,14 @@
     "inlineStyle": {
       "description": "When true, includes styles inline in the root component.ts file. Only CSS styles can be included inline. Default is false, meaning that an external styles file is created and referenced in the root component.ts file.",
       "type": "boolean",
+      "default": false,
       "alias": "s",
       "x-user-analytics": 9
     },
     "inlineTemplate": {
       "description": "When true, includes template inline in the root component.ts file. Default is false, meaning that an external template file is created and referenced in the root component.ts file. ",
       "type": "boolean",
+      "default": false,
       "alias": "t",
       "x-user-analytics": 10
     },
@@ -70,7 +72,7 @@
           { "value": "scss", "label": "SCSS   [ https://sass-lang.com/documentation/syntax#scss                ]" },
           { "value": "sass", "label": "Sass   [ https://sass-lang.com/documentation/syntax#the-indented-syntax ]" },
           { "value": "less", "label": "Less   [ http://lesscss.org                                             ]" },
-          { "value": "styl", "label": "Stylus [ https://stylus-lang.com                                        ]" }
+          { "value": "styl", "label": "Stylus [ http://stylus-lang.com                                         ]" }
         ]
       },
       "x-user-analytics": 5
@@ -102,14 +104,12 @@
       "type": "boolean",
       "default": false,
       "description": "When true, applies lint fixes after generating the application.",
-      "x-user-analytics": 15,
-      "x-deprecated": "Use \"ng lint --fix\" directly instead."
+      "x-user-analytics": 15
     },
     "strict": {
-      "description": "Creates an application with stricter bundle budgets settings.",
+      "description": "Creates an application with stricter build optimization options.",
       "type": "boolean",
-      "default": false,
-      "x-user-analytics": 7
+      "default": false
     },
     "legacyBrowsers": {
       "type": "boolean",

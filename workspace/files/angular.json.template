@@ -5,6 +5,5 @@
     "packageManager": "<%= packageManager %>"
   },<% } %>
   "newProjectRoot": "<%= newProjectRoot %>",
-  "projects": {
-  }
+  "projects": {}
 }

@@ -8,10 +8,12 @@ exports.polyfillMetadataRule = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const ts = require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript");
-const workspace_1 = require("../../utility/workspace");
-const workspace_models_1 = require("../../utility/workspace-models");
+function isJsonObject(value) {
+    return value != null && typeof value === 'object' && !Array.isArray(value);
+}
 /**
  * Remove the Reflect import from a polyfill file.
  * @param tree The tree to use.
@@ -26,7 +28,8 @@ function _removeReflectFromPolyfills(tree, path) {
     // Start the update of the file.
     const recorder = tree.beginUpdate(path);
     const sourceFile = ts.createSourceFile(path, source.toString(), ts.ScriptTarget.Latest);
-    const imports = sourceFile.statements.filter(ts.isImportDeclaration);
+    const imports = sourceFile.statements
+        .filter(s => s.kind === ts.SyntaxKind.ImportDeclaration);
     for (const i of imports) {
         const module = ts.isStringLiteral(i.moduleSpecifier) && i.moduleSpecifier.text;
         switch (module) {
@@ -37,34 +40,79 @@ function _removeReflectFromPolyfills(tree, path) {
     }
     tree.commitUpdate(recorder);
 }
+/**
+ * Update a project's target, maybe. Only if it's a builder supported and the options look right.
+ * This is a rule factory so we return the new rule (or noop if we don't support doing the change).
+ * @param root The root of the project source.
+ * @param targetObject The target information.
+ * @private
+ */
+function _updateProjectTarget(targetObject) {
+    // Make sure we're using the correct builder.
+    if (targetObject.builder !== '@angular-devkit/build-angular:browser'
+        || !isJsonObject(targetObject.options)) {
+        return schematics_1.noop();
+    }
+    const options = targetObject.options;
+    if (typeof options.polyfills != 'string') {
+        return schematics_1.noop();
+    }
+    const polyfillsToUpdate = [options.polyfills];
+    const configurations = targetObject.configurations;
+    if (isJsonObject(configurations)) {
+        for (const configName of Object.keys(configurations)) {
+            const config = configurations[configName];
+            // Just in case, only do non-AOT configurations.
+            if (isJsonObject(config)
+                && typeof config.polyfills == 'string'
+                && config.aot !== true) {
+                polyfillsToUpdate.push(config.polyfills);
+            }
+        }
+    }
+    return schematics_1.chain(polyfillsToUpdate.map(polyfillPath => {
+        return (tree) => _removeReflectFromPolyfills(tree, polyfillPath);
+    }));
+}
+/**
+ * Move the import reflect metadata polyfill from the polyfill file to the dev environment. This is
+ * not guaranteed to work, but if it doesn't it will result in no changes made.
+ */
 function polyfillMetadataRule() {
-    return async (tree) => {
-        var _a;
-        const workspace = await workspace_1.getWorkspace(tree);
+    return (tree) => {
+        // Simple. Take the ast of polyfills (if it exists) and find the import metadata. Remove it.
+        const angularConfigContent = tree.read('angular.json') || tree.read('.angular.json');
         const rules = [];
-        for (const [, project] of workspace.projects) {
-            if (typeof project.root !== 'string') {
+        if (!angularConfigContent) {
+            // Is this even an angular project?
+            return;
+        }
+        const angularJson = core_1.parseJson(angularConfigContent.toString(), core_1.JsonParseMode.Loose);
+        if (!isJsonObject(angularJson) || !isJsonObject(angularJson.projects)) {
+            // If that field isn't there, no use...
+            return;
+        }
+        // For all projects, for all targets, read the polyfill field, and read the environment.
+        for (const projectName of Object.keys(angularJson.projects)) {
+            const project = angularJson.projects[projectName];
+            if (!isJsonObject(project)) {
                 continue;
             }
-            for (const [, target] of project.targets) {
-                if (target.builder !== workspace_models_1.Builders.Browser) {
-                    continue;
-                }
-                const optionPolyfills = (_a = target.options) === null || _a === void 0 ? void 0 : _a.polyfills;
-                if (optionPolyfills && typeof optionPolyfills === 'string') {
-                    rules.push((tree) => _removeReflectFromPolyfills(tree, optionPolyfills));
-                }
-                if (!target.configurations) {
-                    continue;
-                }
-                for (const configuration of Object.values(target.configurations)) {
-                    const configurationPolyfills = configuration === null || configuration === void 0 ? void 0 : configuration.polyfills;
-                    if (configurationPolyfills && typeof configurationPolyfills === 'string') {
-                        rules.push((tree) => _removeReflectFromPolyfills(tree, configurationPolyfills));
-                    }
+            if (typeof project.root != 'string') {
+                continue;
+            }
+            const targets = project.targets || project.architect;
+            if (!isJsonObject(targets)) {
+                continue;
+            }
+            for (const targetName of Object.keys(targets)) {
+                const target = targets[targetName];
+                if (isJsonObject(target)) {
+                    rules.push(_updateProjectTarget(target));
                 }
             }
         }
+        // Remove null or undefined rules.
         return schematics_1.chain(rules);
     };
 }
