@@ -1,5 +1,10 @@
-import { Tree } from '@angular-devkit/schematics';
-import { WorkspaceSchema } from './workspace-models';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 export interface AppConfig {
     /**
      * Name of the app.
@@ -446,5 +451,3 @@ export interface CliConfig {
         versionMismatch?: boolean;
     };
 }
-export declare function getWorkspacePath(host: Tree): string;
-export declare function getWorkspace(host: Tree): WorkspaceSchema;
