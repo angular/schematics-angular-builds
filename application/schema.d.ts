@@ -53,7 +53,7 @@ export interface Schema {
      */
     skipPackageJson?: boolean;
     /**
-     * When true, does not create "spec.ts" test files for the app.
+     * When true, does not create "spec.ts" test files for the application.
      */
     skipTests?: boolean;
     /**
