@@ -35,10 +35,14 @@ class JSONFile {
         return this._jsonAst;
     }
     get(jsonPath) {
-        if (jsonPath.length === 0) {
-            return jsonc_parser_1.getNodeValue(this.JsonAst);
+        const jsonAstNode = this.JsonAst;
+        if (!jsonAstNode) {
+            return undefined;
         }
-        const node = jsonc_parser_1.findNodeAtLocation(this.JsonAst, jsonPath);
+        if (jsonPath.length === 0) {
+            return jsonc_parser_1.getNodeValue(jsonAstNode);
+        }
+        const node = jsonc_parser_1.findNodeAtLocation(jsonAstNode, jsonPath);
         return node === undefined ? undefined : jsonc_parser_1.getNodeValue(node);
     }
     modify(jsonPath, value, insertInOrder) {
