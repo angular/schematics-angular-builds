@@ -1,6 +1,6 @@
 {
   "name": "@schematics/angular",
-  "version": "11.0.2+12.9db916c",
+  "version": "11.0.2+14.6e32253",
   "description": "Schematics specific to Angular",
   "keywords": [
     "angular",
@@ -14,8 +14,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#9db916cdd",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#9db916cdd",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#6e3225388",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#6e3225388",
     "jsonc-parser": "2.3.1"
   },
   "repository": {
@@ -32,11 +32,5 @@
   "bugs": {
     "url": "https://github.com/angular/angular-cli/issues"
   },
-  "homepage": "https://github.com/angular/angular-cli",
-  "husky": {
-    "hooks": {
-      "commit-msg": "yarn -s ng-dev commit-message pre-commit-validate --file-env-variable HUSKY_GIT_PARAMS",
-      "prepare-commit-msg": "yarn -s ng-dev commit-message restore-commit-message-draft --file-env-variable HUSKY_GIT_PARAMS"
-    }
-  }
+  "homepage": "https://github.com/angular/angular-cli"
 }
