@@ -12,8 +12,8 @@
       "description": "Create an Angular workspace.",
       "hidden": true
     },
-    "service-worker": {
-      "aliases": [ "serviceWorker" ],
+    "serviceWorker": {
+      "aliases": [ "service-worker" ],
       "factory": "./service-worker",
       "description": "Initializes a service worker setup.",
       "schema": "./service-worker/schema.json"
@@ -113,8 +113,8 @@
       "schema": "./library/schema.json",
       "description": "Generate a library project for Angular."
     },
-    "web-worker": {
-      "aliases": ["webWorker"],
+    "webWorker": {
+      "aliases": ["web-worker"],
       "factory": "./web-worker",
       "schema": "./web-worker/schema.json",
       "description": "Create a Web Worker."

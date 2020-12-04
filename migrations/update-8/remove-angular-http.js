@@ -9,9 +9,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.removeAngularHttp = void 0;
 const dependencies_1 = require("../../utility/dependencies");
-const removeAngularHttp = () => {
+exports.removeAngularHttp = () => {
     return (host) => {
         dependencies_1.removePackageJsonDependency(host, '@angular/http');
     };
 };
-exports.removeAngularHttp = removeAngularHttp;

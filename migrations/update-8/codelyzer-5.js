@@ -25,7 +25,7 @@ const ruleMapping = {
     'no-attribute-parameter-decorator': 'no-attribute-decorator',
     'max-inline-declarations': 'component-max-inline-declarations',
 };
-const updateTsLintConfig = () => {
+exports.updateTsLintConfig = () => {
     return (host) => {
         const tsLintPath = '/tslint.json';
         let tsLintJson;
@@ -44,8 +44,7 @@ const updateTsLintConfig = () => {
         }
     };
 };
-exports.updateTsLintConfig = updateTsLintConfig;
-const updatePackageJson = () => {
+exports.updatePackageJson = () => {
     return (host) => {
         const dependency = {
             type: dependencies_1.NodeDependencyType.Dev,
@@ -56,4 +55,3 @@ const updatePackageJson = () => {
         dependencies_1.addPackageJsonDependency(host, dependency);
     };
 };
-exports.updatePackageJson = updatePackageJson;
