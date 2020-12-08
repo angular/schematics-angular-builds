@@ -7,7 +7,7 @@ export interface Schema {
      */
     flat?: boolean;
     /**
-     * When true, applies lint fixes after generating the interceptor.
+     * Apply lint fixes after generating the interceptor.
      * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
@@ -24,7 +24,7 @@ export interface Schema {
      */
     project?: string;
     /**
-     * When true, does not create "spec.ts" test files for the new interceptor.
+     * Do not create "spec.ts" test files for the new interceptor.
      */
     skipTests?: boolean;
 }

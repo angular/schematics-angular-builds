@@ -11,7 +11,7 @@ export interface Schema {
      */
     implements?: Implement[];
     /**
-     * When true, applies lint fixes after generating the guard.
+     * Apply lint fixes after generating the guard.
      * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
@@ -29,7 +29,7 @@ export interface Schema {
      */
     project?: string;
     /**
-     * When true, does not create "spec.ts" test files for the new guard.
+     * Do not create "spec.ts" test files for the new guard.
      */
     skipTests?: boolean;
 }

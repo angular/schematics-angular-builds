@@ -3,15 +3,15 @@
  */
 export interface Schema {
     /**
-     * When true, the new NgModule imports "CommonModule".
+     * The new NgModule imports "CommonModule".
      */
     commonModule?: boolean;
     /**
-     * When true, creates the new files at the top level of the current project root.
+     * Create the new files at the top level of the current project root.
      */
     flat?: boolean;
     /**
-     * When true, applies lint fixes after generating the module.
+     * Apply lint fixes after generating the module.
      * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
@@ -38,7 +38,7 @@ export interface Schema {
      */
     route?: string;
     /**
-     * When true, creates a routing module.
+     * Create a routing module.
      */
     routing?: boolean;
     /**

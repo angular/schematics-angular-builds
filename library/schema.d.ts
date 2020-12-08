@@ -7,7 +7,7 @@ export interface Schema {
      */
     entryFile?: string;
     /**
-     * When true, applies lint fixes after generating the library.
+     * Apply lint fixes after generating the library.
      * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
@@ -20,17 +20,16 @@ export interface Schema {
      */
     prefix?: string;
     /**
-     * When true, does not install dependency packages.
+     * Do not install dependency packages.
      */
     skipInstall?: boolean;
     /**
-     * When true, does not add dependencies to the "package.json" file.
+     * Do not add dependencies to the "package.json" file.
      */
     skipPackageJson?: boolean;
     /**
-     * When true, does not update "tsconfig.json" to add a path mapping for the new library. The
-     * path mapping is needed to use the library in an app, but can be disabled here to simplify
-     * development.
+     * Do not update "tsconfig.json" to add a path mapping for the new library. The path mapping
+     * is needed to use the library in an app, but can be disabled here to simplify development.
      */
     skipTsConfig?: boolean;
 }

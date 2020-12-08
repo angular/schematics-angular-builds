@@ -20,7 +20,7 @@ export interface Schema {
      */
     project?: string;
     /**
-     * When true, does not create "spec.ts" test files for the new resolver.
+     * Do not create "spec.ts" test files for the new resolver.
      */
     skipTests?: boolean;
 }
