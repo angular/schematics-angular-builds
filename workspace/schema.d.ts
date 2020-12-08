@@ -1,7 +1,6 @@
 export interface Schema {
     /**
-     * When true, creates a workspace without any testing frameworks. (Use for learning purposes
-     * only.)
+     * Create a workspace without any testing frameworks. (Use for learning purposes only.)
      */
     minimal?: boolean;
     /**
@@ -17,7 +16,7 @@ export interface Schema {
      */
     packageManager?: PackageManager;
     /**
-     * Creates a workspace with stricter type checking options. This setting helps improve
+     * Create a workspace with stricter type checking options. This setting helps improve
      * maintainability and catch bugs ahead of time. For more information, see
      * https://angular.io/strict
      */

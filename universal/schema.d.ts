@@ -27,7 +27,7 @@ export interface Schema {
      */
     rootModuleFileName?: string;
     /**
-     * When true, does not install packages for dependencies.
+     * Do not install packages for dependencies.
      */
     skipInstall?: boolean;
 }

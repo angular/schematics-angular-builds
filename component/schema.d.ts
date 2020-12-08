@@ -11,31 +11,30 @@ export interface Schema {
      */
     displayBlock?: boolean;
     /**
-     * When true, the new component is the entry component of the declaring NgModule.
+     * The new component is the entry component of the declaring NgModule.
      * @deprecated Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
      */
     entryComponent?: boolean;
     /**
-     * When true, the declaring NgModule exports this component.
+     * The declaring NgModule exports this component.
      */
     export?: boolean;
     /**
-     * When true, creates the new files at the top level of the current project.
+     * Create the new files at the top level of the current project.
      */
     flat?: boolean;
     /**
-     * When true, includes styles inline in the component.ts file. Only CSS styles can be
-     * included inline. By default, an external styles file is created and referenced in the
-     * component.ts file.
+     * Include styles inline in the component.ts file. Only CSS styles can be included inline.
+     * By default, an external styles file is created and referenced in the component.ts file.
      */
     inlineStyle?: boolean;
     /**
-     * When true, includes template inline in the component.ts file. By default, an external
-     * template file is created and referenced in the component.ts file.
+     * Include template inline in the component.ts file. By default, an external template file
+     * is created and referenced in the component.ts file.
      */
     inlineTemplate?: boolean;
     /**
-     * When true, applies lint fixes after generating the component.
+     * Apply lint fixes after generating the component.
      * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
@@ -65,7 +64,7 @@ export interface Schema {
      */
     selector?: string;
     /**
-     * When true, does not import this component into the owning NgModule.
+     * Do not import this component into the owning NgModule.
      */
     skipImport?: boolean;
     /**
@@ -73,7 +72,7 @@ export interface Schema {
      */
     skipSelector?: boolean;
     /**
-     * When true, does not create "spec.ts" test files for the new component.
+     * Do not create "spec.ts" test files for the new component.
      */
     skipTests?: boolean;
     /**

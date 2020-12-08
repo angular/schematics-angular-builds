@@ -4,10 +4,9 @@ export interface Schema {
      */
     commit?: CommitUnion;
     /**
-     * When true (the default), creates a new initial application project in the src folder of
-     * the new workspace. When false, creates an empty workspace with no initial app. You can
-     * then use the generate application command so that all apps are created in the projects
-     * folder.
+     * Create a new initial application project in the 'src' folder of the new workspace. When
+     * false, creates an empty workspace with no initial application. You can then use the
+     * generate application command so that all applications are created in the projects folder.
      */
     createApplication?: boolean;
     /**
@@ -15,13 +14,13 @@ export interface Schema {
      */
     directory?: string;
     /**
-     * When true, includes styles inline in the component TS file. By default, an external
-     * styles file is created and referenced in the component TS file.
+     * Include styles inline in the component TS file. By default, an external styles file is
+     * created and referenced in the component TypeScript file.
      */
     inlineStyle?: boolean;
     /**
-     * When true, includes template inline in the component TS file. By default, an external
-     * template file is created and referenced in the component TS file.
+     * Include template inline in the component TS file. By default, an external template file
+     * is created and referenced in the component TypeScript file.
      */
     inlineTemplate?: boolean;
     /**
@@ -29,12 +28,11 @@ export interface Schema {
      */
     legacyBrowsers?: boolean;
     /**
-     * When true, links the CLI to the global version (internal development only).
+     * Link the CLI to the global version (internal development only).
      */
     linkCli?: boolean;
     /**
-     * When true, creates a workspace without any testing frameworks. (Use for learning purposes
-     * only.)
+     * Create a workspace without any testing frameworks. (Use for learning purposes only.)
      */
     minimal?: boolean;
     /**
@@ -54,19 +52,19 @@ export interface Schema {
      */
     prefix?: string;
     /**
-     * When true, generates a routing module for the initial project.
+     * Generate a routing module for the initial project.
      */
     routing?: boolean;
     /**
-     * When true, does not initialize a git repository.
+     * Do not initialize a git repository.
      */
     skipGit?: boolean;
     /**
-     * When true, does not install dependency packages.
+     * Do not install dependency packages.
      */
     skipInstall?: boolean;
     /**
-     * When true, does not generate "spec.ts" test files for the new project.
+     * Do not generate "spec.ts" test files for the new project.
      */
     skipTests?: boolean;
     /**

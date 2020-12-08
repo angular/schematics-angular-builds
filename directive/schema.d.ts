@@ -3,7 +3,7 @@
  */
 export interface Schema {
     /**
-     * When true, the declaring NgModule exports this directive.
+     * The declaring NgModule exports this directive.
      */
     export?: boolean;
     /**
@@ -11,7 +11,7 @@ export interface Schema {
      */
     flat?: boolean;
     /**
-     * When true, applies lint fixes after generating the directive.
+     * Apply lint fixes after generating the directive.
      * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
@@ -41,11 +41,11 @@ export interface Schema {
      */
     selector?: string;
     /**
-     * When true, does not import this directive into the owning NgModule.
+     * Do not import this directive into the owning NgModule.
      */
     skipImport?: boolean;
     /**
-     * When true, does not create "spec.ts" test files for the new class.
+     * Do not create "spec.ts" test files for the new class.
      */
     skipTests?: boolean;
 }

@@ -3,15 +3,14 @@
  */
 export interface Schema {
     /**
-     * When true, includes styles inline in the root component.ts file. Only CSS styles can be
-     * included inline. Default is false, meaning that an external styles file is created and
-     * referenced in the root component.ts file.
+     * Include styles inline in the root component.ts file. Only CSS styles can be included
+     * inline. Default is false, meaning that an external styles file is created and referenced
+     * in the root component.ts file.
      */
     inlineStyle?: boolean;
     /**
-     * When true, includes template inline in the root component.ts file. Default is false,
-     * meaning that an external template file is created and referenced in the root component.ts
-     * file.
+     * Include template inline in the root component.ts file. Default is false, meaning that an
+     * external template file is created and referenced in the root component.ts file.
      */
     inlineTemplate?: boolean;
     /**
@@ -19,13 +18,13 @@ export interface Schema {
      */
     legacyBrowsers?: boolean;
     /**
-     * When true, applies lint fixes after generating the application.
+     * Apply lint fixes after generating the application.
      * @deprecated Use "ng lint --fix" directly instead.
      */
     lintFix?: boolean;
     /**
-     * When true, creates a bare-bones project without any testing frameworks. (Use for learning
-     * purposes only.)
+     * Create a bare-bones project without any testing frameworks. (Use for learning purposes
+     * only.)
      */
     minimal?: boolean;
     /**
@@ -41,7 +40,7 @@ export interface Schema {
      */
     projectRoot?: string;
     /**
-     * When true, creates a routing NgModule.
+     * Create a routing NgModule.
      */
     routing?: boolean;
     /**
@@ -49,11 +48,11 @@ export interface Schema {
      */
     skipInstall?: boolean;
     /**
-     * When true, does not add dependencies to the "package.json" file.
+     * Do not add dependencies to the "package.json" file.
      */
     skipPackageJson?: boolean;
     /**
-     * When true, does not create "spec.ts" test files for the application.
+     * Do not create "spec.ts" test files for the application.
      */
     skipTests?: boolean;
     /**
