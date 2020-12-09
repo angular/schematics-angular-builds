@@ -27,7 +27,7 @@ class JSONFile {
             return this._jsonAst;
         }
         const errors = [];
-        this._jsonAst = jsonc_parser_1.parseTree(this.content, errors);
+        this._jsonAst = jsonc_parser_1.parseTree(this.content, errors, { allowTrailingComma: true });
         if (errors.length) {
             const { error, offset } = errors[0];
             throw new Error(`Failed to parse "${this.path}" as JSON AST Object. ${jsonc_parser_1.printParseErrorCode(error)} at location: ${offset}.`);
