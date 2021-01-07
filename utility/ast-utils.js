@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addRouteDeclarationToModule = exports.getRouterModuleDeclaration = exports.getEnvironmentExportName = exports.isImported = exports.addEntryComponentToModule = exports.addBootstrapToModule = exports.addExportToModule = exports.addProviderToModule = exports.addImportToModule = exports.addDeclarationToModule = exports.addSymbolToNgModuleMetadata = exports.getMetadataField = exports.getFirstNgModuleName = exports.getDecoratorMetadata = exports.getContentOfKeyLiteral = exports.insertAfterLastOccurrence = exports.findNode = exports.getSourceNodes = exports.findNodes = exports.insertImport = void 0;
+exports.addRouteDeclarationToModule = exports.getRouterModuleDeclaration = exports.getEnvironmentExportName = exports.isImported = exports.addEntryComponentToModule = exports.addBootstrapToModule = exports.addExportToModule = exports.addProviderToModule = exports.addImportToModule = exports.addDeclarationToModule = exports.addSymbolToNgModuleMetadata = exports.getMetadataField = exports.getDecoratorMetadata = exports.insertAfterLastOccurrence = exports.findNode = exports.getSourceNodes = exports.findNodes = exports.insertImport = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -167,18 +167,6 @@ function insertAfterLastOccurrence(nodes, toInsert, file, fallbackPos, syntaxKin
     return new change_1.InsertChange(file, lastItemPosition, toInsert);
 }
 exports.insertAfterLastOccurrence = insertAfterLastOccurrence;
-function getContentOfKeyLiteral(_source, node) {
-    if (node.kind == ts.SyntaxKind.Identifier) {
-        return node.text;
-    }
-    else if (node.kind == ts.SyntaxKind.StringLiteral) {
-        return node.text;
-    }
-    else {
-        return null;
-    }
-}
-exports.getContentOfKeyLiteral = getContentOfKeyLiteral;
 function _angularImportsFromNode(node, _sourceFile) {
     const ms = node.moduleSpecifier;
     let modulePath;
@@ -261,34 +249,6 @@ function getDecoratorMetadata(source, identifier, module) {
         .map(expr => expr.arguments[0]);
 }
 exports.getDecoratorMetadata = getDecoratorMetadata;
-function findClassDeclarationParent(node) {
-    if (ts.isClassDeclaration(node)) {
-        return node;
-    }
-    return node.parent && findClassDeclarationParent(node.parent);
-}
-/**
- * Given a source file with @NgModule class(es), find the name of the first @NgModule class.
- *
- * @param source source file containing one or more @NgModule
- * @returns the name of the first @NgModule, or `undefined` if none is found
- */
-function getFirstNgModuleName(source) {
-    // First, find the @NgModule decorators.
-    const ngModulesMetadata = getDecoratorMetadata(source, 'NgModule', '@angular/core');
-    if (ngModulesMetadata.length === 0) {
-        return undefined;
-    }
-    // Then walk parent pointers up the AST, looking for the ClassDeclaration parent of the NgModule
-    // metadata.
-    const moduleClass = findClassDeclarationParent(ngModulesMetadata[0]);
-    if (!moduleClass || !moduleClass.name) {
-        return undefined;
-    }
-    // Get the class name of the module ClassDeclaration.
-    return moduleClass.name.text;
-}
-exports.getFirstNgModuleName = getFirstNgModuleName;
 function getMetadataField(node, metadataField) {
     return node.properties
         .filter(ts.isPropertyAssignment)
