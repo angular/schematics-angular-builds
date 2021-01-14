@@ -109,15 +109,12 @@ function default_1(options) {
                 ...options,
             }),
             !options.type ? schematics_1.forEach((file => {
-                if (!!file.path.match(new RegExp('..'))) {
-                    return {
+                return file.path.includes('..')
+                    ? {
                         content: file.content,
                         path: file.path.replace('..', '.'),
-                    };
-                }
-                else {
-                    return file;
-                }
+                    }
+                    : file;
             })) : schematics_1.noop(),
             schematics_1.move(parsedPath.path),
         ]);
