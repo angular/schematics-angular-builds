@@ -70,7 +70,7 @@ export interface Schema {
     /**
      * Creates a workspace with stricter type checking and stricter bundle budgets settings.
      * This setting helps improve maintainability and catch bugs ahead of time. For more
-     * information, see https://angular.io/strict
+     * information, see https://angular.io/guide/strict-mode
      */
     strict?: boolean;
     /**
