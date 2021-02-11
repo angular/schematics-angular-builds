@@ -10,30 +10,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const workspace_1 = require("../../utility/workspace");
 function default_1() {
     return workspace_1.updateWorkspace(workspace => {
-        const optionsToRemove = {
-            experimentalRollupPass: undefined,
-        };
-        for (const [, project] of workspace.projects) {
-            for (const [, target] of project.targets) {
-                // Only interested in Angular Devkit builders
-                if (!(target === null || target === void 0 ? void 0 : target.builder.startsWith('@angular-devkit/build-angular'))) {
-                    continue;
-                }
-                // Check options
-                if (target.options) {
-                    target.options = {
-                        ...optionsToRemove,
-                    };
-                }
-                // Go through each configuration entry
-                if (!target.configurations) {
-                    continue;
-                }
-                for (const configurationName of Object.keys(target.configurations)) {
-                    target.configurations[configurationName] = {
-                        ...optionsToRemove,
-                    };
-                }
+        for (const [, target] of workspace_1.allWorkspaceTargets(workspace)) {
+            if (!target.builder.startsWith('@angular-devkit/build-angular')) {
+                continue;
+            }
+            for (const [, options] of workspace_1.allTargetOptions(target)) {
+                delete options.experimentalRollupPass;
             }
         }
     });
