@@ -25,6 +25,8 @@ export interface Schema {
     inlineTemplate?: boolean;
     /**
      * Add support for legacy browsers like Internet Explorer using differential loading.
+     * @deprecated Legacy browsers support is deprecated since version 12. For more information,
+     * see https://angular.io/guide/browser-support
      */
     legacyBrowsers?: boolean;
     /**

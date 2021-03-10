@@ -120,15 +120,19 @@ function default_1(options) {
         ]);
         const moduleDasherized = core_1.strings.dasherize(options.name);
         const modulePath = `${!options.flat ? moduleDasherized + '/' : ''}${moduleDasherized}.module.ts`;
+        const componentOptions = {
+            module: modulePath,
+            flat: options.flat,
+            name: options.name,
+            path: options.path,
+            project: options.project,
+        };
         return schematics_1.chain([
             !isLazyLoadedModuleGen ? addDeclarationToNgModule(options) : schematics_1.noop(),
             addRouteDeclarationToNgModule(options, routingModulePath),
             schematics_1.mergeWith(templateSource),
             isLazyLoadedModuleGen
-                ? schematics_1.schematic('component', {
-                    ...options,
-                    module: modulePath,
-                })
+                ? schematics_1.schematic('component', componentOptions)
                 : schematics_1.noop(),
             options.lintFix ? lint_fix_1.applyLintFix(options.path) : schematics_1.noop(),
         ]);
