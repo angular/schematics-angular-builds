@@ -16,6 +16,7 @@ function default_1() {
             }
             for (const [, options] of workspace_1.allTargetOptions(target)) {
                 delete options.experimentalRollupPass;
+                delete options.lazyModules;
             }
         }
     });
