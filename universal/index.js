@@ -23,25 +23,34 @@ function updateConfigFile(options, tsConfigDirectory) {
     return workspace_1.updateWorkspace(workspace => {
         const clientProject = workspace.projects.get(options.clientProject);
         if (clientProject) {
-            const buildTarget = clientProject.targets.get('build');
-            let fileReplacements;
-            if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
-                fileReplacements = buildTarget.configurations.production.fileReplacements;
-            }
-            if (buildTarget && buildTarget.options) {
-                buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
-            }
             // In case the browser builder hashes the assets
             // we need to add this setting to the server builder
             // as otherwise when assets it will be requested twice.
             // One for the server which will be unhashed, and other on the client which will be hashed.
-            let outputHashing;
-            if (buildTarget && buildTarget.configurations && buildTarget.configurations.production) {
-                switch (buildTarget.configurations.production.outputHashing) {
-                    case 'all':
-                    case 'media':
-                        outputHashing = 'media';
-                        break;
+            const getServerOptions = (options = {}) => {
+                return {
+                    outputHashing: (options === null || options === void 0 ? void 0 : options.outputHashing) === 'all' ? 'media' : options === null || options === void 0 ? void 0 : options.outputHashing,
+                    fileReplacements: options === null || options === void 0 ? void 0 : options.fileReplacements,
+                    optimization: (options === null || options === void 0 ? void 0 : options.optimization) === undefined ? undefined : !!(options === null || options === void 0 ? void 0 : options.optimization),
+                    sourceMap: options === null || options === void 0 ? void 0 : options.sourceMap,
+                    localization: options === null || options === void 0 ? void 0 : options.localization,
+                    stylePreprocessorOptions: options === null || options === void 0 ? void 0 : options.stylePreprocessorOptions,
+                    resourcesOutputPath: options === null || options === void 0 ? void 0 : options.resourcesOutputPath,
+                    deployUrl: options === null || options === void 0 ? void 0 : options.deployUrl,
+                    i18nMissingTranslation: options === null || options === void 0 ? void 0 : options.i18nMissingTranslation,
+                    preserveSymlinks: options === null || options === void 0 ? void 0 : options.preserveSymlinks,
+                    extractLicenses: options === null || options === void 0 ? void 0 : options.extractLicenses,
+                };
+            };
+            const buildTarget = clientProject.targets.get('build');
+            if (buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) {
+                buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
+            }
+            const buildConfigurations = buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.configurations;
+            const configurations = {};
+            if (buildConfigurations) {
+                for (const [key, options] of Object.entries(buildConfigurations)) {
+                    configurations[key] = getServerOptions(options);
                 }
             }
             const mainPath = options.main;
@@ -49,24 +58,18 @@ function updateConfigFile(options, tsConfigDirectory) {
             clientProject.targets.add({
                 name: 'server',
                 builder: workspace_models_1.Builders.Server,
+                defaultConfiguration: 'production',
                 options: {
                     outputPath: `dist/${options.clientProject}/server`,
                     main: core_1.join(core_1.normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
                     tsConfig: serverTsConfig,
+                    ...((buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) ? getServerOptions(buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) : {}),
                 },
-                configurations: {
-                    production: {
-                        outputHashing,
-                        fileReplacements,
-                        sourceMap: false,
-                        optimization: true,
-                    },
-                },
+                configurations,
             });
             const lintTarget = clientProject.targets.get('lint');
             if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
-                lintTarget.options.tsConfig =
-                    lintTarget.options.tsConfig.concat(serverTsConfig);
+                lintTarget.options.tsConfig = lintTarget.options.tsConfig.concat(serverTsConfig);
             }
         }
     });

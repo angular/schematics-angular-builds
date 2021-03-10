@@ -34,13 +34,16 @@ function default_1(options) {
         project.targets.add({
             name: 'e2e',
             builder: workspace_models_1.Builders.Protractor,
+            defaultConfiguration: 'development',
             options: {
                 protractorConfig: `${root}/protractor.conf.js`,
-                devServerTarget: `${options.relatedAppName}:serve`,
             },
             configurations: {
                 production: {
                     devServerTarget: `${options.relatedAppName}:serve:production`,
+                },
+                development: {
+                    devServerTarget: `${options.relatedAppName}:serve:development`,
                 },
             },
         });

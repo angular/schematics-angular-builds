@@ -140,6 +140,7 @@ function addAppToWorkspaceFile(options, appDir) {
         targets: {
             build: {
                 builder: workspace_models_1.Builders.Browser,
+                defaultConfiguration: 'production',
                 options: {
                     outputPath: `dist/${options.name}`,
                     index: `${sourceRoot}/index.html`,
@@ -158,29 +159,34 @@ function addAppToWorkspaceFile(options, appDir) {
                 },
                 configurations: {
                     production: {
+                        budgets,
                         fileReplacements: [{
                                 replace: `${sourceRoot}/environments/environment.ts`,
                                 with: `${sourceRoot}/environments/environment.prod.ts`,
                             }],
+                        buildOptimizer: true,
                         optimization: true,
                         outputHashing: 'all',
                         sourceMap: false,
                         namedChunks: false,
                         extractLicenses: true,
                         vendorChunk: false,
-                        buildOptimizer: true,
-                        budgets,
+                    },
+                    development: {
+                        vendorChunk: true,
                     },
                 },
             },
             serve: {
                 builder: workspace_models_1.Builders.DevServer,
-                options: {
-                    browserTarget: `${options.name}:build`,
-                },
+                defaultConfiguration: 'development',
+                options: {},
                 configurations: {
                     production: {
                         browserTarget: `${options.name}:build:production`,
+                    },
+                    development: {
+                        browserTarget: `${options.name}:build:development`,
                     },
                 },
             },

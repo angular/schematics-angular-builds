@@ -105,29 +105,47 @@ function addUniversalTarget(options) {
     };
 }
 function addAppShellConfigToWorkspace(options) {
-    return () => {
+    return (host, context) => {
         if (!options.route) {
             throw new schematics_1.SchematicsException(`Route is not defined`);
         }
         return workspace_1.updateWorkspace(workspace => {
+            var _a, _b, _c, _d;
             const project = workspace.projects.get(options.clientProject);
             if (!project) {
                 return;
             }
+            // Validation of targets is handled already in the main function.
+            // Duplicate keys means that we have configurations in both server and build builders.
+            const serverConfigKeys = (_b = (_a = project.targets.get('server')) === null || _a === void 0 ? void 0 : _a.configurations) !== null && _b !== void 0 ? _b : {};
+            const buildConfigKeys = (_d = (_c = project.targets.get('build')) === null || _c === void 0 ? void 0 : _c.configurations) !== null && _d !== void 0 ? _d : {};
+            const configurationNames = Object.keys({
+                ...serverConfigKeys,
+                ...buildConfigKeys,
+            });
+            const configurations = {};
+            for (const key of configurationNames) {
+                if (!serverConfigKeys[key]) {
+                    context.logger.warn(`Skipped adding "${key}" configuration to "app-shell" target as it's missing from "server" target.`);
+                    continue;
+                }
+                if (!buildConfigKeys[key]) {
+                    context.logger.warn(`Skipped adding "${key}" configuration to "app-shell" target as it's missing from "build" target.`);
+                    continue;
+                }
+                configurations[key] = {
+                    browserTarget: `${options.clientProject}:build:${key}`,
+                    serverTarget: `${options.clientProject}:server:${key}`,
+                };
+            }
             project.targets.add({
                 name: 'app-shell',
                 builder: workspace_models_1.Builders.AppShell,
+                defaultConfiguration: configurations['production'] ? 'production' : undefined,
                 options: {
-                    browserTarget: `${options.clientProject}:build`,
-                    serverTarget: `${options.clientProject}:server`,
                     route: options.route,
                 },
-                configurations: {
-                    production: {
-                        browserTarget: `${options.clientProject}:build:production`,
-                        serverTarget: `${options.clientProject}:server:production`,
-                    },
-                },
+                configurations,
             });
         });
     };

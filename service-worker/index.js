@@ -106,16 +106,10 @@ function default_1(options) {
             throw project_targets_1.targetBuildNotFoundError();
         }
         const buildOptions = (buildTarget.options || {});
-        let buildConfiguration;
-        if (options.configuration && buildTarget.configurations) {
-            buildConfiguration =
-                buildTarget.configurations[options.configuration];
-        }
-        const config = buildConfiguration || buildOptions;
         const root = project.root;
-        config.serviceWorker = true;
-        config.ngswConfigPath = core_1.join(core_1.normalize(root), 'ngsw-config.json');
-        let { resourcesOutputPath = '' } = config;
+        buildOptions.serviceWorker = true;
+        buildOptions.ngswConfigPath = core_1.join(core_1.normalize(root), 'ngsw-config.json');
+        let { resourcesOutputPath = '' } = buildOptions;
         if (resourcesOutputPath) {
             resourcesOutputPath = core_1.normalize(`/${resourcesOutputPath}`);
         }
