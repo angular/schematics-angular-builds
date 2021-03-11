@@ -27,7 +27,7 @@ function addConfig(options, root, tsConfigPath) {
                 json.modify(['exclude'], [...exclude, workerGlob]);
             }
         }
-        catch (_a) { }
+        catch { }
         return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [
             schematics_1.applyTemplates({
                 ...options,

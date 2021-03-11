@@ -84,7 +84,7 @@ function default_1() {
         try {
             json = new json_file_1.JSONFile(tree, TSLINT_CONFIG_PATH);
         }
-        catch (_a) {
+        catch {
             const config = ['tslint.js', 'tslint.yaml'].find(c => tree.exists(c));
             if (config) {
                 logger.warn(`Expected a JSON configuration file but found "${config}".`);

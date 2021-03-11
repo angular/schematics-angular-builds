@@ -17,7 +17,7 @@ function isIvyEnabled(tree, tsConfigPath) {
     try {
         tsconfigJson = new json_file_1.JSONFile(tree, tsConfigPath);
     }
-    catch (_a) {
+    catch {
         return true;
     }
     const enableIvy = tsconfigJson.get(['angularCompilerOptions', 'enableIvy']);

@@ -25,7 +25,7 @@ function removeTsickle() {
                 try {
                     tsConfigJson = new json_file_1.JSONFile(tree, tsConfigPath);
                 }
-                catch (_a) {
+                catch {
                     logger.warn(`Cannot find file: ${tsConfigPath}`);
                     continue;
                 }

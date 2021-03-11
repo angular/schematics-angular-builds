@@ -23,7 +23,7 @@ function updateNGSWConfig() {
                 try {
                     ngswConfigJson = new json_file_1.JSONFile(tree, ngswConfigPath);
                 }
-                catch (_a) {
+                catch {
                     logger.warn(`Cannot find file: ${ngswConfigPath}`);
                     continue;
                 }

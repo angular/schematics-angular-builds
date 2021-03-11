@@ -62,7 +62,7 @@ function updateTsConfig(tree, builderConfig, projectSourceRoot, logger) {
         try {
             tsConfigJson = new json_file_1.JSONFile(tree, tsConfigPath);
         }
-        catch (_a) {
+        catch {
             logger.warn(`Cannot find file: ${tsConfigPath}`);
             continue;
         }
@@ -123,7 +123,7 @@ function updateModuleCompilerOption(tree, tsConfigPath, builderName) {
     try {
         tsConfigJson = new json_file_1.JSONFile(tree, tsConfigPath);
     }
-    catch (_a) {
+    catch {
         return;
     }
     const compilerOptions = tsConfigJson.get(['compilerOptions']);

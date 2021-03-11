@@ -123,7 +123,7 @@ function dropES2015Polyfills() {
         try {
             workspace = await workspace_1.getWorkspace(tree);
         }
-        catch (_b) {
+        catch {
             return;
         }
         const rules = [];

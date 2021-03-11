@@ -33,7 +33,7 @@ function updateES5Projects() {
         try {
             workspace = await workspace_1.getWorkspace(tree);
         }
-        catch (_c) {
+        catch {
             return;
         }
         for (const [projectName, project] of workspace.projects) {
@@ -81,7 +81,7 @@ function updateTsConfig(tree, tsConfigPath) {
     try {
         tsConfigJson = new json_file_1.JSONFile(tree, tsConfigPath);
     }
-    catch (_a) {
+    catch {
         return;
     }
     const compilerOptions = tsConfigJson.get(['compilerOptions']);

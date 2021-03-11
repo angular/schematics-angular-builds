@@ -64,7 +64,7 @@ function migrateKarmaConfiguration(config) {
                 host.overwrite(karmaPath, content);
             }
         }
-        catch (_a) { }
+        catch { }
         return host;
     };
 }
@@ -536,7 +536,7 @@ function updateSpecTsConfig(config) {
             try {
                 tsConfigJson = new json_file_1.JSONFile(host, tsSpecConfigPath);
             }
-            catch (_a) {
+            catch {
                 return;
             }
             const files = tsConfigJson.get(['files']);
@@ -578,7 +578,7 @@ function updateTsLintConfig() {
         try {
             tsLintJson = new json_file_1.JSONFile(host, tsLintPath);
         }
-        catch (_a) {
+        catch {
             return;
         }
         const rulePath = ['rules', 'import-blacklist'];
@@ -598,7 +598,7 @@ function updateRootTsConfig() {
         try {
             tsConfigJson = new json_file_1.JSONFile(host, tsConfigPath);
         }
-        catch (_a) {
+        catch {
             return;
         }
         const baseUrlPath = ['compilerOptions', 'baseUrl'];

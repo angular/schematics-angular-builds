@@ -93,7 +93,7 @@ async function isES5SupportNeeded(projectRoot) {
             return !featureStatus || !criteria.includes(featureStatus.charAt(0));
         });
     }
-    catch (_a) {
+    catch {
         return undefined;
     }
 }

@@ -37,7 +37,7 @@ function _updateTsConfig() {
         try {
             tsConfigJson = new json_file_1.JSONFile(host, tsConfigPath);
         }
-        catch (_a) {
+        catch {
             return;
         }
         const compilerOptions = tsConfigJson.get(['compilerOptions']);

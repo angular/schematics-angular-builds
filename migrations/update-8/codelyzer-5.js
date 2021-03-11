@@ -32,7 +32,7 @@ const updateTsLintConfig = () => {
         try {
             tsLintJson = new json_file_1.JSONFile(host, tsLintPath);
         }
-        catch (_a) {
+        catch {
             return;
         }
         for (const [existingRule, newRule] of Object.entries(ruleMapping)) {
