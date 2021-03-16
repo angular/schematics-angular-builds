@@ -11,7 +11,6 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../utility/dependencies");
-const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const lint_fix_1 = require("../utility/lint-fix");
 const paths_1 = require("../utility/paths");
@@ -42,26 +41,6 @@ function addDependenciesToPackageJson(options) {
             context.addTask(new tasks_1.NodePackageInstallTask());
         }
         return host;
-    };
-}
-/**
- * Merges the application tslint.json with the workspace tslint.json
- * when the application being created is a root application
- *
- * @param {Tree} parentHost The root host of the schematic
- */
-function mergeWithRootTsLint(parentHost) {
-    return (host) => {
-        const tsLintPath = '/tslint.json';
-        const rulesPath = ['rules'];
-        if (!host.exists(tsLintPath)) {
-            return;
-        }
-        const rootTsLintFile = new json_file_1.JSONFile(parentHost, tsLintPath);
-        const rootRules = rootTsLintFile.get(rulesPath);
-        const appRules = new json_file_1.JSONFile(host, tsLintPath).get(rulesPath);
-        rootTsLintFile.modify(rulesPath, { ...rootRules, ...appRules });
-        host.overwrite(tsLintPath, rootTsLintFile.content);
     };
 }
 function addAppToWorkspaceFile(options, appDir) {
@@ -213,18 +192,6 @@ function addAppToWorkspaceFile(options, appDir) {
                     scripts: [],
                 },
             },
-            lint: options.minimal ? undefined : {
-                builder: workspace_models_1.Builders.TsLint,
-                options: {
-                    tsConfig: [
-                        `${projectRoot}tsconfig.app.json`,
-                        `${projectRoot}tsconfig.spec.json`,
-                    ],
-                    exclude: [
-                        '**/node_modules/**',
-                    ],
-                },
-            },
         },
     };
     return workspace_1.updateWorkspace(workspace => {
@@ -238,7 +205,7 @@ function addAppToWorkspaceFile(options, appDir) {
     });
 }
 function minimalPathFilter(path) {
-    const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js|tslint.json).template$/;
+    const toRemoveList = /(test.ts|tsconfig.spec.json|karma.conf.js).template$/;
     return !toRemoveList.test(path);
 }
 function default_1(options) {
@@ -286,7 +253,6 @@ function default_1(options) {
                     appName: options.name,
                     isRootApp,
                 }),
-                isRootApp ? mergeWithRootTsLint(host) : schematics_1.noop(),
                 schematics_1.move(appDir),
             ]), schematics_1.MergeStrategy.Overwrite),
             schematics_1.schematic('module', {

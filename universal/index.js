@@ -67,10 +67,6 @@ function updateConfigFile(options, tsConfigDirectory) {
                 },
                 configurations,
             });
-            const lintTarget = clientProject.targets.get('lint');
-            if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
-                lintTarget.options.tsConfig = lintTarget.options.tsConfig.concat(serverTsConfig);
-            }
         }
     });
 }

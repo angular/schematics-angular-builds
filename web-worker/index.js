@@ -108,12 +108,6 @@ function default_1(options) {
         if (needWebWorkerConfig) {
             const workerConfigPath = core_1.join(core_1.normalize(root), 'tsconfig.worker.json');
             projectTargetOptions.webWorkerTsConfig = workerConfigPath;
-            // add worker tsconfig to lint architect target
-            const lintTarget = project.targets.get('lint');
-            if (lintTarget) {
-                const lintOptions = (lintTarget.options || {});
-                lintOptions.tsConfig = (lintOptions.tsConfig || []).concat(workerConfigPath);
-            }
         }
         const templateSource = schematics_1.apply(schematics_1.url('./files/worker'), [
             schematics_1.applyTemplates({ ...options, ...core_1.strings }),

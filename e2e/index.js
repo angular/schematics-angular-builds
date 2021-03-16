@@ -47,12 +47,6 @@ function default_1(options) {
                 },
             },
         });
-        const e2eTsConfig = `${root}/tsconfig.json`;
-        const lintTarget = project.targets.get('lint');
-        if (lintTarget && lintTarget.options && Array.isArray(lintTarget.options.tsConfig)) {
-            lintTarget.options.tsConfig =
-                lintTarget.options.tsConfig.concat(e2eTsConfig);
-        }
         return schematics_1.chain([
             workspace_1.updateWorkspace(workspace),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
