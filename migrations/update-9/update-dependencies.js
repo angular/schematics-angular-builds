@@ -2,15 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateDependencies = void 0;
 const dependencies_1 = require("../../utility/dependencies");
-const latest_versions_1 = require("../../utility/latest-versions");
 function updateDependencies() {
     return (host, context) => {
         const dependenciesToUpdate = {
-            '@angular-devkit/build-angular': latest_versions_1.latestVersions.DevkitBuildAngular,
-            '@angular-devkit/build-ng-packagr': latest_versions_1.latestVersions.DevkitBuildNgPackagr,
-            '@angular-devkit/build-webpack': latest_versions_1.latestVersions.DevkitBuildWebpack,
-            'zone.js': latest_versions_1.latestVersions.ZoneJs,
-            'ng-packagr': latest_versions_1.latestVersions.ngPackagr,
+            '@angular-devkit/build-angular': '~0.901.15',
+            '@angular-devkit/build-ng-packagr': '~0.901.15',
+            '@angular-devkit/build-webpack': '~0.901.15',
+            'zone.js': '~0.10.0',
+            'ng-packagr': '^9.0.0',
             'web-animations-js': '^2.3.2',
             'codelyzer': '^5.1.2',
             '@types/node': '^12.11.1',

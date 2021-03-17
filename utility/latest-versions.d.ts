@@ -12,7 +12,5 @@ export declare const latestVersions: {
     TypeScript: string;
     TsLib: string;
     DevkitBuildAngular: string;
-    DevkitBuildNgPackagr: string;
-    DevkitBuildWebpack: string;
     ngPackagr: string;
 };
