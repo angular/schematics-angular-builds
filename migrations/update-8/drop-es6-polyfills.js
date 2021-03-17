@@ -57,7 +57,7 @@ const knownPolyfillHashes = [
     'd6c13d6dcf94ff3749283f33dd0d4864',
     '79bf0fd46c215e5f4145e15641c325f3',
     '6fe8080c7e38ee0ce677fdbc3884377a',
-    '8e7f6abb3d2dca03b4dbb300e400a880',
+    '8e7f6abb3d2dca03b4dbb300e400a880', // 7.3 - unmodified
 ];
 function dropES2015PolyfillsFromFile(polyfillPath) {
     return (tree) => {
