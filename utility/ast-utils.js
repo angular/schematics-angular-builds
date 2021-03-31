@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addRouteDeclarationToModule = exports.getRouterModuleDeclaration = exports.getEnvironmentExportName = exports.isImported = exports.addEntryComponentToModule = exports.addBootstrapToModule = exports.addExportToModule = exports.addProviderToModule = exports.addImportToModule = exports.addDeclarationToModule = exports.addSymbolToNgModuleMetadata = exports.getMetadataField = exports.getDecoratorMetadata = exports.insertAfterLastOccurrence = exports.findNode = exports.getSourceNodes = exports.findNodes = exports.insertImport = void 0;
+exports.addRouteDeclarationToModule = exports.getRouterModuleDeclaration = exports.getEnvironmentExportName = exports.isImported = exports.addBootstrapToModule = exports.addExportToModule = exports.addProviderToModule = exports.addImportToModule = exports.addDeclarationToModule = exports.addSymbolToNgModuleMetadata = exports.getMetadataField = exports.getDecoratorMetadata = exports.insertAfterLastOccurrence = exports.findNode = exports.getSourceNodes = exports.findNodes = exports.insertImport = void 0;
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -386,14 +386,6 @@ function addBootstrapToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'bootstrap', classifiedName, importPath);
 }
 exports.addBootstrapToModule = addBootstrapToModule;
-/**
- * Custom function to insert an entryComponent into NgModule. It also imports it.
- * @deprecated - Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
- */
-function addEntryComponentToModule(source, modulePath, classifiedName, importPath) {
-    return addSymbolToNgModuleMetadata(source, modulePath, 'entryComponents', classifiedName, importPath);
-}
-exports.addEntryComponentToModule = addEntryComponentToModule;
 /**
  * Determine if an import already exists.
  */

@@ -76,11 +76,6 @@ export declare function addExportToModule(source: ts.SourceFile, modulePath: str
  */
 export declare function addBootstrapToModule(source: ts.SourceFile, modulePath: string, classifiedName: string, importPath: string): Change[];
 /**
- * Custom function to insert an entryComponent into NgModule. It also imports it.
- * @deprecated - Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
- */
-export declare function addEntryComponentToModule(source: ts.SourceFile, modulePath: string, classifiedName: string, importPath: string): Change[];
-/**
  * Determine if an import already exists.
  */
 export declare function isImported(source: ts.SourceFile, classifiedName: string, importPath: string): boolean;

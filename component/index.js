@@ -60,18 +60,6 @@ function addDeclarationToNgModule(options) {
             }
             host.commitUpdate(exportRecorder);
         }
-        if (options.entryComponent) {
-            // Need to refresh the AST because we overwrote the file in the host.
-            const source = readIntoSourceFile(host, modulePath);
-            const entryComponentRecorder = host.beginUpdate(modulePath);
-            const entryComponentChanges = ast_utils_1.addEntryComponentToModule(source, modulePath, core_1.strings.classify(options.name) + core_1.strings.classify(options.type), relativePath);
-            for (const change of entryComponentChanges) {
-                if (change instanceof change_1.InsertChange) {
-                    entryComponentRecorder.insertLeft(change.pos, change.toAdd);
-                }
-            }
-            host.commitUpdate(entryComponentRecorder);
-        }
         return host;
     };
 }

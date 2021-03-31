@@ -11,11 +11,6 @@ export interface Schema {
      */
     displayBlock?: boolean;
     /**
-     * The new component is the entry component of the declaring NgModule.
-     * @deprecated Since version 9.0.0 with Ivy, entryComponents is no longer necessary.
-     */
-    entryComponent?: boolean;
-    /**
      * The declaring NgModule exports this component.
      */
     export?: boolean;
