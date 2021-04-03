@@ -20,7 +20,7 @@ function updateI18nConfig() {
         for (const [, target] of workspace_1.allWorkspaceTargets(workspace)) {
             switch (target.builder) {
                 case workspace_models_1.Builders.Browser:
-                case workspace_models_1.Builders.Karma:
+                case workspace_models_1.Builders.Server:
                     updateBaseHrefs(target);
                     removeFormatOption(target);
                     addBuilderI18NOptions(target, logger);
