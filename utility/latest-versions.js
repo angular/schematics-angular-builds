@@ -20,5 +20,5 @@ exports.latestVersions = {
     // During RC periods they will not match the latest RC until there's a new git tag, and
     // should not be updated.
     DevkitBuildAngular: '~0.1200.0-next.9',
-    ngPackagr: '^12.0.0-next.0',
+    ngPackagr: '^12.0.0-next.8',
 };
