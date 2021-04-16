@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateLazyModulePaths = void 0;
 const ts = require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript");
 function* visit(directory) {
     for (const path of directory.subfiles) {
@@ -21,7 +22,7 @@ function* visit(directory) {
         yield* visit(directory.dir(path));
     }
 }
-function default_1() {
+function updateLazyModulePaths() {
     return tree => {
         for (const sourceFile of visit(tree.root)) {
             let recorder;
@@ -52,4 +53,4 @@ function default_1() {
         }
     };
 }
-exports.default = default_1;
+exports.updateLazyModulePaths = updateLazyModulePaths;
