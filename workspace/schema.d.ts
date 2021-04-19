@@ -1,3 +1,7 @@
+/**
+ * Initializes an empty workspace and adds the necessary dependencies required by an Angular
+ * application.
+ */
 export interface Schema {
     /**
      * Create a workspace without any testing frameworks. (Use for learning purposes only.)

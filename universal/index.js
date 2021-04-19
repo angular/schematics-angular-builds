@@ -40,6 +40,7 @@ function updateConfigFile(options, tsConfigDirectory) {
                     i18nMissingTranslation: options === null || options === void 0 ? void 0 : options.i18nMissingTranslation,
                     preserveSymlinks: options === null || options === void 0 ? void 0 : options.preserveSymlinks,
                     extractLicenses: options === null || options === void 0 ? void 0 : options.extractLicenses,
+                    inlineStyleLanguage: options === null || options === void 0 ? void 0 : options.inlineStyleLanguage,
                 };
             };
             const buildTarget = clientProject.targets.get('build');
