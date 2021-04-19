@@ -1,5 +1,5 @@
 /**
- * Creates a new generic pipe definition in the given or default project.
+ * Creates a new, generic pipe definition in the given or default project.
  */
 export interface Schema {
     /**
