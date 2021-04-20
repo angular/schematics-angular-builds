@@ -1,6 +1,3 @@
-/**
- * Creates a new project by combining the workspace and application schematics.
- */
 export interface Schema {
     /**
      * Initial git repository commit information.
