@@ -1,5 +1,5 @@
 /**
- * Creates a new generic library project in the current workspace.
+ * Creates a new, generic library project in the current workspace.
  */
 export interface Schema {
     /**
