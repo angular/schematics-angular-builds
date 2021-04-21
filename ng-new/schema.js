@@ -22,7 +22,6 @@ var Style;
     Style["Less"] = "less";
     Style["Sass"] = "sass";
     Style["Scss"] = "scss";
-    Style["Styl"] = "styl";
 })(Style = exports.Style || (exports.Style = {}));
 /**
  * The view encapsulation strategy to use in the initial project.

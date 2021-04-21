@@ -9,6 +9,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
+const dependencies_1 = require("../utility/dependencies");
 const json_file_1 = require("../utility/json-file");
 const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
@@ -57,6 +58,11 @@ function default_1(options) {
                 }),
                 schematics_1.move(root),
             ])),
+            host => dependencies_1.addPackageJsonDependency(host, {
+                type: dependencies_1.NodeDependencyType.Dev,
+                name: 'protractor',
+                version: '~7.0.0',
+            }),
             addScriptsToPackageJson(),
         ]);
     };

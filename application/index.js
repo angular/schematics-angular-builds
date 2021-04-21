@@ -110,7 +110,7 @@ function addAppToWorkspaceFile(options, appDir) {
             },
         ];
     }
-    const inlineStyleLanguage = options.style && options.style !== schema_1.Style.Css && options.style !== schema_1.Style.Styl
+    const inlineStyleLanguage = (options === null || options === void 0 ? void 0 : options.style) !== schema_1.Style.Css
         ? options.style
         : undefined;
     const project = {
@@ -129,7 +129,6 @@ function addAppToWorkspaceFile(options, appDir) {
                     main: `${sourceRoot}/main.ts`,
                     polyfills: `${sourceRoot}/polyfills.ts`,
                     tsConfig: `${projectRoot}tsconfig.app.json`,
-                    aot: true,
                     inlineStyleLanguage,
                     assets: [
                         `${sourceRoot}/favicon.ico`,
@@ -147,16 +146,15 @@ function addAppToWorkspaceFile(options, appDir) {
                                 replace: `${sourceRoot}/environments/environment.ts`,
                                 with: `${sourceRoot}/environments/environment.prod.ts`,
                             }],
-                        buildOptimizer: true,
-                        optimization: true,
                         outputHashing: 'all',
-                        sourceMap: false,
-                        namedChunks: false,
-                        extractLicenses: true,
-                        vendorChunk: false,
                     },
                     development: {
+                        buildOptimizer: false,
+                        optimization: false,
                         vendorChunk: true,
+                        extractLicenses: false,
+                        sourceMap: true,
+                        namedChunks: true,
                     },
                 },
             },
@@ -243,10 +241,6 @@ function default_1(options) {
             ? core_1.normalize(options.projectRoot || '')
             : core_1.join(core_1.normalize(newProjectRoot), core_1.strings.dasherize(options.name));
         const sourceDir = `${appDir}/src/app`;
-        const e2eOptions = {
-            relatedAppName: options.name,
-            rootSelector: appRootSelector,
-        };
         return schematics_1.chain([
             addAppToWorkspaceFile(options, appDir),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
@@ -296,7 +290,6 @@ function default_1(options) {
                 }),
                 schematics_1.move(sourceDir),
             ]), schematics_1.MergeStrategy.Overwrite),
-            options.minimal ? schematics_1.noop() : schematics_1.schematic('e2e', e2eOptions),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(options),
             options.lintFix ? lint_fix_1.applyLintFix(appDir) : schematics_1.noop(),
         ]);
