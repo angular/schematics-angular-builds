@@ -10,15 +10,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.latestVersions = void 0;
 exports.latestVersions = {
     // These versions should be kept up to date with latest Angular peer dependencies.
-    Angular: '~12.0.0-next.9',
+    Angular: '~12.0.0-rc.0',
     RxJs: '~6.6.0',
     ZoneJs: '~0.11.4',
     TypeScript: '~4.2.3',
     TsLib: '^2.1.0',
-    // The versions below must be manually updated when making a new devkit release.
-    // For our e2e tests, these versions must match the latest tag present on the branch.
-    // During RC periods they will not match the latest RC until there's a new git tag, and
-    // should not be updated.
-    DevkitBuildAngular: '~12.0.0-rc.0',
+    // Since @angular-devkit/build-angular and @schematics/angular are always
+    // published together from the same monorepo, and they are both
+    // non-experimental, they will always have the same version.
+    DevkitBuildAngular: '~' + require('../package.json')['version'],
     ngPackagr: '^12.0.0-next.8',
 };
