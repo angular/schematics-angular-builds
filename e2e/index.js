@@ -58,11 +58,19 @@ function default_1(options) {
                 }),
                 schematics_1.move(root),
             ])),
-            host => dependencies_1.addPackageJsonDependency(host, {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: 'protractor',
-                version: '~7.0.0',
-            }),
+            host => [{
+                    type: dependencies_1.NodeDependencyType.Dev,
+                    name: 'protractor',
+                    version: '~7.0.0',
+                }, {
+                    type: dependencies_1.NodeDependencyType.Dev,
+                    name: 'jasmine-spec-reporter',
+                    version: '~7.0.0',
+                }, {
+                    type: dependencies_1.NodeDependencyType.Dev,
+                    name: 'ts-node',
+                    version: '~9.1.1',
+                }].forEach(dep => dependencies_1.addPackageJsonDependency(host, dep)),
             addScriptsToPackageJson(),
         ]);
     };
