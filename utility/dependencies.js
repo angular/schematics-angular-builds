@@ -1,4 +1,11 @@
 "use strict";
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPackageJsonDependency = exports.removePackageJsonDependency = exports.addPackageJsonDependency = exports.NodeDependencyType = void 0;
 const json_file_1 = require("./json-file");
