@@ -15,7 +15,7 @@ const ServerBuilderOptions = [
     ['optimization', false, true],
 ];
 function default_1() {
-    return workspace_1.updateWorkspace(workspace => {
+    return workspace_1.updateWorkspace((workspace) => {
         for (const [, target] of workspace_1.allWorkspaceTargets(workspace)) {
             if (!(target === null || target === void 0 ? void 0 : target.builder.startsWith('@angular-devkit/build-angular'))) {
                 continue;
@@ -55,6 +55,6 @@ function updateOptions(target, optionsToUpdate) {
             value = oldDefault;
         }
         // Remove overrides in configurations which are no longer needed.
-        configurationOptions === null || configurationOptions === void 0 ? void 0 : configurationOptions.filter(o => o && o[optionName] === value).forEach(o => o && delete o[optionName]);
+        configurationOptions === null || configurationOptions === void 0 ? void 0 : configurationOptions.filter((o) => o && o[optionName] === value).forEach((o) => o && delete o[optionName]);
     }
 }

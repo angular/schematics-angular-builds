@@ -53,8 +53,7 @@ function default_1() {
             // - require('zone.js/dist/zone') -> require('zone.js')
             // - import 'zone.js/dist/zone-error' -> import 'zone.js/plugins/zone-error'
             // - require('zone.js/dist/zone-error') -> require('zone.js/plugins/zone-error')
-            tree.overwrite(path, content
-                .replace(/(?<=(?:require\s*\(|import\s+)['"]zone\.js)\/dist\/zone-?\w*(?=['"]\)?)/g, match => {
+            tree.overwrite(path, content.replace(/(?<=(?:require\s*\(|import\s+)['"]zone\.js)\/dist\/zone-?\w*(?=['"]\)?)/g, (match) => {
                 switch (match) {
                     case '/dist/zone':
                     case '/dist/zone-evergreen':

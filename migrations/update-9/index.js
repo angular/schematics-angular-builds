@@ -31,7 +31,7 @@ function default_1() {
             remove_tsickle_1.removeTsickle(),
             add_tslib_1.addTsLib(),
             (tree, context) => {
-                const packageChanges = tree.actions.some(a => a.path.endsWith('/package.json'));
+                const packageChanges = tree.actions.some((a) => a.path.endsWith('/package.json'));
                 if (packageChanges) {
                     context.addTask(new tasks_1.NodePackageInstallTask());
                 }

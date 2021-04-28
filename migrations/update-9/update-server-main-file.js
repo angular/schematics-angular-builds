@@ -36,7 +36,9 @@ function updateServerMainFile() {
             const source = ts.createSourceFile(mainFilePath, content.toString().replace(/^\uFEFF/, ''), ts.ScriptTarget.Latest, true);
             // find exports in main server file
             const exportDeclarations = ast_utils_1.findNodes(source, ts.SyntaxKind.ExportDeclaration);
-            const platformServerExports = exportDeclarations.filter(({ moduleSpecifier }) => (moduleSpecifier && ts.isStringLiteral(moduleSpecifier) && moduleSpecifier.text === '@angular/platform-server'));
+            const platformServerExports = exportDeclarations.filter(({ moduleSpecifier }) => moduleSpecifier &&
+                ts.isStringLiteral(moduleSpecifier) &&
+                moduleSpecifier.text === '@angular/platform-server');
             let hasRenderModule = false;
             let hasRenderModuleFactory = false;
             // find exports of renderModule or renderModuleFactory
@@ -83,9 +85,7 @@ function updateServerMainFile() {
             if (updateExisting) {
                 const start = platformServerExports[0].getStart();
                 const width = platformServerExports[0].getWidth();
-                recorder
-                    .remove(start, width)
-                    .insertLeft(start, newExportDeclarationText);
+                recorder.remove(start, width).insertLeft(start, newExportDeclarationText);
             }
             else {
                 recorder.insertLeft(source.getWidth(), '\n' + newExportDeclarationText);

@@ -63,11 +63,11 @@ function getRegExpFailPosition(str) {
     const parts = str.indexOf('-') >= 0 ? str.split('-') : [str];
     const matched = [];
     const projectNameRegexp = /^[a-zA-Z][.0-9a-zA-Z]*(-[.0-9a-zA-Z]*)*$/;
-    parts.forEach(part => {
+    parts.forEach((part) => {
         if (part.match(projectNameRegexp)) {
             matched.push(part);
         }
     });
     const compare = matched.join('-');
-    return (str !== compare) ? compare.length : null;
+    return str !== compare ? compare.length : null;
 }

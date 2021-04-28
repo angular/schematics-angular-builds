@@ -28,10 +28,10 @@ function addDeclarationToNgModule(options) {
         }
         const sourceText = text.toString('utf-8');
         const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
-        const pipePath = `/${options.path}/`
-            + (options.flat ? '' : core_1.strings.dasherize(options.name) + '/')
-            + core_1.strings.dasherize(options.name)
-            + '.pipe';
+        const pipePath = `/${options.path}/` +
+            (options.flat ? '' : core_1.strings.dasherize(options.name) + '/') +
+            core_1.strings.dasherize(options.name) +
+            '.pipe';
         const relativePath = find_module_1.buildRelativePath(modulePath, pipePath);
         const changes = ast_utils_1.addDeclarationToModule(source, modulePath, core_1.strings.classify(`${options.name}Pipe`), relativePath);
         const recorder = host.beginUpdate(modulePath);
@@ -70,10 +70,10 @@ function default_1(options) {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            options.skipTests ? schematics_1.filter(path => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
+            options.skipTests ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
             schematics_1.applyTemplates({
                 ...core_1.strings,
-                'if-flat': (s) => options.flat ? '' : s,
+                'if-flat': (s) => (options.flat ? '' : s),
                 ...options,
             }),
             schematics_1.move(parsedPath.path),

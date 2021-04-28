@@ -20,7 +20,7 @@ const project_targets_1 = require("../utility/project-targets");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function updateConfigFile(options, tsConfigDirectory) {
-    return workspace_1.updateWorkspace(workspace => {
+    return workspace_1.updateWorkspace((workspace) => {
         const clientProject = workspace.projects.get(options.clientProject);
         if (clientProject) {
             // In case the browser builder hashes the assets
@@ -111,8 +111,8 @@ function wrapBootstrapCall(mainFile) {
         }
         // indent contents
         const triviaWidth = bootstrapCall.getLeadingTriviaWidth();
-        const beforeText = `document.addEventListener('DOMContentLoaded', () => {\n`
-            + ' '.repeat(triviaWidth > 2 ? triviaWidth + 1 : triviaWidth);
+        const beforeText = `document.addEventListener('DOMContentLoaded', () => {\n` +
+            ' '.repeat(triviaWidth > 2 ? triviaWidth + 1 : triviaWidth);
         const afterText = `\n${triviaWidth > 2 ? ' '.repeat(triviaWidth - 1) : ''}});`;
         // in some cases we need to cater for a trailing semicolon such as;
         // bootstrap().catch(err => console.log(err));
@@ -128,13 +128,13 @@ function wrapBootstrapCall(mainFile) {
     };
 }
 function findCallExpressionNode(node, text) {
-    if (ts.isCallExpression(node)
-        && ts.isIdentifier(node.expression)
-        && node.expression.text === text) {
+    if (ts.isCallExpression(node) &&
+        ts.isIdentifier(node.expression) &&
+        node.expression.text === text) {
         return node;
     }
     let foundNode = null;
-    ts.forEachChild(node, childNode => {
+    ts.forEachChild(node, (childNode) => {
         foundNode = findCallExpressionNode(childNode, text);
         if (foundNode) {
             return true;
@@ -182,7 +182,8 @@ function default_1(options) {
         if (!clientBuildTarget) {
             throw project_targets_1.targetBuildNotFoundError();
         }
-        const clientBuildOptions = (clientBuildTarget.options || {});
+        const clientBuildOptions = (clientBuildTarget.options ||
+            {});
         const clientTsConfig = core_1.normalize(clientBuildOptions.tsConfig);
         const tsConfigExtends = core_1.basename(clientTsConfig);
         // this is needed because prior to version 8, tsconfig might have been in 'src'

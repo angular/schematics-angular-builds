@@ -15,7 +15,7 @@ const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function addScriptsToPackageJson() {
-    return host => {
+    return (host) => {
         const pkgJson = new json_file_1.JSONFile(host, 'package.json');
         const e2eScriptPath = ['scripts', 'e2e'];
         if (!pkgJson.get(e2eScriptPath)) {
@@ -58,19 +58,23 @@ function default_1(options) {
                 }),
                 schematics_1.move(root),
             ])),
-            host => [{
+            (host) => [
+                {
                     type: dependencies_1.NodeDependencyType.Dev,
                     name: 'protractor',
                     version: '~7.0.0',
-                }, {
+                },
+                {
                     type: dependencies_1.NodeDependencyType.Dev,
                     name: 'jasmine-spec-reporter',
                     version: '~7.0.0',
-                }, {
+                },
+                {
                     type: dependencies_1.NodeDependencyType.Dev,
                     name: 'ts-node',
                     version: '~9.1.1',
-                }].forEach(dep => dependencies_1.addPackageJsonDependency(host, dep)),
+                },
+            ].forEach((dep) => dependencies_1.addPackageJsonDependency(host, dep)),
             addScriptsToPackageJson(),
         ]);
     };

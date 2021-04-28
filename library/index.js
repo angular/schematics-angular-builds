@@ -57,12 +57,12 @@ function addDependenciesToPackageJson() {
                 name: 'typescript',
                 version: latest_versions_1.latestVersions.TypeScript,
             },
-        ].forEach(dependency => dependencies_1.addPackageJsonDependency(host, dependency));
+        ].forEach((dependency) => dependencies_1.addPackageJsonDependency(host, dependency));
         return host;
     };
 }
 function addLibToWorkspaceFile(options, projectRoot, projectName) {
-    return workspace_1.updateWorkspace(workspace => {
+    return workspace_1.updateWorkspace((workspace) => {
         if (workspace.projects.size === 0) {
             workspace.extensions.defaultProject = projectName;
         }

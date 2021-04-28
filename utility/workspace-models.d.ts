@@ -123,8 +123,8 @@ export interface WorkspaceSchema {
 }
 export interface WorkspaceProject<TProjectType extends ProjectType = ProjectType.Application> {
     /**
-    * Project type.
-    */
+     * Project type.
+     */
     projectType: ProjectType;
     root: string;
     sourceRoot: string;

@@ -23,7 +23,7 @@ function* visit(directory) {
     }
 }
 function default_1() {
-    return tree => {
+    return (tree) => {
         for (const path of visit(tree.root)) {
             tree.rename(path, path.replace(/browserslist$/, '.browserslistrc'));
         }

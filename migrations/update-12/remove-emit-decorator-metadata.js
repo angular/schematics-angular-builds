@@ -24,7 +24,7 @@ function* visitJsonFiles(directory) {
     }
 }
 function default_1() {
-    return tree => {
+    return (tree) => {
         for (const path of visitJsonFiles(tree.root)) {
             const content = tree.read(path);
             if (content === null || content === void 0 ? void 0 : content.toString().includes('"emitDecoratorMetadata"')) {

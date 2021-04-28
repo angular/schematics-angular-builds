@@ -15,7 +15,7 @@ function applyLintFix(path = '/') {
         // Find the closest tslint.json or tslint.yaml
         let dir = tree.getDir(path.substr(0, path.lastIndexOf('/')));
         do {
-            if (dir.subfiles.some(f => f === 'tslint.json' || f === 'tslint.yaml')) {
+            if (dir.subfiles.some((f) => f === 'tslint.json' || f === 'tslint.yaml')) {
                 break;
             }
             dir = dir.parent;

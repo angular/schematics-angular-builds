@@ -33,11 +33,11 @@ function addDeclarationToNgModule(options) {
         options.type = options.type != null ? options.type : 'Component';
         const modulePath = options.module;
         const source = readIntoSourceFile(host, modulePath);
-        const componentPath = `/${options.path}/`
-            + (options.flat ? '' : core_1.strings.dasherize(options.name) + '/')
-            + core_1.strings.dasherize(options.name)
-            + (options.type ? '.' : '')
-            + core_1.strings.dasherize(options.type);
+        const componentPath = `/${options.path}/` +
+            (options.flat ? '' : core_1.strings.dasherize(options.name) + '/') +
+            core_1.strings.dasherize(options.name) +
+            (options.type ? '.' : '') +
+            core_1.strings.dasherize(options.type);
         const relativePath = find_module_1.buildRelativePath(modulePath, componentPath);
         const classifiedName = core_1.strings.classify(options.name) + core_1.strings.classify(options.type);
         const declarationChanges = ast_utils_1.addDeclarationToModule(source, modulePath, classifiedName, relativePath);
@@ -84,26 +84,29 @@ function default_1(options) {
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
-        options.selector = options.selector || buildSelector(options, project && project.prefix || '');
+        options.selector =
+            options.selector || buildSelector(options, (project && project.prefix) || '');
         validation_1.validateName(options.name);
         validation_1.validateHtmlSelector(options.selector);
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            options.skipTests ? schematics_1.filter(path => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
-            options.inlineStyle ? schematics_1.filter(path => !path.endsWith('.__style__.template')) : schematics_1.noop(),
-            options.inlineTemplate ? schematics_1.filter(path => !path.endsWith('.html.template')) : schematics_1.noop(),
+            options.skipTests ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
+            options.inlineStyle ? schematics_1.filter((path) => !path.endsWith('.__style__.template')) : schematics_1.noop(),
+            options.inlineTemplate ? schematics_1.filter((path) => !path.endsWith('.html.template')) : schematics_1.noop(),
             schematics_1.applyTemplates({
                 ...core_1.strings,
-                'if-flat': (s) => options.flat ? '' : s,
+                'if-flat': (s) => (options.flat ? '' : s),
                 ...options,
             }),
-            !options.type ? schematics_1.forEach((file => {
-                return file.path.includes('..')
-                    ? {
-                        content: file.content,
-                        path: file.path.replace('..', '.'),
-                    }
-                    : file;
-            })) : schematics_1.noop(),
+            !options.type
+                ? schematics_1.forEach(((file) => {
+                    return file.path.includes('..')
+                        ? {
+                            content: file.content,
+                            path: file.path.replace('..', '.'),
+                        }
+                        : file;
+                }))
+                : schematics_1.noop(),
             schematics_1.move(parsedPath.path),
         ]);
         return schematics_1.chain([

@@ -20,16 +20,14 @@ function default_1(options) {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            options.skipTests ? schematics_1.filter(path => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
+            options.skipTests ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
             schematics_1.applyTemplates({
                 ...core_1.strings,
                 ...options,
             }),
             schematics_1.move(parsedPath.path + (options.flat ? '' : '/' + core_1.strings.dasherize(options.name))),
         ]);
-        return schematics_1.chain([
-            schematics_1.mergeWith(templateSource),
-        ]);
+        return schematics_1.chain([schematics_1.mergeWith(templateSource)]);
     };
 }
 exports.default = default_1;

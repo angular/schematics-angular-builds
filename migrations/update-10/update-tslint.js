@@ -12,10 +12,7 @@ const dependencies_1 = require("../../utility/dependencies");
 const json_file_1 = require("../../utility/json-file");
 exports.TSLINT_VERSION = '~6.1.0';
 const TSLINT_CONFIG_PATH = '/tslint.json';
-const RULES_TO_DELETE = [
-    'no-use-before-declare',
-    'no-unused-variable',
-];
+const RULES_TO_DELETE = ['no-use-before-declare', 'no-unused-variable'];
 const RULES_TO_ADD = {
     align: {
         options: ['parameters', 'statements'],
@@ -92,7 +89,7 @@ function default_1() {
             json = new json_file_1.JSONFile(tree, TSLINT_CONFIG_PATH);
         }
         catch {
-            const config = ['tslint.js', 'tslint.yaml'].find(c => tree.exists(c));
+            const config = ['tslint.js', 'tslint.yaml'].find((c) => tree.exists(c));
             if (config) {
                 logger.warn(`Expected a JSON configuration file but found "${config}".`);
             }
@@ -108,9 +105,10 @@ function default_1() {
         // Add new rules only iif the configuration extends 'tslint:recommended'.
         // This is because some rules conflict with prettier or other tools.
         const extend = json.get(['extends']);
-        if (extend !== 'tslint:recommended' || (Array.isArray(extend) && extend.some(e => e.value !== 'tslint:recommended'))) {
-            logger.warn(`tslint configuration does not extend "tslint:recommended" or it extends multiple configurations.`
-                + '\nSkipping rule changes as some rules might conflict.');
+        if (extend !== 'tslint:recommended' ||
+            (Array.isArray(extend) && extend.some((e) => e.value !== 'tslint:recommended'))) {
+            logger.warn(`tslint configuration does not extend "tslint:recommended" or it extends multiple configurations.` +
+                '\nSkipping rule changes as some rules might conflict.');
             return;
         }
         for (const [name, value] of Object.entries(RULES_TO_ADD)) {

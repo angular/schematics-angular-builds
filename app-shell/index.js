@@ -28,7 +28,7 @@ function getSourceFile(host, path) {
 function getServerModulePath(host, sourceRoot, mainPath) {
     const mainSource = getSourceFile(host, core_1.join(core_1.normalize(sourceRoot), mainPath));
     const allNodes = ast_utils_1.getSourceNodes(mainSource);
-    const expNode = allNodes.find(node => ts.isExportDeclaration(node));
+    const expNode = allNodes.find((node) => ts.isExportDeclaration(node));
     if (!expNode) {
         return null;
     }
@@ -70,10 +70,10 @@ function getBootstrapComponentPath(host, mainPath) {
     const componentSymbol = arrLiteral.elements[0].getText();
     const relativePath = ast_utils_1.getSourceNodes(moduleSource)
         .filter(ts.isImportDeclaration)
-        .filter(imp => {
+        .filter((imp) => {
         return ast_utils_1.findNode(imp, ts.SyntaxKind.Identifier, componentSymbol);
     })
-        .map(imp => {
+        .map((imp) => {
         const pathStringLiteral = imp.moduleSpecifier;
         return pathStringLiteral.text;
     })[0];
@@ -109,7 +109,7 @@ function addAppShellConfigToWorkspace(options) {
         if (!options.route) {
             throw new schematics_1.SchematicsException(`Route is not defined`);
         }
-        return workspace_1.updateWorkspace(workspace => {
+        return workspace_1.updateWorkspace((workspace) => {
             var _a, _b, _c, _d;
             const project = workspace.projects.get(options.clientProject);
             if (!project) {
@@ -163,9 +163,7 @@ function addRouterModule(mainPath) {
 }
 function getMetadataProperty(metadata, propertyName) {
     const properties = metadata.properties;
-    const property = properties
-        .filter(ts.isPropertyAssignment)
-        .filter((prop) => {
+    const property = properties.filter(ts.isPropertyAssignment).filter((prop) => {
         const name = prop.name;
         switch (name.kind) {
             case ts.SyntaxKind.Identifier:
@@ -205,7 +203,7 @@ function addServerRoutes(options) {
                 change_1.applyToUpdateRecorder(recorder, [routesChange]);
             }
             const imports = ast_utils_1.getSourceNodes(moduleSource)
-                .filter(node => node.kind === ts.SyntaxKind.ImportDeclaration)
+                .filter((node) => node.kind === ts.SyntaxKind.ImportDeclaration)
                 .sort((a, b) => a.getStart() - b.getStart());
             const insertPosition = imports[imports.length - 1].getEnd();
             const routeText = `\n\nconst routes: Routes = [ { path: '${options.route}', component: AppShellComponent }];`;
@@ -246,7 +244,8 @@ function default_1(options) {
         if (!clientBuildTarget) {
             throw project_targets_1.targetBuildNotFoundError();
         }
-        const clientBuildOptions = (clientBuildTarget.options || {});
+        const clientBuildOptions = (clientBuildTarget.options ||
+            {});
         return schematics_1.chain([
             validateProject(clientBuildOptions.main),
             clientProject.targets.has('server') ? schematics_1.noop() : addUniversalTarget(options),

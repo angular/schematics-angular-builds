@@ -17,7 +17,9 @@ class NoopChange {
         this.order = Infinity;
         this.path = null;
     }
-    apply() { return Promise.resolve(); }
+    apply() {
+        return Promise.resolve();
+    }
 }
 exports.NoopChange = NoopChange;
 /**
@@ -38,7 +40,7 @@ class InsertChange {
      * This method does not insert spaces if there is none in the original string.
      */
     apply(host) {
-        return host.read(this.path).then(content => {
+        return host.read(this.path).then((content) => {
             const prefix = content.substring(0, this.pos);
             const suffix = content.substring(this.pos);
             return host.write(this.path, `${prefix}${this.toAdd}${suffix}`);
@@ -61,7 +63,7 @@ class RemoveChange {
         this.order = pos;
     }
     apply(host) {
-        return host.read(this.path).then(content => {
+        return host.read(this.path).then((content) => {
             const prefix = content.substring(0, this.pos);
             const suffix = content.substring(this.pos + this.toRemove.length);
             // TODO: throw error if toRemove doesn't match removed string.
@@ -86,7 +88,7 @@ class ReplaceChange {
         this.order = pos;
     }
     apply(host) {
-        return host.read(this.path).then(content => {
+        return host.read(this.path).then((content) => {
             const prefix = content.substring(0, this.pos);
             const suffix = content.substring(this.pos + this.oldText.length);
             const text = content.substring(this.pos, this.pos + this.oldText.length);

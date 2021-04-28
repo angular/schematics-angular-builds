@@ -29,7 +29,7 @@ function* visit(directory) {
     }
 }
 function default_1() {
-    return tree => {
+    return (tree) => {
         for (const sourceFile of visit(tree.root)) {
             let recorder;
             ts.forEachChild(sourceFile, function analyze(node) {
@@ -47,9 +47,7 @@ function default_1() {
                     }
                     const index = valueNode.getStart();
                     const length = valueNode.getWidth();
-                    recorder
-                        .remove(index, length)
-                        .insertLeft(index, fix);
+                    recorder.remove(index, length).insertLeft(index, fix);
                 }
                 ts.forEachChild(node, analyze);
             });
