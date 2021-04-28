@@ -4,11 +4,11 @@ const workspace_1 = require("../../utility/workspace");
 const BrowserBuilderOptions = [
     ['aot', false, true],
     ['vendorChunk', true, false],
-    ['extractLicenses', true, false],
+    ['extractLicenses', false, true],
     ['buildOptimizer', false, true],
     ['sourceMap', true, false],
     ['optimization', false, true],
-    ['namedChunks', false, true],
+    ['namedChunks', true, false],
 ];
 const ServerBuilderOptions = [
     ['sourceMap', true, false],
