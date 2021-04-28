@@ -24,11 +24,19 @@ function default_1(options) {
         const implementations = options.implements
             .map(implement => implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement)
             .join(', ');
-        let implementationImports = `${options.implements.join(', ')}, `;
-        // As long as we aren't in IE... ;)
+        const commonRouterNameImports = ['ActivatedRouteSnapshot', 'RouterStateSnapshot'];
+        const routerNamedImports = [...options.implements, 'UrlTree'];
         if (options.implements.includes(schema_1.Implement.CanLoad)) {
-            implementationImports = `${implementationImports}Route, UrlSegment, `;
+            routerNamedImports.push('Route', 'UrlSegment');
+            if (options.implements.length > 1) {
+                routerNamedImports.push(...commonRouterNameImports);
+            }
         }
+        else {
+            routerNamedImports.push(...commonRouterNameImports);
+        }
+        routerNamedImports.sort();
+        const implementationImports = routerNamedImports.join(', ');
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
