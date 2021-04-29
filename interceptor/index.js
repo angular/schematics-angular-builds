@@ -21,10 +21,10 @@ function default_1(options) {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            options.skipTests ? schematics_1.filter(path => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
+            options.skipTests ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
             schematics_1.applyTemplates({
                 ...core_1.strings,
-                'if-flat': (s) => options.flat ? '' : s,
+                'if-flat': (s) => (options.flat ? '' : s),
                 ...options,
             }),
             schematics_1.move(parsedPath.path),

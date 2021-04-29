@@ -28,9 +28,7 @@ function findModuleFromOptions(host, options) {
         const modulePath = core_1.normalize(`/${options.path}/${options.module}`);
         const componentPath = core_1.normalize(`/${options.path}/${options.name}`);
         const moduleBaseName = core_1.normalize(modulePath).split('/').pop();
-        const candidateSet = new Set([
-            core_1.normalize(options.path || '/'),
-        ]);
+        const candidateSet = new Set([core_1.normalize(options.path || '/')]);
         for (let dir = modulePath; dir != core_1.NormalizedRoot; dir = core_1.dirname(dir)) {
             candidateSet.add(dir);
         }
@@ -43,15 +41,15 @@ function findModuleFromOptions(host, options) {
                 '',
                 `${moduleBaseName}.ts`,
                 `${moduleBaseName}${moduleExt}`,
-            ].map(x => core_1.join(c, x));
+            ].map((x) => core_1.join(c, x));
             for (const sc of candidateFiles) {
                 if (host.exists(sc)) {
                     return core_1.normalize(sc);
                 }
             }
         }
-        throw new Error(`Specified module '${options.module}' does not exist.\n`
-            + `Looked in the following directories:\n    ${candidatesDirs.join('\n    ')}`);
+        throw new Error(`Specified module '${options.module}' does not exist.\n` +
+            `Looked in the following directories:\n    ${candidatesDirs.join('\n    ')}`);
     }
 }
 exports.findModuleFromOptions = findModuleFromOptions;
@@ -62,8 +60,8 @@ function findModule(host, generateDir, moduleExt = exports.MODULE_EXT, routingMo
     let dir = host.getDir('/' + generateDir);
     let foundRoutingModule = false;
     while (dir) {
-        const allMatches = dir.subfiles.filter(p => p.endsWith(moduleExt));
-        const filteredMatches = allMatches.filter(p => !p.endsWith(routingModuleExt));
+        const allMatches = dir.subfiles.filter((p) => p.endsWith(moduleExt));
+        const filteredMatches = allMatches.filter((p) => !p.endsWith(routingModuleExt));
         foundRoutingModule = foundRoutingModule || allMatches.length !== filteredMatches.length;
         if (filteredMatches.length == 1) {
             return core_1.join(dir.path, filteredMatches[0]);
@@ -74,9 +72,10 @@ function findModule(host, generateDir, moduleExt = exports.MODULE_EXT, routingMo
         }
         dir = dir.parent;
     }
-    const errorMsg = foundRoutingModule ? 'Could not find a non Routing NgModule.'
-        + `\nModules with suffix '${routingModuleExt}' are strictly reserved for routing.`
-        + '\nUse the skip-import option to skip importing in NgModule.'
+    const errorMsg = foundRoutingModule
+        ? 'Could not find a non Routing NgModule.' +
+            `\nModules with suffix '${routingModuleExt}' are strictly reserved for routing.` +
+            '\nUse the skip-import option to skip importing in NgModule.'
         : 'Could not find an NgModule. Use the skip-import option to skip importing in NgModule.';
     throw new Error(errorMsg);
 }

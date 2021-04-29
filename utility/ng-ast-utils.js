@@ -26,8 +26,9 @@ function findBootstrapModuleCall(host, mainPath) {
         let bootstrapCallNode = null;
         bootstrapCallNode = ast_utils_1.findNode(node, ts.SyntaxKind.Identifier, 'bootstrapModule');
         // Walk up the parent until CallExpression is found.
-        while (bootstrapCallNode && bootstrapCallNode.parent
-            && bootstrapCallNode.parent.kind !== ts.SyntaxKind.CallExpression) {
+        while (bootstrapCallNode &&
+            bootstrapCallNode.parent &&
+            bootstrapCallNode.parent.kind !== ts.SyntaxKind.CallExpression) {
             bootstrapCallNode = bootstrapCallNode.parent;
         }
         if (bootstrapCallNode !== null &&
@@ -55,10 +56,10 @@ function findBootstrapModulePath(host, mainPath) {
     const allNodes = ast_utils_1.getSourceNodes(source);
     const bootstrapModuleRelativePath = allNodes
         .filter(ts.isImportDeclaration)
-        .filter(imp => {
+        .filter((imp) => {
         return ast_utils_1.findNode(imp, ts.SyntaxKind.Identifier, bootstrapModule.getText());
     })
-        .map(imp => {
+        .map((imp) => {
         const modulePathStringLiteral = imp.moduleSpecifier;
         return modulePathStringLiteral.text;
     })[0];

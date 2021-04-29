@@ -89,7 +89,7 @@ function addProjectI18NOptions(tree, builderConfig, projectConfig) {
         const i18nOptions = [...workspace_1.allTargetOptions(builderConfig)];
         const sourceLocale = i18nOptions
             .map(([, o]) => o.i18nLocale)
-            .find(x => !!x && typeof x === 'string');
+            .find((x) => !!x && typeof x === 'string');
         projectConfig.extensions['i18n'] = {
             locales,
             ...(sourceLocale ? { sourceLocale } : {}),
@@ -109,9 +109,7 @@ function addBuilderI18NOptions(builderConfig, logger) {
         const localeId = options.i18nLocale;
         const i18nFile = options.i18nFile;
         const outputPath = options.outputPath;
-        if (typeof localeId === 'string' &&
-            i18nFile &&
-            typeof outputPath === 'string') {
+        if (typeof localeId === 'string' && i18nFile && typeof outputPath === 'string') {
             if (outputPath.match(new RegExp(`[/\\\\]${localeId}[/\\\\]?$`))) {
                 const newOutputPath = outputPath.replace(new RegExp(`[/\\\\]${localeId}[/\\\\]?$`), '');
                 options.outputPath = newOutputPath;

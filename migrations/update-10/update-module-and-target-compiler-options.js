@@ -29,7 +29,8 @@ function default_1() {
         for (const [, project] of workspace.projects) {
             for (const [, target] of project.targets) {
                 // E2E builder doesn't reference a tsconfig but it uses one found in the root folder.
-                if (target.builder === workspace_models_1.Builders.Protractor && typeof ((_a = target.options) === null || _a === void 0 ? void 0 : _a.protractorConfig) === 'string') {
+                if (target.builder === workspace_models_1.Builders.Protractor &&
+                    typeof ((_a = target.options) === null || _a === void 0 ? void 0 : _a.protractorConfig) === 'string') {
                     const tsConfigPath = core_1.join(core_1.dirname(core_1.normalize(target.options.protractorConfig)), 'tsconfig.json');
                     try {
                         updateModuleAndTarget(host, tsConfigPath, {
@@ -43,19 +44,16 @@ function default_1() {
                     continue;
                 }
                 // Update all other known CLI builders that use a tsconfig
-                const tsConfigs = [
-                    target.options || {},
-                    ...Object.values(target.configurations || {}),
-                ]
-                    .filter(opt => typeof (opt === null || opt === void 0 ? void 0 : opt.tsConfig) === 'string')
-                    .map(opt => opt.tsConfig);
+                const tsConfigs = [target.options || {}, ...Object.values(target.configurations || {})]
+                    .filter((opt) => typeof (opt === null || opt === void 0 ? void 0 : opt.tsConfig) === 'string')
+                    .map((opt) => opt.tsConfig);
                 const uniqueTsConfigs = [...new Set(tsConfigs)];
                 if (uniqueTsConfigs.length < 1) {
                     continue;
                 }
                 switch (target.builder) {
                     case workspace_models_1.Builders.Server:
-                        uniqueTsConfigs.forEach(p => {
+                        uniqueTsConfigs.forEach((p) => {
                             try {
                                 updateModuleAndTarget(host, p, {
                                     oldModule: 'commonjs',
@@ -81,7 +79,7 @@ function default_1() {
                     case workspace_models_1.Builders.Karma:
                     case workspace_models_1.Builders.Browser:
                     case workspace_models_1.Builders.DeprecatedNgPackagr:
-                        uniqueTsConfigs.forEach(p => {
+                        uniqueTsConfigs.forEach((p) => {
                             try {
                                 updateModuleAndTarget(host, p, {
                                     oldModule: 'esnext',
@@ -104,7 +102,8 @@ function updateModuleAndTarget(host, tsConfigPath, replacements) {
     const { oldTarget, newTarget, newModule, oldModule } = replacements;
     if (newTarget) {
         const target = json.get(['compilerOptions', 'target']);
-        if ((typeof target === 'string' && (!oldTarget || oldTarget === target.toLowerCase())) || !target) {
+        if ((typeof target === 'string' && (!oldTarget || oldTarget === target.toLowerCase())) ||
+            !target) {
             json.modify(['compilerOptions', 'target'], newTarget);
         }
     }

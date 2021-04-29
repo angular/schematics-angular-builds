@@ -11,7 +11,7 @@ const core_1 = require("@angular-devkit/core");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
-    return async (_host, context) => workspace_1.updateWorkspace(workspace => {
+    return async (_host, context) => workspace_1.updateWorkspace((workspace) => {
         for (const [name, target] of workspace_1.allWorkspaceTargets(workspace)) {
             let defaultConfiguration;
             // Only interested in 1st party builders
@@ -33,7 +33,8 @@ function default_1() {
                     // Nothing to update
                     break;
                 default:
-                    context.logger.warn(core_1.tags.stripIndents `Cannot update "${name}" target configuration as it's using "${target.builder}"
+                    context.logger
+                        .warn(core_1.tags.stripIndents `Cannot update "${name}" target configuration as it's using "${target.builder}"
           which is a third-party builder. This target configuration will require manual review.`);
                     continue;
             }

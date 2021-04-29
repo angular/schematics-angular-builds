@@ -11,7 +11,7 @@ const core_1 = require("@angular-devkit/core");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
-    return workspace_1.updateWorkspace(workspace => {
+    return workspace_1.updateWorkspace((workspace) => {
         // Remove deprecated CLI root level options
         removeDeprecatedCLIOptions(workspace.extensions);
         for (const [, project] of workspace.projects) {

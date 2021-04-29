@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const workspace_1 = require("../../utility/workspace");
 function default_1() {
-    return workspace_1.updateWorkspace(workspace => {
+    return workspace_1.updateWorkspace((workspace) => {
         const optionsToRemove = {
             environment: undefined,
             extractCss: undefined,

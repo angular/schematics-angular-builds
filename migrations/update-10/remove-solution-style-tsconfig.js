@@ -54,7 +54,8 @@ function default_1() {
                 const tsConfigDir = core_1.dirname(core_1.normalize(path));
                 const tsConfigJson = new json_file_1.JSONFile(host, path);
                 const extendsValue = tsConfigJson.get(extendsJsonPath);
-                if (typeof extendsValue === 'string' && '/tsconfig.base.json' === core_1.resolve(tsConfigDir, core_1.normalize(extendsValue))) {
+                if (typeof extendsValue === 'string' &&
+                    '/tsconfig.base.json' === core_1.resolve(tsConfigDir, core_1.normalize(extendsValue))) {
                     // tsconfig extends the workspace tsconfig path.
                     tsConfigJson.modify(extendsJsonPath, extendsValue.replace('tsconfig.base.json', 'tsconfig.json'));
                 }

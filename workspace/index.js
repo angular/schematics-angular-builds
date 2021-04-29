@@ -12,7 +12,7 @@ const schematics_1 = require("@angular-devkit/schematics");
 const latest_versions_1 = require("../utility/latest-versions");
 function default_1(options) {
     return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
-        options.minimal ? schematics_1.filter(path => !path.endsWith('editorconfig.template')) : schematics_1.noop(),
+        options.minimal ? schematics_1.filter((path) => !path.endsWith('editorconfig.template')) : schematics_1.noop(),
         schematics_1.applyTemplates({
             utils: core_1.strings,
             ...options,

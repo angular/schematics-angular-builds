@@ -22,7 +22,7 @@ function default_1(options) {
             throw new schematics_1.SchematicsException('Option "implements" is required.');
         }
         const implementations = options.implements
-            .map(implement => implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement)
+            .map((implement) => (implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement))
             .join(', ');
         const commonRouterNameImports = ['ActivatedRouteSnapshot', 'RouterStateSnapshot'];
         const routerNamedImports = [...options.implements, 'UrlTree'];
@@ -41,7 +41,7 @@ function default_1(options) {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            options.skipTests ? schematics_1.filter(path => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
+            options.skipTests ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
             schematics_1.applyTemplates({
                 implementations,
                 implementationImports,

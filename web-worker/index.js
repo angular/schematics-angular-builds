@@ -44,10 +44,11 @@ function addSnippet(options) {
             return;
         }
         const fileRegExp = new RegExp(`^${options.name}.*\.ts`);
-        const siblingModules = host.getDir(options.path).subfiles
-            // Find all files that start with the same name, are ts files,
+        const siblingModules = host
+            .getDir(options.path)
+            .subfiles // Find all files that start with the same name, are ts files,
             // and aren't spec or module files.
-            .filter(f => fileRegExp.test(f) && !/(module|spec)\.ts$/.test(f))
+            .filter((f) => fileRegExp.test(f) && !/(module|spec)\.ts$/.test(f))
             // Sort alphabetically for consistency.
             .sort();
         if (siblingModules.length === 0) {
@@ -96,7 +97,8 @@ function default_1(options) {
         if (!projectTarget) {
             throw new Error(`Target is not defined for this project.`);
         }
-        const projectTargetOptions = (projectTarget.options || {});
+        const projectTargetOptions = (projectTarget.options ||
+            {});
         if (options.path === undefined) {
             options.path = workspace_1.buildDefaultPath(project);
         }

@@ -18,10 +18,10 @@ const parse_name_1 = require("../utility/parse-name");
 const workspace_1 = require("../utility/workspace");
 const schema_1 = require("./schema");
 function buildRelativeModulePath(options, modulePath) {
-    const importModulePath = core_1.normalize(`/${options.path}/`
-        + (options.flat ? '' : core_1.strings.dasherize(options.name) + '/')
-        + core_1.strings.dasherize(options.name)
-        + '.module');
+    const importModulePath = core_1.normalize(`/${options.path}/` +
+        (options.flat ? '' : core_1.strings.dasherize(options.name) + '/') +
+        core_1.strings.dasherize(options.name) +
+        '.module');
     return find_module_1.buildRelativePath(modulePath, importModulePath);
 }
 function addDeclarationToNgModule(options) {
@@ -107,10 +107,10 @@ function default_1(options) {
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             options.routing || (isLazyLoadedModuleGen && routingModulePath)
                 ? schematics_1.noop()
-                : schematics_1.filter(path => !path.endsWith('-routing.module.ts.template')),
+                : schematics_1.filter((path) => !path.endsWith('-routing.module.ts.template')),
             schematics_1.applyTemplates({
                 ...core_1.strings,
-                'if-flat': (s) => options.flat ? '' : s,
+                'if-flat': (s) => (options.flat ? '' : s),
                 lazyRoute: isLazyLoadedModuleGen,
                 lazyRouteWithoutRouteModule: isLazyLoadedModuleGen && !routingModulePath,
                 lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
@@ -131,9 +131,7 @@ function default_1(options) {
             !isLazyLoadedModuleGen ? addDeclarationToNgModule(options) : schematics_1.noop(),
             addRouteDeclarationToNgModule(options, routingModulePath),
             schematics_1.mergeWith(templateSource),
-            isLazyLoadedModuleGen
-                ? schematics_1.schematic('component', componentOptions)
-                : schematics_1.noop(),
+            isLazyLoadedModuleGen ? schematics_1.schematic('component', componentOptions) : schematics_1.noop(),
             options.lintFix ? lint_fix_1.applyLintFix(options.path) : schematics_1.noop(),
         ]);
     };

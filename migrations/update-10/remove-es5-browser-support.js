@@ -69,10 +69,7 @@ async function isES5SupportNeeded(projectRoot) {
     // n: feature is unavailable
     // a: feature is partially supported
     // x: feature is prefixed
-    const criteria = [
-        'y',
-        'a',
-    ];
+    const criteria = ['y', 'a'];
     try {
         // tslint:disable-next-line:no-implicit-dependencies
         const browserslist = await Promise.resolve().then(() => require('browserslist'));
@@ -82,8 +79,7 @@ async function isES5SupportNeeded(projectRoot) {
         // tslint:disable-next-line:no-implicit-dependencies
         const { feature, features } = await Promise.resolve().then(() => require('caniuse-lite'));
         const data = feature(features['es6-module']);
-        return supportedBrowsers
-            .some(browser => {
+        return supportedBrowsers.some((browser) => {
             const [agentId, version] = browser.split(' ');
             const browserData = data.stats[agentId];
             const featureStatus = (browserData && browserData[version]);

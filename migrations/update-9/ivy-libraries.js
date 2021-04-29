@@ -21,7 +21,7 @@ const workspace_models_1 = require("../../utility/workspace-models");
  * - Create a prod tsconfig for which disables Ivy and enables VE compilations.
  */
 function updateLibraries() {
-    return workspace_1.updateWorkspace(workspace => {
+    return workspace_1.updateWorkspace((workspace) => {
         const followupRules = [];
         for (const [, project] of workspace.projects) {
             if (typeof project.root !== 'string') {

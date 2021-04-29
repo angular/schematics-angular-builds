@@ -36,7 +36,7 @@ function addDependenciesToPackageJson(options) {
                 name: 'typescript',
                 version: latest_versions_1.latestVersions.TypeScript,
             },
-        ].forEach(dependency => dependencies_1.addPackageJsonDependency(host, dependency));
+        ].forEach((dependency) => dependencies_1.addPackageJsonDependency(host, dependency));
         if (!options.skipInstall) {
             context.addTask(new tasks_1.NodePackageInstallTask());
         }
@@ -50,10 +50,10 @@ function addAppToWorkspaceFile(options, appDir) {
         projectRoot += '/';
     }
     const schematics = {};
-    if (options.inlineTemplate
-        || options.inlineStyle
-        || options.minimal
-        || options.style !== schema_1.Style.Css) {
+    if (options.inlineTemplate ||
+        options.inlineStyle ||
+        options.minimal ||
+        options.style !== schema_1.Style.Css) {
         const componentSchematicsOptions = {};
         if ((_a = options.inlineTemplate) !== null && _a !== void 0 ? _a : options.minimal) {
             componentSchematicsOptions.inlineTemplate = true;
@@ -67,7 +67,16 @@ function addAppToWorkspaceFile(options, appDir) {
         schematics['@schematics/angular:component'] = componentSchematicsOptions;
     }
     if (options.skipTests || options.minimal) {
-        ['class', 'component', 'directive', 'guard', 'interceptor', 'module', 'pipe', 'service'].forEach((type) => {
+        [
+            'class',
+            'component',
+            'directive',
+            'guard',
+            'interceptor',
+            'module',
+            'pipe',
+            'service',
+        ].forEach((type) => {
             if (!(`@schematics/angular:${type}` in schematics)) {
                 schematics[`@schematics/angular:${type}`] = {};
             }
@@ -110,9 +119,7 @@ function addAppToWorkspaceFile(options, appDir) {
             },
         ];
     }
-    const inlineStyleLanguage = (options === null || options === void 0 ? void 0 : options.style) !== schema_1.Style.Css
-        ? options.style
-        : undefined;
+    const inlineStyleLanguage = (options === null || options === void 0 ? void 0 : options.style) !== schema_1.Style.Css ? options.style : undefined;
     const project = {
         root: core_1.normalize(projectRoot),
         sourceRoot,
@@ -130,22 +137,19 @@ function addAppToWorkspaceFile(options, appDir) {
                     polyfills: `${sourceRoot}/polyfills.ts`,
                     tsConfig: `${projectRoot}tsconfig.app.json`,
                     inlineStyleLanguage,
-                    assets: [
-                        `${sourceRoot}/favicon.ico`,
-                        `${sourceRoot}/assets`,
-                    ],
-                    styles: [
-                        `${sourceRoot}/styles.${options.style}`,
-                    ],
+                    assets: [`${sourceRoot}/favicon.ico`, `${sourceRoot}/assets`],
+                    styles: [`${sourceRoot}/styles.${options.style}`],
                     scripts: [],
                 },
                 configurations: {
                     production: {
                         budgets,
-                        fileReplacements: [{
+                        fileReplacements: [
+                            {
                                 replace: `${sourceRoot}/environments/environment.ts`,
                                 with: `${sourceRoot}/environments/environment.prod.ts`,
-                            }],
+                            },
+                        ],
                         outputHashing: 'all',
                     },
                     development: {
@@ -177,27 +181,24 @@ function addAppToWorkspaceFile(options, appDir) {
                     browserTarget: `${options.name}:build`,
                 },
             },
-            test: options.minimal ? undefined : {
-                builder: workspace_models_1.Builders.Karma,
-                options: {
-                    main: `${sourceRoot}/test.ts`,
-                    polyfills: `${sourceRoot}/polyfills.ts`,
-                    tsConfig: `${projectRoot}tsconfig.spec.json`,
-                    karmaConfig: `${projectRoot}karma.conf.js`,
-                    inlineStyleLanguage,
-                    assets: [
-                        `${sourceRoot}/favicon.ico`,
-                        `${sourceRoot}/assets`,
-                    ],
-                    styles: [
-                        `${sourceRoot}/styles.${options.style}`,
-                    ],
-                    scripts: [],
+            test: options.minimal
+                ? undefined
+                : {
+                    builder: workspace_models_1.Builders.Karma,
+                    options: {
+                        main: `${sourceRoot}/test.ts`,
+                        polyfills: `${sourceRoot}/polyfills.ts`,
+                        tsConfig: `${projectRoot}tsconfig.spec.json`,
+                        karmaConfig: `${projectRoot}karma.conf.js`,
+                        inlineStyleLanguage,
+                        assets: [`${sourceRoot}/favicon.ico`, `${sourceRoot}/assets`],
+                        styles: [`${sourceRoot}/styles.${options.style}`],
+                        scripts: [],
+                    },
                 },
-            },
         },
     };
-    return workspace_1.updateWorkspace(workspace => {
+    return workspace_1.updateWorkspace((workspace) => {
         if (workspace.projects.size === 0) {
             workspace.extensions.defaultProject = options.name;
         }
@@ -219,15 +220,15 @@ function default_1(options) {
         }
         validation_1.validateProjectName(options.name);
         const appRootSelector = `${options.prefix}-root`;
-        const componentOptions = !options.minimal ?
-            {
+        const componentOptions = !options.minimal
+            ? {
                 inlineStyle: options.inlineStyle,
                 inlineTemplate: options.inlineTemplate,
                 skipTests: options.skipTests,
                 style: options.style,
                 viewEncapsulation: options.viewEncapsulation,
-            } :
-            {
+            }
+            : {
                 inlineStyle: (_a = options.inlineStyle) !== null && _a !== void 0 ? _a : true,
                 inlineTemplate: (_b = options.inlineTemplate) !== null && _b !== void 0 ? _b : true,
                 skipTests: true,
@@ -273,14 +274,12 @@ function default_1(options) {
                 ...componentOptions,
             }),
             schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./other-files'), [
-                options.strict
-                    ? schematics_1.noop()
-                    : schematics_1.filter(path => path !== '/package.json.template'),
+                options.strict ? schematics_1.noop() : schematics_1.filter((path) => path !== '/package.json.template'),
                 componentOptions.inlineTemplate
-                    ? schematics_1.filter(path => !path.endsWith('.html.template'))
+                    ? schematics_1.filter((path) => !path.endsWith('.html.template'))
                     : schematics_1.noop(),
                 componentOptions.skipTests
-                    ? schematics_1.filter(path => !path.endsWith('.spec.ts.template'))
+                    ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template'))
                     : schematics_1.noop(),
                 schematics_1.applyTemplates({
                     utils: core_1.strings,
