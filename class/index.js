@@ -17,7 +17,7 @@ function default_1(options) {
         if (options.path === undefined) {
             options.path = await workspace_1.createDefaultPath(host, options.project);
         }
-        options.type = !!options.type ? `.${options.type}` : '';
+        options.type = options.type ? `.${options.type}` : '';
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;

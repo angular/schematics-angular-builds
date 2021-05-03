@@ -21,7 +21,7 @@ function default_1(options) {
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         options.prefix = options.prefix ? options.prefix : '';
-        options.type = !!options.type ? `.${options.type}` : '';
+        options.type = options.type ? `.${options.type}` : '';
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             schematics_1.applyTemplates({
                 ...core_1.strings,

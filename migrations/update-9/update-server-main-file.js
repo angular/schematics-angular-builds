@@ -78,7 +78,7 @@ function updateServerMainFile() {
             const moduleSpecifier = ts.createStringLiteral('@angular/platform-server');
             // TypeScript will emit the Node with double quotes.
             // In schematics we usually write code with a single quotes
-            // tslint:disable-next-line: no-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             moduleSpecifier.singleQuote = true;
             const newExportDeclarationText = printer.printNode(ts.EmitHint.Unspecified, ts.createExportDeclaration(undefined, undefined, ts.createNamedExports(exportSpecifiers), moduleSpecifier), source);
             const recorder = tree.beginUpdate(mainFilePath);

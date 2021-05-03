@@ -168,7 +168,7 @@ function insertAfterLastOccurrence(nodes, toInsert, file, fallbackPos, syntaxKin
     return new change_1.InsertChange(file, lastItemPosition, toInsert);
 }
 exports.insertAfterLastOccurrence = insertAfterLastOccurrence;
-function _angularImportsFromNode(node, _sourceFile) {
+function _angularImportsFromNode(node) {
     const ms = node.moduleSpecifier;
     let modulePath;
     switch (ms.kind) {
@@ -214,7 +214,7 @@ function _angularImportsFromNode(node, _sourceFile) {
 }
 function getDecoratorMetadata(source, identifier, module) {
     const angularImports = findNodes(source, ts.isImportDeclaration)
-        .map((node) => _angularImportsFromNode(node, source))
+        .map((node) => _angularImportsFromNode(node))
         .reduce((acc, current) => {
         for (const key of Object.keys(current)) {
             acc[key] = current[key];
@@ -261,7 +261,7 @@ function getMetadataField(node, metadataField) {
 exports.getMetadataField = getMetadataField;
 function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbolName, importPath = null) {
     const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
-    let node = nodes[0]; // tslint:disable-line:no-any
+    let node = nodes[0]; // eslint-disable-line @typescript-eslint/no-explicit-any
     // Find the decorator declaration.
     if (!node) {
         return [];

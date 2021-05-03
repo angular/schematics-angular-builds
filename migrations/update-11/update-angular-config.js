@@ -47,7 +47,7 @@ function default_1() {
 exports.default = default_1;
 function updateLazyScriptsStyleOption(options) {
     function visitor(options, type) {
-        // tslint:disable-next-line: no-non-null-assertion
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         if (!options[type] || !core_1.isJsonArray(options[type])) {
             return undefined;
         }

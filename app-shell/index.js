@@ -65,8 +65,7 @@ function getBootstrapComponentPath(host, mainPath) {
     const moduleSource = getSourceFile(host, modulePath);
     const metadataNode = ast_utils_1.getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
     const bootstrapProperty = getMetadataProperty(metadataNode, 'bootstrap');
-    const arrLiteral = bootstrapProperty
-        .initializer;
+    const arrLiteral = bootstrapProperty.initializer;
     const componentSymbol = arrLiteral.elements[0].getText();
     const relativePath = ast_utils_1.getSourceNodes(moduleSource)
         .filter(ts.isImportDeclaration)
