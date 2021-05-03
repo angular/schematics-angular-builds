@@ -61,7 +61,7 @@ function default_1(options) {
                 }
             }
             if (!options.skipGit) {
-                const commit = typeof options.commit == 'object' ? options.commit : !!options.commit ? {} : false;
+                const commit = typeof options.commit == 'object' ? options.commit : options.commit ? {} : false;
                 context.addTask(new tasks_1.RepositoryInitializerTask(options.directory, commit), packageTask ? [packageTask] : []);
             }
         },

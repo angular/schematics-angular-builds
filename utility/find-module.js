@@ -15,6 +15,7 @@ exports.ROUTING_MODULE_EXT = '-routing.module.ts';
  * Find the module referred by a set of options passed to the schematics.
  */
 function findModuleFromOptions(host, options) {
+    // eslint-disable-next-line no-prototype-builtins
     if (options.hasOwnProperty('skipImport') && options.skipImport) {
         return undefined;
     }
