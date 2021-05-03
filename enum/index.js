@@ -20,7 +20,6 @@ function default_1(options) {
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
-        options.type = options.type ? `.${options.type}` : '';
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             schematics_1.applyTemplates({
                 ...core_1.strings,

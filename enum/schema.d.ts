@@ -20,8 +20,4 @@ export interface Schema {
      * project for the workspace.
      */
     project?: string;
-    /**
-     * Adds a developer-defined type to the filename, in the format "name.type.ts".
-     */
-    type?: string;
 }
