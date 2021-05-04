@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.latestVersions = void 0;
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -8,6 +6,8 @@ exports.latestVersions = void 0;
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.latestVersions = void 0;
 exports.latestVersions = {
     // These versions should be kept up to date with latest Angular peer dependencies.
     Angular: '~12.0.0-next.9',
