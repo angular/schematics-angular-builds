@@ -11,13 +11,13 @@ export interface Schema {
      */
     appId?: string;
     /**
-     * The name of the related client app.
-     */
-    clientProject: string;
-    /**
      * The name of the main entry-point file.
      */
     main?: string;
+    /**
+     * The name of the related client app.
+     */
+    project: string;
     /**
      * The name of the root module class.
      */

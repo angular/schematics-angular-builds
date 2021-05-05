@@ -11,13 +11,13 @@ export interface Schema {
      */
     appId?: string;
     /**
-     * The name of the related client app. Required in place of "project".
-     */
-    clientProject: string;
-    /**
      * The name of the main entry-point file.
      */
     main?: string;
+    /**
+     * The name of the project.
+     */
+    project: string;
     /**
      * The name of the root NgModule class.
      */
