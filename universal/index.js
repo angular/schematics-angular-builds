@@ -21,7 +21,7 @@ const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function updateConfigFile(options, tsConfigDirectory) {
     return workspace_1.updateWorkspace((workspace) => {
-        const clientProject = workspace.projects.get(options.project);
+        const clientProject = workspace.projects.get(options.clientProject);
         if (clientProject) {
             // In case the browser builder hashes the assets
             // we need to add this setting to the server builder
@@ -45,7 +45,7 @@ function updateConfigFile(options, tsConfigDirectory) {
             };
             const buildTarget = clientProject.targets.get('build');
             if (buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) {
-                buildTarget.options.outputPath = `dist/${options.project}/browser`;
+                buildTarget.options.outputPath = `dist/${options.clientProject}/browser`;
             }
             const buildConfigurations = buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.configurations;
             const configurations = {};
@@ -61,7 +61,7 @@ function updateConfigFile(options, tsConfigDirectory) {
                 builder: workspace_models_1.Builders.Server,
                 defaultConfiguration: 'production',
                 options: {
-                    outputPath: `dist/${options.project}/server`,
+                    outputPath: `dist/${options.clientProject}/server`,
                     main: core_1.join(core_1.normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
                     tsConfig: serverTsConfig,
                     ...((buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) ? getServerOptions(buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) : {}),
@@ -174,7 +174,7 @@ function addDependencies() {
 function default_1(options) {
     return async (host, context) => {
         const workspace = await workspace_1.getWorkspace(host);
-        const clientProject = workspace.projects.get(options.project);
+        const clientProject = workspace.projects.get(options.clientProject);
         if (!clientProject || clientProject.extensions.projectType !== 'application') {
             throw new schematics_1.SchematicsException(`Universal requires a project type of "application".`);
         }
