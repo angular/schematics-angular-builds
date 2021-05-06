@@ -110,7 +110,7 @@ function addAppShellConfigToWorkspace(options) {
         }
         return workspace_1.updateWorkspace((workspace) => {
             var _a, _b, _c, _d;
-            const project = workspace.projects.get(options.clientProject);
+            const project = workspace.projects.get(options.project);
             if (!project) {
                 return;
             }
@@ -133,8 +133,8 @@ function addAppShellConfigToWorkspace(options) {
                     continue;
                 }
                 configurations[key] = {
-                    browserTarget: `${options.clientProject}:build:${key}`,
-                    serverTarget: `${options.clientProject}:server:${key}`,
+                    browserTarget: `${options.project}:build:${key}`,
+                    serverTarget: `${options.project}:server:${key}`,
                 };
             }
             project.targets.add({
@@ -178,7 +178,7 @@ function addServerRoutes(options) {
     return async (host) => {
         // The workspace gets updated so this needs to be reloaded
         const workspace = await workspace_1.getWorkspace(host);
-        const clientProject = workspace.projects.get(options.clientProject);
+        const clientProject = workspace.projects.get(options.project);
         if (!clientProject) {
             throw new Error('Universal schematic removed client project.');
         }
@@ -228,14 +228,14 @@ function addShellComponent(options) {
     const componentOptions = {
         name: 'app-shell',
         module: options.rootModuleFileName,
-        project: options.clientProject,
+        project: options.project,
     };
     return schematics_1.schematic('component', componentOptions);
 }
 function default_1(options) {
     return async (tree) => {
         const workspace = await workspace_1.getWorkspace(tree);
-        const clientProject = workspace.projects.get(options.clientProject);
+        const clientProject = workspace.projects.get(options.project);
         if (!clientProject || clientProject.extensions.projectType !== 'application') {
             throw new schematics_1.SchematicsException(`A client project type of "application" is required.`);
         }
