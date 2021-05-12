@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.latestVersions = void 0;
 exports.latestVersions = {
     // These versions should be kept up to date with latest Angular peer dependencies.
-    Angular: '~12.0.0-rc.2',
+    Angular: '~12.0.0',
     RxJs: '~6.6.0',
     ZoneJs: '~0.11.4',
     TypeScript: '~4.2.3',
@@ -19,5 +19,5 @@ exports.latestVersions = {
     // published together from the same monorepo, and they are both
     // non-experimental, they will always have the same version.
     DevkitBuildAngular: '~' + require('../package.json')['version'],
-    ngPackagr: '^12.0.0-next.8',
+    ngPackagr: '^12.0.0',
 };
