@@ -46,6 +46,13 @@ function default_1() {
 }
 exports.default = default_1;
 function updateOptions(target, optionsToUpdate) {
+    // This is a hacky way to make this migration idempotent.
+    // `defaultConfiguration` was only introduced in v12 projects and hence v11 projects do not have this property.
+    // Setting it as an empty string will not cause any side-effect.
+    if (typeof target.defaultConfiguration === 'string') {
+        return;
+    }
+    target.defaultConfiguration = '';
     if (!target.options) {
         target.options = {};
     }
