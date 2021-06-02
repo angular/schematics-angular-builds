@@ -78,7 +78,7 @@ function default_1(options) {
         const workspace = await workspace_1.getWorkspace(host);
         const project = workspace.projects.get(options.project);
         if (!project) {
-            throw new schematics_1.SchematicsException(`Invalid project name (${options.project})`);
+            throw new schematics_1.SchematicsException(`Project "${options.project}" does not exist.`);
         }
         if (options.path === undefined) {
             options.path = workspace_1.buildDefaultPath(project);
