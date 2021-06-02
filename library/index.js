@@ -149,7 +149,7 @@ function default_1(options) {
                 commonModule: false,
                 flat: true,
                 path: sourceDir,
-                project: options.name,
+                project: projectName,
             }),
             schematics_1.schematic('component', {
                 name: options.name,
@@ -159,13 +159,13 @@ function default_1(options) {
                 flat: true,
                 path: sourceDir,
                 export: true,
-                project: options.name,
+                project: projectName,
             }),
             schematics_1.schematic('service', {
                 name: options.name,
                 flat: true,
                 path: sourceDir,
-                project: options.name,
+                project: projectName,
             }),
             options.lintFix ? lint_fix_1.applyLintFix(sourceDir) : schematics_1.noop(),
             (_tree, context) => {
