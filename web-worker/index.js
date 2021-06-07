@@ -97,8 +97,7 @@ function default_1(options) {
         if (!projectTarget) {
             throw new Error(`Target is not defined for this project.`);
         }
-        const projectTargetOptions = (projectTarget.options ||
-            {});
+        const projectTargetOptions = (projectTarget.options || {});
         if (options.path === undefined) {
             options.path = workspace_1.buildDefaultPath(project);
         }
@@ -110,6 +109,16 @@ function default_1(options) {
         if (needWebWorkerConfig) {
             const workerConfigPath = core_1.join(core_1.normalize(root), 'tsconfig.worker.json');
             projectTargetOptions.webWorkerTsConfig = workerConfigPath;
+        }
+        const projectTestTarget = project.targets.get('test');
+        if (projectTestTarget) {
+            const projectTestTargetOptions = (projectTestTarget.options ||
+                {});
+            const needWebWorkerConfig = !projectTestTargetOptions.webWorkerTsConfig;
+            if (needWebWorkerConfig) {
+                const workerConfigPath = core_1.join(core_1.normalize(root), 'tsconfig.worker.json');
+                projectTestTargetOptions.webWorkerTsConfig = workerConfigPath;
+            }
         }
         const templateSource = schematics_1.apply(schematics_1.url('./files/worker'), [
             schematics_1.applyTemplates({ ...options, ...core_1.strings }),
