@@ -9,34 +9,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const json_file_1 = require("../utility/json-file");
 const parse_name_1 = require("../utility/parse-name");
 const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
-function addConfig(options, root, tsConfigPath) {
-    return (host, context) => {
-        context.logger.debug('updating project configuration.');
-        // Add worker glob exclusion to tsconfig.app.json.
-        // Projects pre version 8 should to have tsconfig.app.json inside their application
-        const isInSrc = core_1.dirname(core_1.normalize(tsConfigPath)).endsWith('src');
-        const workerGlob = `${isInSrc ? '' : 'src/'}**/*.worker.ts`;
-        try {
-            const json = new json_file_1.JSONFile(host, tsConfigPath);
-            const exclude = json.get(['exclude']);
-            if (exclude && Array.isArray(exclude) && !exclude.includes(workerGlob)) {
-                json.modify(['exclude'], [...exclude, workerGlob]);
-            }
-        }
-        catch { }
-        return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [
-            schematics_1.applyTemplates({
-                ...options,
-                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(root),
-            }),
-            schematics_1.move(root),
-        ]));
-    };
-}
 function addSnippet(options) {
     return (host, context) => {
         context.logger.debug('Updating appmodule');
@@ -82,9 +57,6 @@ function default_1(options) {
         if (!options.project) {
             throw new schematics_1.SchematicsException('Option "project" is required.');
         }
-        if (!options.target) {
-            throw new schematics_1.SchematicsException('Option "target" is required.');
-        }
         const project = workspace.projects.get(options.project);
         if (!project) {
             throw new schematics_1.SchematicsException(`Invalid project name (${options.project})`);
@@ -93,45 +65,47 @@ function default_1(options) {
         if (projectType !== 'application') {
             throw new schematics_1.SchematicsException(`Web Worker requires a project type of "application".`);
         }
-        const projectTarget = project.targets.get(options.target);
-        if (!projectTarget) {
-            throw new Error(`Target is not defined for this project.`);
-        }
-        const projectTargetOptions = (projectTarget.options || {});
         if (options.path === undefined) {
             options.path = workspace_1.buildDefaultPath(project);
         }
         const parsedPath = parse_name_1.parseName(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
-        const root = project.root || '';
-        const needWebWorkerConfig = !projectTargetOptions.webWorkerTsConfig;
-        if (needWebWorkerConfig) {
-            const workerConfigPath = core_1.join(core_1.normalize(root), 'tsconfig.worker.json');
-            projectTargetOptions.webWorkerTsConfig = workerConfigPath;
-        }
-        const projectTestTarget = project.targets.get('test');
-        if (projectTestTarget) {
-            const projectTestTargetOptions = (projectTestTarget.options ||
-                {});
-            const needWebWorkerConfig = !projectTestTargetOptions.webWorkerTsConfig;
-            if (needWebWorkerConfig) {
-                const workerConfigPath = core_1.join(core_1.normalize(root), 'tsconfig.worker.json');
-                projectTestTargetOptions.webWorkerTsConfig = workerConfigPath;
-            }
-        }
-        const templateSource = schematics_1.apply(schematics_1.url('./files/worker'), [
+        const templateSourceWorkerCode = schematics_1.apply(schematics_1.url('./files/worker'), [
             schematics_1.applyTemplates({ ...options, ...core_1.strings }),
             schematics_1.move(parsedPath.path),
         ]);
+        const root = project.root || '';
+        const templateSourceWorkerConfig = schematics_1.apply(schematics_1.url('./files/worker-tsconfig'), [
+            schematics_1.applyTemplates({
+                ...options,
+                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(root),
+            }),
+            schematics_1.move(root),
+        ]);
         return schematics_1.chain([
             // Add project configuration.
-            needWebWorkerConfig ? addConfig(options, root, projectTargetOptions.tsConfig) : schematics_1.noop(),
-            needWebWorkerConfig ? workspace_1.updateWorkspace(workspace) : schematics_1.noop(),
+            workspace_1.updateWorkspace((workspace) => {
+                var _a, _b, _c, _d;
+                var _e, _f;
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                const project = workspace.projects.get(options.project);
+                const buildTarget = project.targets.get('build');
+                const testTarget = project.targets.get('test');
+                if (!buildTarget) {
+                    throw new Error(`Build target is not defined for this project.`);
+                }
+                const workerConfigPath = core_1.join(core_1.normalize(root), 'tsconfig.worker.json');
+                (_b = (_e = ((_a = buildTarget.options) !== null && _a !== void 0 ? _a : (buildTarget.options = {}))).webWorkerTsConfig) !== null && _b !== void 0 ? _b : (_e.webWorkerTsConfig = workerConfigPath);
+                if (testTarget) {
+                    (_d = (_f = ((_c = testTarget.options) !== null && _c !== void 0 ? _c : (testTarget.options = {}))).webWorkerTsConfig) !== null && _d !== void 0 ? _d : (_f.webWorkerTsConfig = workerConfigPath);
+                }
+            }),
             // Create the worker in a sibling module.
             options.snippet ? addSnippet(options) : schematics_1.noop(),
             // Add the worker.
-            schematics_1.mergeWith(templateSource),
+            schematics_1.mergeWith(templateSourceWorkerCode),
+            schematics_1.mergeWith(templateSourceWorkerConfig),
         ]);
     };
 }

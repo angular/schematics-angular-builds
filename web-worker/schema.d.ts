@@ -20,6 +20,7 @@ export interface Schema {
     snippet?: boolean;
     /**
      * The target to apply web worker to.
+     * @deprecated No longer has an effect.
      */
     target?: string;
 }
