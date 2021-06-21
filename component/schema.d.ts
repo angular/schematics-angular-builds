@@ -71,7 +71,8 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
-     * The file extension or preprocessor to use for style files.
+     * The file extension or preprocessor to use for style files, or 'none' to skip generating
+     * the style file.
      */
     style?: Style;
     /**
@@ -91,11 +92,13 @@ export declare enum ChangeDetection {
     OnPush = "OnPush"
 }
 /**
- * The file extension or preprocessor to use for style files.
+ * The file extension or preprocessor to use for style files, or 'none' to skip generating
+ * the style file.
  */
 export declare enum Style {
     Css = "css",
     Less = "less",
+    None = "none",
     Sass = "sass",
     Scss = "scss"
 }

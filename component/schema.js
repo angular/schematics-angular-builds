@@ -12,12 +12,14 @@ var ChangeDetection;
     ChangeDetection["OnPush"] = "OnPush";
 })(ChangeDetection = exports.ChangeDetection || (exports.ChangeDetection = {}));
 /**
- * The file extension or preprocessor to use for style files.
+ * The file extension or preprocessor to use for style files, or 'none' to skip generating
+ * the style file.
  */
 var Style;
 (function (Style) {
     Style["Css"] = "css";
     Style["Less"] = "less";
+    Style["None"] = "none";
     Style["Sass"] = "sass";
     Style["Scss"] = "scss";
 })(Style = exports.Style || (exports.Style = {}));

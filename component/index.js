@@ -36,6 +36,7 @@ const lint_fix_1 = require("../utility/lint-fix");
 const parse_name_1 = require("../utility/parse-name");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
+const schema_1 = require("./schema");
 function readIntoSourceFile(host, modulePath) {
     const text = host.read(modulePath);
     if (text === null) {
@@ -110,9 +111,10 @@ function default_1(options) {
             options.selector || buildSelector(options, (project && project.prefix) || '');
         validation_1.validateName(options.name);
         validation_1.validateHtmlSelector(options.selector);
+        const skipStyleFile = options.inlineStyle || options.style === schema_1.Style.None;
         const templateSource = schematics_1.apply(schematics_1.url('./files'), [
             options.skipTests ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
-            options.inlineStyle ? schematics_1.filter((path) => !path.endsWith('.__style__.template')) : schematics_1.noop(),
+            skipStyleFile ? schematics_1.filter((path) => !path.endsWith('.__style__.template')) : schematics_1.noop(),
             options.inlineTemplate ? schematics_1.filter((path) => !path.endsWith('.html.template')) : schematics_1.noop(),
             schematics_1.applyTemplates({
                 ...core_1.strings,
