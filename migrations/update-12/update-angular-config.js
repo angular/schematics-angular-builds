@@ -7,7 +7,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@angular-devkit/core");
 const workspace_1 = require("../../utility/workspace");
 const BrowserBuilderOptions = [
     ['aot', false, true],
@@ -23,15 +22,9 @@ const ServerBuilderOptions = [
     ['optimization', false, true],
 ];
 function default_1() {
-    return (_tree, context) => workspace_1.updateWorkspace((workspace) => {
-        for (const [targetName, target, projectName] of workspace_1.allWorkspaceTargets(workspace)) {
-            if (!target.builder.startsWith('@angular-devkit/') &&
-                !target.builder.startsWith('@nguniversal/')) {
-                context.logger.warn(core_1.tags.stripIndent `
-            "${targetName}" target in "${projectName}" project is using a third-party builder.
-            You may need to adjust the options to retain the existing behavior.
-            For more information, see the breaking changes section within the release notes: https://github.com/angular/angular-cli/releases/tag/v12.0.0
-          `);
+    return workspace_1.updateWorkspace((workspace) => {
+        for (const [, target] of workspace_1.allWorkspaceTargets(workspace)) {
+            if (!(target === null || target === void 0 ? void 0 : target.builder.startsWith('@angular-devkit/build-angular'))) {
                 continue;
             }
             // Only interested in Angular Devkit browser and server builders
