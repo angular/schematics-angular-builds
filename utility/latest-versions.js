@@ -19,5 +19,5 @@ exports.latestVersions = {
     // published together from the same monorepo, and they are both
     // non-experimental, they will always have the same version.
     DevkitBuildAngular: '~' + require('../package.json')['version'],
-    ngPackagr: '^12.1.0',
+    ngPackagr: '^12.1.0-next.0',
 };
