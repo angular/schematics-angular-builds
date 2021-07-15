@@ -7,32 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@angular-devkit/core");
-const schematics_1 = require("@angular-devkit/schematics");
-const lint_fix_1 = require("../utility/lint-fix");
-const parse_name_1 = require("../utility/parse-name");
-const workspace_1 = require("../utility/workspace");
+const generate_from_files_1 = require("../utility/generate-from-files");
 function default_1(options) {
-    return async (host) => {
-        if (options.path === undefined) {
-            options.path = await workspace_1.createDefaultPath(host, options.project);
-        }
-        const parsedPath = parse_name_1.parseName(options.path, options.name);
-        options.name = parsedPath.name;
-        options.path = parsedPath.path;
-        options.prefix = options.prefix ? options.prefix : '';
-        options.type = options.type ? `.${options.type}` : '';
-        const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            schematics_1.applyTemplates({
-                ...core_1.strings,
-                ...options,
-            }),
-            schematics_1.move(parsedPath.path),
-        ]);
-        return schematics_1.chain([
-            schematics_1.mergeWith(templateSource),
-            options.lintFix ? lint_fix_1.applyLintFix(options.path) : schematics_1.noop(),
-        ]);
-    };
+    options.type = options.type ? `.${options.type}` : '';
+    return generate_from_files_1.generateFromFiles(options);
 }
 exports.default = default_1;
