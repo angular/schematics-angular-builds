@@ -9,15 +9,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.latestVersions = void 0;
 exports.latestVersions = {
+    // We could have used TypeScripts' `resolveJsonModule` to make the `latestVersion` object typesafe,
+    // but ts_library doesn't support JSON inputs.
+    ...require('./latest-versions/package.json')['dependencies'],
     // These versions should be kept up to date with latest Angular peer dependencies.
     Angular: '~12.2.0-next.2',
-    RxJs: '~6.6.0',
-    ZoneJs: '~0.11.4',
-    TypeScript: '~4.3.2',
-    TsLib: '^2.2.0',
     // Since @angular-devkit/build-angular and @schematics/angular are always
     // published together from the same monorepo, and they are both
     // non-experimental, they will always have the same version.
     DevkitBuildAngular: '~' + require('../package.json')['version'],
-    ngPackagr: '^12.1.0',
 };

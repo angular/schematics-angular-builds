@@ -21,7 +21,7 @@ function default_1() {
             'karma-jasmine': '~4.0.0',
             'karma-jasmine-html-reporter': '^1.5.0',
             'protractor': '~7.0.0',
-            'ng-packagr': latest_versions_1.latestVersions.ngPackagr,
+            'ng-packagr': latest_versions_1.latestVersions['ng-packagr'],
             'tslib': '^2.0.0',
         };
         let hasChanges = false;

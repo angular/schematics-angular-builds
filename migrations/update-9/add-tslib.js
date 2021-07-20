@@ -18,7 +18,7 @@ function addTsLib() {
         }
         dependencies_1.addPackageJsonDependency(host, {
             name: 'tslib',
-            version: latest_versions_1.latestVersions.TsLib,
+            version: latest_versions_1.latestVersions['tslib'],
             type: dependencies_1.NodeDependencyType.Default,
             overwrite: true,
         });

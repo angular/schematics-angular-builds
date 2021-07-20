@@ -34,7 +34,7 @@ function addDependenciesToPackageJson(options) {
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: 'typescript',
-                version: latest_versions_1.latestVersions.TypeScript,
+                version: latest_versions_1.latestVersions['typescript'],
             },
         ].forEach((dependency) => dependencies_1.addPackageJsonDependency(host, dependency));
         if (!options.skipInstall) {

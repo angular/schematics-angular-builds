@@ -45,17 +45,17 @@ function addDependenciesToPackageJson() {
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: 'ng-packagr',
-                version: latest_versions_1.latestVersions.ngPackagr,
+                version: latest_versions_1.latestVersions['ng-packagr'],
             },
             {
                 type: dependencies_1.NodeDependencyType.Default,
                 name: 'tslib',
-                version: latest_versions_1.latestVersions.TsLib,
+                version: latest_versions_1.latestVersions['tslib'],
             },
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: 'typescript',
-                version: latest_versions_1.latestVersions.TypeScript,
+                version: latest_versions_1.latestVersions['typescript'],
             },
         ].forEach((dependency) => dependencies_1.addPackageJsonDependency(host, dependency));
         return host;
@@ -133,8 +133,8 @@ function default_1(options) {
                 distRoot,
                 relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(projectRoot),
                 prefix,
-                angularLatestVersion: latest_versions_1.latestVersions.Angular.replace('~', '').replace('^', ''),
-                tsLibLatestVersion: latest_versions_1.latestVersions.TsLib.replace('~', '').replace('^', ''),
+                angularLatestVersion: latest_versions_1.latestVersions.Angular.replace(/\~|\^/, ''),
+                tsLibLatestVersion: latest_versions_1.latestVersions['tslib'].replace(/\~|\^/, ''),
                 folderName,
             }),
             schematics_1.move(projectRoot),
