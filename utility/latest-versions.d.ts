@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export declare const latestVersions: {
-    Angular: string;
     RxJs: string;
     ZoneJs: string;
     TypeScript: string;
     TsLib: string;
+    Angular: string;
     DevkitBuildAngular: string;
     ngPackagr: string;
 };
