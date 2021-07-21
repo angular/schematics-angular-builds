@@ -8,12 +8,23 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.latestVersions = void 0;
+/** Retrieve the minor version for the provided version string. */
+function getEarliestMinorVersion(version) {
+    const versionMatching = version.match(/^(\d+)\.(\d+)\.*/);
+    if (versionMatching === null) {
+        throw Error('Unable to determine the minor version for the provided version');
+    }
+    const [_, major, minor] = versionMatching;
+    return `${major}.${minor}.0`;
+}
 exports.latestVersions = {
     // We could have used TypeScripts' `resolveJsonModule` to make the `latestVersion` object typesafe,
     // but ts_library doesn't support JSON inputs.
     ...require('./latest-versions/package.json')['dependencies'],
-    // These versions should be kept up to date with latest Angular peer dependencies.
-    Angular: '~12.2.0-next.2',
+    // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
+    // Angular CLI minor version with earliest prerelease (appended with `-`) will match the latest
+    // Angular Framework minor.
+    Angular: `~${getEarliestMinorVersion(require('../package.json')['version'])}-`,
     // Since @angular-devkit/build-angular and @schematics/angular are always
     // published together from the same monorepo, and they are both
     // non-experimental, they will always have the same version.
