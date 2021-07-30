@@ -41,7 +41,6 @@ function default_1(options) {
         skipInstall: true,
         strict: options.strict,
         minimal: options.minimal,
-        legacyBrowsers: options.legacyBrowsers || undefined,
     };
     return schematics_1.chain([
         schematics_1.mergeWith(schematics_1.apply(schematics_1.empty(), [

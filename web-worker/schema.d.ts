@@ -18,9 +18,4 @@ export interface Schema {
      * Add a worker creation snippet in a sibling file of the same name.
      */
     snippet?: boolean;
-    /**
-     * The target to apply web worker to.
-     * @deprecated No longer has an effect.
-     */
-    target?: string;
 }

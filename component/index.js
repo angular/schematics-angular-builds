@@ -32,7 +32,6 @@ const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
 const find_module_1 = require("../utility/find-module");
-const lint_fix_1 = require("../utility/lint-fix");
 const parse_name_1 = require("../utility/parse-name");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
@@ -133,11 +132,7 @@ function default_1(options) {
                 : schematics_1.noop(),
             schematics_1.move(parsedPath.path),
         ]);
-        return schematics_1.chain([
-            addDeclarationToNgModule(options),
-            schematics_1.mergeWith(templateSource),
-            options.lintFix ? lint_fix_1.applyLintFix(options.path) : schematics_1.noop(),
-        ]);
+        return schematics_1.chain([addDeclarationToNgModule(options), schematics_1.mergeWith(templateSource)]);
     };
 }
 exports.default = default_1;

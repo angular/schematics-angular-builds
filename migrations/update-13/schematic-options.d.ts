@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { Rule } from '@angular-devkit/schematics';
-export declare function applyLintFix(path?: string): Rule;
+export default function (): Rule;
