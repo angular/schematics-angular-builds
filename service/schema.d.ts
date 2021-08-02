@@ -7,6 +7,11 @@ export interface Schema {
      */
     flat?: boolean;
     /**
+     * Apply lint fixes after generating the service.
+     * @deprecated Use "ng lint --fix" directly instead.
+     */
+    lintFix?: boolean;
+    /**
      * The name of the service.
      */
     name: string;

@@ -8,6 +8,7 @@
 import { Rule } from '@angular-devkit/schematics';
 export interface GenerateFromFilesOptions {
     flat?: boolean;
+    lintFix?: boolean;
     name: string;
     path?: string;
     prefix?: string;

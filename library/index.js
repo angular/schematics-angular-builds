@@ -13,6 +13,7 @@ const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../utility/dependencies");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
+const lint_fix_1 = require("../utility/lint-fix");
 const paths_1 = require("../utility/paths");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
@@ -166,6 +167,7 @@ function default_1(options) {
                 path: sourceDir,
                 project: projectName,
             }),
+            options.lintFix ? lint_fix_1.applyLintFix(sourceDir) : schematics_1.noop(),
             (_tree, context) => {
                 if (!options.skipPackageJson && !options.skipInstall) {
                     context.addTask(new tasks_1.NodePackageInstallTask());

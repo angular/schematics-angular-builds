@@ -12,6 +12,7 @@ const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../utility/dependencies");
 const latest_versions_1 = require("../utility/latest-versions");
+const lint_fix_1 = require("../utility/lint-fix");
 const paths_1 = require("../utility/paths");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
@@ -280,6 +281,7 @@ function default_1(options) {
                 schematics_1.move(sourceDir),
             ]), schematics_1.MergeStrategy.Overwrite),
             options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(options),
+            options.lintFix ? lint_fix_1.applyLintFix(appDir) : schematics_1.noop(),
         ]);
     };
 }

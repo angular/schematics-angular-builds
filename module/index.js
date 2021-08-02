@@ -32,6 +32,7 @@ const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
 const find_module_1 = require("../utility/find-module");
+const lint_fix_1 = require("../utility/lint-fix");
 const parse_name_1 = require("../utility/parse-name");
 const workspace_1 = require("../utility/workspace");
 const schema_1 = require("./schema");
@@ -150,6 +151,7 @@ function default_1(options) {
             addRouteDeclarationToNgModule(options, routingModulePath),
             schematics_1.mergeWith(templateSource),
             isLazyLoadedModuleGen ? schematics_1.schematic('component', componentOptions) : schematics_1.noop(),
+            options.lintFix ? lint_fix_1.applyLintFix(options.path) : schematics_1.noop(),
         ]);
     };
 }
