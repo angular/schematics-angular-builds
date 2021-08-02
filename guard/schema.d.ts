@@ -11,11 +11,6 @@ export interface Schema {
      */
     implements?: Implement[];
     /**
-     * Apply lint fixes after generating the guard.
-     * @deprecated Use "ng lint --fix" directly instead.
-     */
-    lintFix?: boolean;
-    /**
      * The name of the new route guard.
      */
     name: string;

@@ -3,11 +3,6 @@
  */
 export interface Schema {
     /**
-     * Apply lint fixes after generating the interface.
-     * @deprecated Use "ng lint --fix" directly instead.
-     */
-    lintFix?: boolean;
-    /**
      * The name of the interface.
      */
     name: string;

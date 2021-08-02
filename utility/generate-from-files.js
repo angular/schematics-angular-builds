@@ -10,7 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateFromFiles = void 0;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const lint_fix_1 = require("./lint-fix");
 const parse_name_1 = require("./parse-name");
 const workspace_1 = require("./workspace");
 function generateFromFiles(options, extraTemplateValues = {}) {
@@ -31,10 +30,7 @@ function generateFromFiles(options, extraTemplateValues = {}) {
             }),
             schematics_1.move(parsedPath.path + (options.flat ? '' : '/' + core_1.strings.dasherize(options.name))),
         ]);
-        return schematics_1.chain([
-            schematics_1.mergeWith(templateSource),
-            options.lintFix ? lint_fix_1.applyLintFix(options.path) : schematics_1.noop(),
-        ]);
+        return schematics_1.chain([schematics_1.mergeWith(templateSource)]);
     };
 }
 exports.generateFromFiles = generateFromFiles;

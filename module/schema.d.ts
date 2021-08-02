@@ -11,11 +11,6 @@ export interface Schema {
      */
     flat?: boolean;
     /**
-     * Apply lint fixes after generating the module.
-     * @deprecated Use "ng lint --fix" directly instead.
-     */
-    lintFix?: boolean;
-    /**
      * The declaring NgModule.
      */
     module?: string;

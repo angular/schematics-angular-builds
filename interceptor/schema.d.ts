@@ -7,11 +7,6 @@ export interface Schema {
      */
     flat?: boolean;
     /**
-     * Apply lint fixes after generating the interceptor.
-     * @deprecated Use "ng lint --fix" directly instead.
-     */
-    lintFix?: boolean;
-    /**
      * The name of the interceptor.
      */
     name: string;

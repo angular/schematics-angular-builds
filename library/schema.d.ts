@@ -7,11 +7,6 @@ export interface Schema {
      */
     entryFile?: string;
     /**
-     * Apply lint fixes after generating the library.
-     * @deprecated Use "ng lint --fix" directly instead.
-     */
-    lintFix?: boolean;
-    /**
      * The name of the library.
      */
     name?: string;

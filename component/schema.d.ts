@@ -29,11 +29,6 @@ export interface Schema {
      */
     inlineTemplate?: boolean;
     /**
-     * Apply lint fixes after generating the component.
-     * @deprecated Use "ng lint --fix" directly instead.
-     */
-    lintFix?: boolean;
-    /**
      * The declaring NgModule.
      */
     module?: string;

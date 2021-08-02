@@ -1,22 +1,13 @@
 /**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * Pass this schematic to the "run" command to create a service worker
  */
-
 export interface Schema {
-  /**
-   * The name of the project.
-   */
-  project: string;
-  /**
-   * The target to apply service worker to.
-   */
-  target: string;
-  /**
-   * The configuration to apply service worker to.
-   */
-  configuration: string;
+    /**
+     * The name of the project.
+     */
+    project: string;
+    /**
+     * The target to apply service worker to.
+     */
+    target?: string;
 }
