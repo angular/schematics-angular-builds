@@ -14,7 +14,7 @@ var Style;
     Style["Scss"] = "scss";
 })(Style = exports.Style || (exports.Style = {}));
 /**
- * The view encapsulation strategy to use in the new app.
+ * The view encapsulation strategy to use in the new application.
  */
 var ViewEncapsulation;
 (function (ViewEncapsulation) {
