@@ -66,7 +66,7 @@ export interface Schema {
      */
     style?: Style;
     /**
-     * The view encapsulation strategy to use in the new app.
+     * The view encapsulation strategy to use in the new application.
      */
     viewEncapsulation?: ViewEncapsulation;
 }
@@ -80,7 +80,7 @@ export declare enum Style {
     Scss = "scss"
 }
 /**
- * The view encapsulation strategy to use in the new app.
+ * The view encapsulation strategy to use in the new application.
  */
 export declare enum ViewEncapsulation {
     Emulated = "Emulated",
