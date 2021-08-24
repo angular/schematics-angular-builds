@@ -100,7 +100,7 @@ function getBootstrapComponentPath(host, mainPath) {
 // end helper functions.
 function validateProject(mainPath) {
     return (host, context) => {
-        const routerOutletCheckRegex = /<router\-outlet.*?>([\s\S]*?)<\/router\-outlet>/;
+        const routerOutletCheckRegex = /<router-outlet.*?>([\s\S]*?)<\/router-outlet>/;
         const componentPath = getBootstrapComponentPath(host, mainPath);
         const tmpl = getComponentTemplateInfo(host, componentPath);
         const template = getComponentTemplate(host, componentPath, tmpl);
