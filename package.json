@@ -15,8 +15,8 @@
   ],
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#c13cc888d",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#c13cc888d",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#7550ecbaf",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#7550ecbaf",
     "jsonc-parser": "3.0.0"
   },
   "repository": {
