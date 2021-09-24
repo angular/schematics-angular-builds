@@ -7,13 +7,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateI18nConfig = void 0;
 const path_1 = require("path");
 const dependencies_1 = require("../../utility/dependencies");
 const latest_versions_1 = require("../../utility/latest-versions");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
-function updateI18nConfig() {
+function default_1() {
     return (tree, { logger }) => workspace_1.updateWorkspace((workspace) => {
         // Process extraction targets first since they use browser option values
         for (const [, target, , project] of workspace_1.allWorkspaceTargets(workspace)) {
@@ -36,7 +35,7 @@ function updateI18nConfig() {
         }
     });
 }
-exports.updateI18nConfig = updateI18nConfig;
+exports.default = default_1;
 function addProjectI18NOptions(tree, builderConfig, projectConfig) {
     const browserConfig = projectConfig.targets.get('build');
     if (!browserConfig || browserConfig.builder !== workspace_models_1.Builders.Browser) {
