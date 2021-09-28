@@ -26,11 +26,11 @@ function default_1() {
         };
         let hasChanges = false;
         for (const [name, version] of Object.entries(dependenciesToUpdate)) {
-            const current = dependencies_1.getPackageJsonDependency(host, name);
+            const current = (0, dependencies_1.getPackageJsonDependency)(host, name);
             if (!current || current.version === version) {
                 continue;
             }
-            dependencies_1.addPackageJsonDependency(host, {
+            (0, dependencies_1.addPackageJsonDependency)(host, {
                 type: current.type,
                 name,
                 version,
@@ -43,13 +43,13 @@ function default_1() {
         }
         // Check for @angular-devkit/schematics and @angular-devkit/core
         for (const name of ['@angular-devkit/schematics', '@angular-devkit/core']) {
-            if (dependencies_1.getPackageJsonDependency(host, name)) {
+            if ((0, dependencies_1.getPackageJsonDependency)(host, name)) {
                 context.logger.info(`Package "${name}" found in the workspace package.json. ` +
                     'This package typically does not need to be installed manually. ' +
                     'If it is not being used by project code, it can be removed from the package.json.');
             }
         }
-        if (dependencies_1.getPackageJsonDependency(host, 'rxjs-compat')) {
+        if ((0, dependencies_1.getPackageJsonDependency)(host, 'rxjs-compat')) {
             context.logger.info(`Package "rxjs-compat" found in the workspace package.json. ` +
                 'This package typically was used during migration from RxJs version 5 to 6 during the Angular 5 ' +
                 'timeframe and may no longer be needed.\n' +

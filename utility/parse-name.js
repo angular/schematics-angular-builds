@@ -11,11 +11,11 @@ exports.parseName = void 0;
 // import { relative, Path } from "../../../angular_devkit/core/src/virtual-fs";
 const core_1 = require("@angular-devkit/core");
 function parseName(path, name) {
-    const nameWithoutPath = core_1.basename(core_1.normalize(name));
-    const namePath = core_1.dirname(core_1.join(core_1.normalize(path), name));
+    const nameWithoutPath = (0, core_1.basename)((0, core_1.normalize)(name));
+    const namePath = (0, core_1.dirname)((0, core_1.join)((0, core_1.normalize)(path), name));
     return {
         name: nameWithoutPath,
-        path: core_1.normalize('/' + namePath),
+        path: (0, core_1.normalize)('/' + namePath),
     };
 }
 exports.parseName = parseName;

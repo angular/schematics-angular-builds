@@ -30,7 +30,7 @@ function default_1(options) {
     }
     routerNamedImports.sort();
     const implementationImports = routerNamedImports.join(', ');
-    return generate_from_files_1.generateFromFiles(options, {
+    return (0, generate_from_files_1.generateFromFiles)(options, {
         implementations,
         implementationImports,
     });

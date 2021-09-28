@@ -11,7 +11,7 @@ const core_1 = require("@angular-devkit/core");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
-    return workspace_1.updateWorkspace((workspace) => {
+    return (0, workspace_1.updateWorkspace)((workspace) => {
         // Remove deprecated CLI root level options
         removeDeprecatedCLIOptions(workspace.extensions);
         for (const [, project] of workspace.projects) {
@@ -97,7 +97,7 @@ function updateVendorSourceMap(options) {
 }
 function removeDeprecatedCLIOptions(extensions) {
     const cliOptions = extensions === null || extensions === void 0 ? void 0 : extensions.cli;
-    if (cliOptions && core_1.isJsonObject(cliOptions) && core_1.isJsonObject(cliOptions.warnings)) {
+    if (cliOptions && (0, core_1.isJsonObject)(cliOptions) && (0, core_1.isJsonObject)(cliOptions.warnings)) {
         cliOptions.warnings = {
             ...cliOptions.warnings,
             typescriptMismatch: undefined,

@@ -13,8 +13,8 @@ const latest_versions_1 = require("../../utility/latest-versions");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
-    return schematics_1.chain([
-        workspace_1.updateWorkspace((workspace) => {
+    return (0, schematics_1.chain)([
+        (0, workspace_1.updateWorkspace)((workspace) => {
             for (const [, project] of workspace.projects) {
                 for (const [, target] of project.targets) {
                     if (target.builder === workspace_models_1.Builders.DeprecatedNgPackagr) {
@@ -24,8 +24,8 @@ function default_1() {
             }
         }),
         (host) => {
-            dependencies_1.removePackageJsonDependency(host, '@angular-devkit/build-ng-packagr');
-            dependencies_1.addPackageJsonDependency(host, {
+            (0, dependencies_1.removePackageJsonDependency)(host, '@angular-devkit/build-ng-packagr');
+            (0, dependencies_1.addPackageJsonDependency)(host, {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: '@angular-devkit/build-angular',
                 version: latest_versions_1.latestVersions.DevkitBuildAngular,

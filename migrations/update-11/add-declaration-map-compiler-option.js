@@ -13,7 +13,7 @@ const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
     return async (host) => {
         var _a;
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         for (const [, project] of workspace.projects) {
             for (const [, target] of project.targets) {
                 if (target.builder !== workspace_models_1.Builders.NgPackagr) {

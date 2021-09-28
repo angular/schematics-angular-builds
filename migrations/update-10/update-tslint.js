@@ -70,13 +70,13 @@ function default_1() {
     return (tree, context) => {
         const logger = context.logger;
         // Update tslint dependency
-        const current = dependencies_1.getPackageJsonDependency(tree, 'tslint');
+        const current = (0, dependencies_1.getPackageJsonDependency)(tree, 'tslint');
         if (!current) {
             logger.info('"tslint" in not a dependency of this workspace.');
             return;
         }
         if (current.version !== exports.TSLINT_VERSION) {
-            dependencies_1.addPackageJsonDependency(tree, {
+            (0, dependencies_1.addPackageJsonDependency)(tree, {
                 type: current.type,
                 name: 'tslint',
                 version: exports.TSLINT_VERSION,

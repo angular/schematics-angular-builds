@@ -50,8 +50,8 @@ function addDeclarationToNgModule(options) {
             (options.flat ? '' : core_1.strings.dasherize(options.name) + '/') +
             core_1.strings.dasherize(options.name) +
             '.pipe';
-        const relativePath = find_module_1.buildRelativePath(modulePath, pipePath);
-        const changes = ast_utils_1.addDeclarationToModule(source, modulePath, core_1.strings.classify(`${options.name}Pipe`), relativePath);
+        const relativePath = (0, find_module_1.buildRelativePath)(modulePath, pipePath);
+        const changes = (0, ast_utils_1.addDeclarationToModule)(source, modulePath, core_1.strings.classify(`${options.name}Pipe`), relativePath);
         const recorder = host.beginUpdate(modulePath);
         for (const change of changes) {
             if (change instanceof change_1.InsertChange) {
@@ -67,7 +67,7 @@ function addDeclarationToNgModule(options) {
             const sourceText = text.toString('utf-8');
             const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
             const exportRecorder = host.beginUpdate(modulePath);
-            const exportChanges = ast_utils_1.addExportToModule(source, modulePath, core_1.strings.classify(`${options.name}Pipe`), relativePath);
+            const exportChanges = (0, ast_utils_1.addExportToModule)(source, modulePath, core_1.strings.classify(`${options.name}Pipe`), relativePath);
             for (const change of exportChanges) {
                 if (change instanceof change_1.InsertChange) {
                     exportRecorder.insertLeft(change.pos, change.toAdd);
@@ -81,22 +81,22 @@ function addDeclarationToNgModule(options) {
 function default_1(options) {
     return async (host) => {
         if (options.path === undefined) {
-            options.path = await workspace_1.createDefaultPath(host, options.project);
+            options.path = await (0, workspace_1.createDefaultPath)(host, options.project);
         }
-        options.module = find_module_1.findModuleFromOptions(host, options);
-        const parsedPath = parse_name_1.parseName(options.path, options.name);
+        options.module = (0, find_module_1.findModuleFromOptions)(host, options);
+        const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
-        const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            options.skipTests ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
-            schematics_1.applyTemplates({
+        const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+            options.skipTests ? (0, schematics_1.filter)((path) => !path.endsWith('.spec.ts.template')) : (0, schematics_1.noop)(),
+            (0, schematics_1.applyTemplates)({
                 ...core_1.strings,
                 'if-flat': (s) => (options.flat ? '' : s),
                 ...options,
             }),
-            schematics_1.move(parsedPath.path),
+            (0, schematics_1.move)(parsedPath.path),
         ]);
-        return schematics_1.chain([addDeclarationToNgModule(options), schematics_1.mergeWith(templateSource)]);
+        return (0, schematics_1.chain)([addDeclarationToNgModule(options), (0, schematics_1.mergeWith)(templateSource)]);
     };
 }
 exports.default = default_1;

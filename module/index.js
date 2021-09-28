@@ -36,11 +36,11 @@ const parse_name_1 = require("../utility/parse-name");
 const workspace_1 = require("../utility/workspace");
 const schema_1 = require("./schema");
 function buildRelativeModulePath(options, modulePath) {
-    const importModulePath = core_1.normalize(`/${options.path}/` +
+    const importModulePath = (0, core_1.normalize)(`/${options.path}/` +
         (options.flat ? '' : core_1.strings.dasherize(options.name) + '/') +
         core_1.strings.dasherize(options.name) +
         '.module');
-    return find_module_1.buildRelativePath(modulePath, importModulePath);
+    return (0, find_module_1.buildRelativePath)(modulePath, importModulePath);
 }
 function addDeclarationToNgModule(options) {
     return (host) => {
@@ -55,7 +55,7 @@ function addDeclarationToNgModule(options) {
         const sourceText = text.toString();
         const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
         const relativePath = buildRelativeModulePath(options, modulePath);
-        const changes = ast_utils_1.addImportToModule(source, modulePath, core_1.strings.classify(`${options.name}Module`), relativePath);
+        const changes = (0, ast_utils_1.addImportToModule)(source, modulePath, core_1.strings.classify(`${options.name}Module`), relativePath);
         const recorder = host.beginUpdate(modulePath);
         for (const change of changes) {
             if (change instanceof change_1.InsertChange) {
@@ -86,7 +86,7 @@ function addRouteDeclarationToNgModule(options, routingModulePath) {
             throw new Error(`Couldn't find the module nor its routing module.`);
         }
         const sourceText = text.toString();
-        const addDeclaration = ast_utils_1.addRouteDeclarationToModule(ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true), path, buildRoute(options, options.module));
+        const addDeclaration = (0, ast_utils_1.addRouteDeclarationToModule)(ts.createSourceFile(path, sourceText, ts.ScriptTarget.Latest, true), path, buildRoute(options, options.module));
         const recorder = host.beginUpdate(path);
         recorder.insertLeft(addDeclaration.pos, addDeclaration.toAdd);
         host.commitUpdate(recorder);
@@ -97,7 +97,7 @@ function getRoutingModulePath(host, modulePath) {
     const routingModulePath = modulePath.endsWith(find_module_1.ROUTING_MODULE_EXT)
         ? modulePath
         : modulePath.replace(find_module_1.MODULE_EXT, find_module_1.ROUTING_MODULE_EXT);
-    return host.exists(routingModulePath) ? core_1.normalize(routingModulePath) : undefined;
+    return host.exists(routingModulePath) ? (0, core_1.normalize)(routingModulePath) : undefined;
 }
 function buildRoute(options, modulePath) {
     const relativeModulePath = buildRelativeModulePath(options, modulePath);
@@ -108,10 +108,10 @@ function buildRoute(options, modulePath) {
 function default_1(options) {
     return async (host) => {
         if (options.path === undefined) {
-            options.path = await workspace_1.createDefaultPath(host, options.project);
+            options.path = await (0, workspace_1.createDefaultPath)(host, options.project);
         }
         if (options.module) {
-            options.module = find_module_1.findModuleFromOptions(host, options);
+            options.module = (0, find_module_1.findModuleFromOptions)(host, options);
         }
         let routingModulePath;
         const isLazyLoadedModuleGen = !!(options.route && options.module);
@@ -119,14 +119,14 @@ function default_1(options) {
             options.routingScope = schema_1.RoutingScope.Child;
             routingModulePath = getRoutingModulePath(host, options.module);
         }
-        const parsedPath = parse_name_1.parseName(options.path, options.name);
+        const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
-        const templateSource = schematics_1.apply(schematics_1.url('./files'), [
+        const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
             options.routing || (isLazyLoadedModuleGen && routingModulePath)
-                ? schematics_1.noop()
-                : schematics_1.filter((path) => !path.endsWith('-routing.module.ts.template')),
-            schematics_1.applyTemplates({
+                ? (0, schematics_1.noop)()
+                : (0, schematics_1.filter)((path) => !path.endsWith('-routing.module.ts.template')),
+            (0, schematics_1.applyTemplates)({
                 ...core_1.strings,
                 'if-flat': (s) => (options.flat ? '' : s),
                 lazyRoute: isLazyLoadedModuleGen,
@@ -134,7 +134,7 @@ function default_1(options) {
                 lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
                 ...options,
             }),
-            schematics_1.move(parsedPath.path),
+            (0, schematics_1.move)(parsedPath.path),
         ]);
         const moduleDasherized = core_1.strings.dasherize(options.name);
         const modulePath = `${!options.flat ? moduleDasherized + '/' : ''}${moduleDasherized}.module.ts`;
@@ -145,11 +145,11 @@ function default_1(options) {
             path: options.path,
             project: options.project,
         };
-        return schematics_1.chain([
-            !isLazyLoadedModuleGen ? addDeclarationToNgModule(options) : schematics_1.noop(),
+        return (0, schematics_1.chain)([
+            !isLazyLoadedModuleGen ? addDeclarationToNgModule(options) : (0, schematics_1.noop)(),
             addRouteDeclarationToNgModule(options, routingModulePath),
-            schematics_1.mergeWith(templateSource),
-            isLazyLoadedModuleGen ? schematics_1.schematic('component', componentOptions) : schematics_1.noop(),
+            (0, schematics_1.mergeWith)(templateSource),
+            isLazyLoadedModuleGen ? (0, schematics_1.schematic)('component', componentOptions) : (0, schematics_1.noop)(),
         ]);
     };
 }

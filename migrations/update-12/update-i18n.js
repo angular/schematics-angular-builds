@@ -13,9 +13,9 @@ const latest_versions_1 = require("../../utility/latest-versions");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
-    return (tree, { logger }) => workspace_1.updateWorkspace((workspace) => {
+    return (tree, { logger }) => (0, workspace_1.updateWorkspace)((workspace) => {
         // Process extraction targets first since they use browser option values
-        for (const [, target, , project] of workspace_1.allWorkspaceTargets(workspace)) {
+        for (const [, target, , project] of (0, workspace_1.allWorkspaceTargets)(workspace)) {
             switch (target.builder) {
                 case workspace_models_1.Builders.ExtractI18n:
                     addProjectI18NOptions(tree, target, project);
@@ -23,7 +23,7 @@ function default_1() {
                     break;
             }
         }
-        for (const [, target] of workspace_1.allWorkspaceTargets(workspace)) {
+        for (const [, target] of (0, workspace_1.allWorkspaceTargets)(workspace)) {
             switch (target.builder) {
                 case workspace_models_1.Builders.Browser:
                 case workspace_models_1.Builders.Server:
@@ -43,7 +43,7 @@ function addProjectI18NOptions(tree, builderConfig, projectConfig) {
     }
     // browser builder options
     let locales;
-    for (const [, options] of workspace_1.allTargetOptions(browserConfig)) {
+    for (const [, options] of (0, workspace_1.allTargetOptions)(browserConfig)) {
         const localeId = options.i18nLocale;
         if (typeof localeId !== 'string') {
             continue;
@@ -85,7 +85,7 @@ function addProjectI18NOptions(tree, builderConfig, projectConfig) {
     }
     if (locales) {
         // Get sourceLocale from extract-i18n builder
-        const i18nOptions = [...workspace_1.allTargetOptions(builderConfig)];
+        const i18nOptions = [...(0, workspace_1.allTargetOptions)(builderConfig)];
         const sourceLocale = i18nOptions
             .map(([, o]) => o.i18nLocale)
             .find((x) => !!x && typeof x === 'string');
@@ -94,8 +94,8 @@ function addProjectI18NOptions(tree, builderConfig, projectConfig) {
             ...(sourceLocale ? { sourceLocale } : {}),
         };
         // Add @angular/localize if not already a dependency
-        if (!dependencies_1.getPackageJsonDependency(tree, '@angular/localize')) {
-            dependencies_1.addPackageJsonDependency(tree, {
+        if (!(0, dependencies_1.getPackageJsonDependency)(tree, '@angular/localize')) {
+            (0, dependencies_1.addPackageJsonDependency)(tree, {
                 name: '@angular/localize',
                 version: latest_versions_1.latestVersions.Angular,
                 type: dependencies_1.NodeDependencyType.Default,
@@ -104,7 +104,7 @@ function addProjectI18NOptions(tree, builderConfig, projectConfig) {
     }
 }
 function addBuilderI18NOptions(builderConfig, logger) {
-    for (const [, options] of workspace_1.allTargetOptions(builderConfig)) {
+    for (const [, options] of (0, workspace_1.allTargetOptions)(builderConfig)) {
         const localeId = options.i18nLocale;
         const i18nFile = options.i18nFile;
         const outputPath = options.outputPath;
@@ -131,7 +131,7 @@ function addBuilderI18NOptions(builderConfig, logger) {
     }
 }
 function removeFormatOption(builderConfig) {
-    for (const [, options] of workspace_1.allTargetOptions(builderConfig)) {
+    for (const [, options] of (0, workspace_1.allTargetOptions)(builderConfig)) {
         // The format is always auto-detected now
         delete options.i18nFormat;
     }
@@ -140,7 +140,7 @@ function updateBaseHrefs(builderConfig) {
     var _a;
     const mainBaseHref = (_a = builderConfig.options) === null || _a === void 0 ? void 0 : _a.baseHref;
     const hasMainBaseHref = !!mainBaseHref && typeof mainBaseHref === 'string' && mainBaseHref !== '/';
-    for (const [, options] of workspace_1.allTargetOptions(builderConfig)) {
+    for (const [, options] of (0, workspace_1.allTargetOptions)(builderConfig)) {
         const localeId = options.i18nLocale;
         const i18nFile = options.i18nFile;
         // localize base HREF values are controlled by the i18n configuration
@@ -158,7 +158,7 @@ function updateBaseHrefs(builderConfig) {
     }
 }
 function removeExtracti18nDeprecatedOptions(builderConfig) {
-    for (const [, options] of workspace_1.allTargetOptions(builderConfig)) {
+    for (const [, options] of (0, workspace_1.allTargetOptions)(builderConfig)) {
         // deprecated options
         delete options.i18nLocale;
         if (options.i18nFormat !== undefined) {

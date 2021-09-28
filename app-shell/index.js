@@ -45,19 +45,19 @@ function getSourceFile(host, path) {
     return source;
 }
 function getServerModulePath(host, sourceRoot, mainPath) {
-    const mainSource = getSourceFile(host, core_1.join(core_1.normalize(sourceRoot), mainPath));
-    const allNodes = ast_utils_1.getSourceNodes(mainSource);
+    const mainSource = getSourceFile(host, (0, core_1.join)((0, core_1.normalize)(sourceRoot), mainPath));
+    const allNodes = (0, ast_utils_1.getSourceNodes)(mainSource);
     const expNode = allNodes.find((node) => ts.isExportDeclaration(node));
     if (!expNode) {
         return null;
     }
     const relativePath = expNode.moduleSpecifier;
-    const modulePath = core_1.normalize(`/${sourceRoot}/${relativePath.text}.ts`);
+    const modulePath = (0, core_1.normalize)(`/${sourceRoot}/${relativePath.text}.ts`);
     return modulePath;
 }
 function getComponentTemplateInfo(host, componentPath) {
     const compSource = getSourceFile(host, componentPath);
-    const compMetadata = ast_utils_1.getDecoratorMetadata(compSource, 'Component', '@angular/core')[0];
+    const compMetadata = (0, ast_utils_1.getDecoratorMetadata)(compSource, 'Component', '@angular/core')[0];
     return {
         templateProp: getMetadataProperty(compMetadata, 'template'),
         templateUrlProp: getMetadataProperty(compMetadata, 'templateUrl'),
@@ -70,8 +70,8 @@ function getComponentTemplate(host, compPath, tmplInfo) {
     }
     else if (tmplInfo.templateUrlProp) {
         const templateUrl = tmplInfo.templateUrlProp.initializer.text;
-        const dir = core_1.dirname(core_1.normalize(compPath));
-        const templatePath = core_1.join(dir, templateUrl);
+        const dir = (0, core_1.dirname)((0, core_1.normalize)(compPath));
+        const templatePath = (0, core_1.join)(dir, templateUrl);
         const buffer = host.read(templatePath);
         if (buffer) {
             template = buffer.toString();
@@ -80,22 +80,22 @@ function getComponentTemplate(host, compPath, tmplInfo) {
     return template;
 }
 function getBootstrapComponentPath(host, mainPath) {
-    const modulePath = ng_ast_utils_1.getAppModulePath(host, mainPath);
+    const modulePath = (0, ng_ast_utils_1.getAppModulePath)(host, mainPath);
     const moduleSource = getSourceFile(host, modulePath);
-    const metadataNode = ast_utils_1.getDecoratorMetadata(moduleSource, 'NgModule', '@angular/core')[0];
+    const metadataNode = (0, ast_utils_1.getDecoratorMetadata)(moduleSource, 'NgModule', '@angular/core')[0];
     const bootstrapProperty = getMetadataProperty(metadataNode, 'bootstrap');
     const arrLiteral = bootstrapProperty.initializer;
     const componentSymbol = arrLiteral.elements[0].getText();
-    const relativePath = ast_utils_1.getSourceNodes(moduleSource)
+    const relativePath = (0, ast_utils_1.getSourceNodes)(moduleSource)
         .filter(ts.isImportDeclaration)
         .filter((imp) => {
-        return ast_utils_1.findNode(imp, ts.SyntaxKind.Identifier, componentSymbol);
+        return (0, ast_utils_1.findNode)(imp, ts.SyntaxKind.Identifier, componentSymbol);
     })
         .map((imp) => {
         const pathStringLiteral = imp.moduleSpecifier;
         return pathStringLiteral.text;
     })[0];
-    return core_1.join(core_1.dirname(core_1.normalize(modulePath)), relativePath + '.ts');
+    return (0, core_1.join)((0, core_1.dirname)((0, core_1.normalize)(modulePath)), relativePath + '.ts');
 }
 // end helper functions.
 function validateProject(mainPath) {
@@ -119,7 +119,7 @@ function addUniversalTarget(options) {
         };
         // Delete non-universal options.
         delete universalOptions.route;
-        return schematics_1.schematic('universal', universalOptions);
+        return (0, schematics_1.schematic)('universal', universalOptions);
     };
 }
 function addAppShellConfigToWorkspace(options) {
@@ -127,7 +127,7 @@ function addAppShellConfigToWorkspace(options) {
         if (!options.route) {
             throw new schematics_1.SchematicsException(`Route is not defined`);
         }
-        return workspace_1.updateWorkspace((workspace) => {
+        return (0, workspace_1.updateWorkspace)((workspace) => {
             var _a, _b, _c, _d;
             const project = workspace.projects.get(options.project);
             if (!project) {
@@ -170,11 +170,11 @@ function addAppShellConfigToWorkspace(options) {
 }
 function addRouterModule(mainPath) {
     return (host) => {
-        const modulePath = ng_ast_utils_1.getAppModulePath(host, mainPath);
+        const modulePath = (0, ng_ast_utils_1.getAppModulePath)(host, mainPath);
         const moduleSource = getSourceFile(host, modulePath);
-        const changes = ast_utils_1.addImportToModule(moduleSource, modulePath, 'RouterModule', '@angular/router');
+        const changes = (0, ast_utils_1.addImportToModule)(moduleSource, modulePath, 'RouterModule', '@angular/router');
         const recorder = host.beginUpdate(modulePath);
-        change_1.applyToUpdateRecorder(recorder, changes);
+        (0, change_1.applyToUpdateRecorder)(recorder, changes);
         host.commitUpdate(recorder);
         return host;
     };
@@ -196,7 +196,7 @@ function getMetadataProperty(metadata, propertyName) {
 function addServerRoutes(options) {
     return async (host) => {
         // The workspace gets updated so this needs to be reloaded
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         const clientProject = workspace.projects.get(options.project);
         if (!clientProject) {
             throw new Error('Universal schematic removed client project.');
@@ -214,13 +214,13 @@ function addServerRoutes(options) {
             throw new schematics_1.SchematicsException('Universal/server module not found.');
         }
         let moduleSource = getSourceFile(host, modulePath);
-        if (!ast_utils_1.isImported(moduleSource, 'Routes', '@angular/router')) {
+        if (!(0, ast_utils_1.isImported)(moduleSource, 'Routes', '@angular/router')) {
             const recorder = host.beginUpdate(modulePath);
-            const routesChange = ast_utils_1.insertImport(moduleSource, modulePath, 'Routes', '@angular/router');
+            const routesChange = (0, ast_utils_1.insertImport)(moduleSource, modulePath, 'Routes', '@angular/router');
             if (routesChange) {
-                change_1.applyToUpdateRecorder(recorder, [routesChange]);
+                (0, change_1.applyToUpdateRecorder)(recorder, [routesChange]);
             }
-            const imports = ast_utils_1.getSourceNodes(moduleSource)
+            const imports = (0, ast_utils_1.getSourceNodes)(moduleSource)
                 .filter((node) => node.kind === ts.SyntaxKind.ImportDeclaration)
                 .sort((a, b) => a.getStart() - b.getStart());
             const insertPosition = imports[imports.length - 1].getEnd();
@@ -229,15 +229,15 @@ function addServerRoutes(options) {
             host.commitUpdate(recorder);
         }
         moduleSource = getSourceFile(host, modulePath);
-        if (!ast_utils_1.isImported(moduleSource, 'RouterModule', '@angular/router')) {
+        if (!(0, ast_utils_1.isImported)(moduleSource, 'RouterModule', '@angular/router')) {
             const recorder = host.beginUpdate(modulePath);
-            const routerModuleChange = ast_utils_1.insertImport(moduleSource, modulePath, 'RouterModule', '@angular/router');
+            const routerModuleChange = (0, ast_utils_1.insertImport)(moduleSource, modulePath, 'RouterModule', '@angular/router');
             if (routerModuleChange) {
-                change_1.applyToUpdateRecorder(recorder, [routerModuleChange]);
+                (0, change_1.applyToUpdateRecorder)(recorder, [routerModuleChange]);
             }
-            const metadataChange = ast_utils_1.addSymbolToNgModuleMetadata(moduleSource, modulePath, 'imports', 'RouterModule.forRoot(routes)');
+            const metadataChange = (0, ast_utils_1.addSymbolToNgModuleMetadata)(moduleSource, modulePath, 'imports', 'RouterModule.forRoot(routes)');
             if (metadataChange) {
-                change_1.applyToUpdateRecorder(recorder, metadataChange);
+                (0, change_1.applyToUpdateRecorder)(recorder, metadataChange);
             }
             host.commitUpdate(recorder);
         }
@@ -249,24 +249,24 @@ function addShellComponent(options) {
         module: options.rootModuleFileName,
         project: options.project,
     };
-    return schematics_1.schematic('component', componentOptions);
+    return (0, schematics_1.schematic)('component', componentOptions);
 }
 function default_1(options) {
     return async (tree) => {
-        const workspace = await workspace_1.getWorkspace(tree);
+        const workspace = await (0, workspace_1.getWorkspace)(tree);
         const clientProject = workspace.projects.get(options.project);
         if (!clientProject || clientProject.extensions.projectType !== 'application') {
             throw new schematics_1.SchematicsException(`A client project type of "application" is required.`);
         }
         const clientBuildTarget = clientProject.targets.get('build');
         if (!clientBuildTarget) {
-            throw project_targets_1.targetBuildNotFoundError();
+            throw (0, project_targets_1.targetBuildNotFoundError)();
         }
         const clientBuildOptions = (clientBuildTarget.options ||
             {});
-        return schematics_1.chain([
+        return (0, schematics_1.chain)([
             validateProject(clientBuildOptions.main),
-            clientProject.targets.has('server') ? schematics_1.noop() : addUniversalTarget(options),
+            clientProject.targets.has('server') ? (0, schematics_1.noop)() : addUniversalTarget(options),
             addAppShellConfigToWorkspace(options),
             addRouterModule(clientBuildOptions.main),
             addServerRoutes(options),

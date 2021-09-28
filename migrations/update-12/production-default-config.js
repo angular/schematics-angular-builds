@@ -11,8 +11,8 @@ const core_1 = require("@angular-devkit/core");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
-    return async (_host, context) => workspace_1.updateWorkspace((workspace) => {
-        for (const [name, target] of workspace_1.allWorkspaceTargets(workspace)) {
+    return async (_host, context) => (0, workspace_1.updateWorkspace)((workspace) => {
+        for (const [name, target] of (0, workspace_1.allWorkspaceTargets)(workspace)) {
             let defaultConfiguration;
             // Only interested in 1st party builders
             switch (target.builder) {
@@ -67,7 +67,7 @@ function updateTarget(targetName, target, logger, defaultConfiguration) {
     let serverTarget = true;
     let browserTarget = true;
     let devServerTarget = true;
-    for (const [, options] of workspace_1.allTargetOptions(target)) {
+    for (const [, options] of (0, workspace_1.allTargetOptions)(target)) {
         if (typeof options.serverTarget === 'string') {
             options.serverTarget = getArchitectTargetWithConfig(options.serverTarget);
             if (!developmentOptions.serverTarget) {

@@ -35,7 +35,7 @@ function addDependenciesToPackageJson(options) {
                 name: 'typescript',
                 version: latest_versions_1.latestVersions['typescript'],
             },
-        ].forEach((dependency) => dependencies_1.addPackageJsonDependency(host, dependency));
+        ].forEach((dependency) => (0, dependencies_1.addPackageJsonDependency)(host, dependency));
         if (!options.skipInstall) {
             context.addTask(new tasks_1.NodePackageInstallTask());
         }
@@ -79,7 +79,7 @@ function addAppToWorkspaceFile(options, appDir) {
         }
         schematics['@schematics/angular:application'].strict = true;
     }
-    const sourceRoot = core_1.join(core_1.normalize(projectRoot), 'src');
+    const sourceRoot = (0, core_1.join)((0, core_1.normalize)(projectRoot), 'src');
     let budgets = [];
     if (options.strict) {
         budgets = [
@@ -111,7 +111,7 @@ function addAppToWorkspaceFile(options, appDir) {
     }
     const inlineStyleLanguage = (options === null || options === void 0 ? void 0 : options.style) !== schema_1.Style.Css ? options.style : undefined;
     const project = {
-        root: core_1.normalize(projectRoot),
+        root: (0, core_1.normalize)(projectRoot),
         sourceRoot,
         projectType: workspace_models_1.ProjectType.Application,
         prefix: options.prefix || 'app',
@@ -188,7 +188,7 @@ function addAppToWorkspaceFile(options, appDir) {
                 },
         },
     };
-    return workspace_1.updateWorkspace((workspace) => {
+    return (0, workspace_1.updateWorkspace)((workspace) => {
         if (workspace.projects.size === 0) {
             workspace.extensions.defaultProject = options.name;
         }
@@ -208,7 +208,7 @@ function default_1(options) {
         if (!options.name) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
-        validation_1.validateProjectName(options.name);
+        (0, validation_1.validateProjectName)(options.name);
         const appRootSelector = `${options.prefix}-root`;
         const componentOptions = !options.minimal
             ? {
@@ -225,27 +225,27 @@ function default_1(options) {
                 style: options.style,
                 viewEncapsulation: options.viewEncapsulation,
             };
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
         const isRootApp = options.projectRoot !== undefined;
         const appDir = isRootApp
-            ? core_1.normalize(options.projectRoot || '')
-            : core_1.join(core_1.normalize(newProjectRoot), core_1.strings.dasherize(options.name));
+            ? (0, core_1.normalize)(options.projectRoot || '')
+            : (0, core_1.join)((0, core_1.normalize)(newProjectRoot), core_1.strings.dasherize(options.name));
         const sourceDir = `${appDir}/src/app`;
-        return schematics_1.chain([
+        return (0, schematics_1.chain)([
             addAppToWorkspaceFile(options, appDir),
-            schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
-                options.minimal ? schematics_1.filter(minimalPathFilter) : schematics_1.noop(),
-                schematics_1.applyTemplates({
+            (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+                options.minimal ? (0, schematics_1.filter)(minimalPathFilter) : (0, schematics_1.noop)(),
+                (0, schematics_1.applyTemplates)({
                     utils: core_1.strings,
                     ...options,
-                    relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(appDir),
+                    relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(appDir),
                     appName: options.name,
                     isRootApp,
                 }),
-                schematics_1.move(appDir),
+                (0, schematics_1.move)(appDir),
             ]), schematics_1.MergeStrategy.Overwrite),
-            schematics_1.schematic('module', {
+            (0, schematics_1.schematic)('module', {
                 name: 'app',
                 commonModule: false,
                 flat: true,
@@ -254,7 +254,7 @@ function default_1(options) {
                 path: sourceDir,
                 project: options.name,
             }),
-            schematics_1.schematic('component', {
+            (0, schematics_1.schematic)('component', {
                 name: 'app',
                 selector: appRootSelector,
                 flat: true,
@@ -263,23 +263,23 @@ function default_1(options) {
                 project: options.name,
                 ...componentOptions,
             }),
-            schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./other-files'), [
-                options.strict ? schematics_1.noop() : schematics_1.filter((path) => path !== '/package.json.template'),
+            (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./other-files'), [
+                options.strict ? (0, schematics_1.noop)() : (0, schematics_1.filter)((path) => path !== '/package.json.template'),
                 componentOptions.inlineTemplate
-                    ? schematics_1.filter((path) => !path.endsWith('.html.template'))
-                    : schematics_1.noop(),
+                    ? (0, schematics_1.filter)((path) => !path.endsWith('.html.template'))
+                    : (0, schematics_1.noop)(),
                 componentOptions.skipTests
-                    ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template'))
-                    : schematics_1.noop(),
-                schematics_1.applyTemplates({
+                    ? (0, schematics_1.filter)((path) => !path.endsWith('.spec.ts.template'))
+                    : (0, schematics_1.noop)(),
+                (0, schematics_1.applyTemplates)({
                     utils: core_1.strings,
                     ...options,
                     selector: appRootSelector,
                     ...componentOptions,
                 }),
-                schematics_1.move(sourceDir),
+                (0, schematics_1.move)(sourceDir),
             ]), schematics_1.MergeStrategy.Overwrite),
-            options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(options),
+            options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(options),
         ]);
     };
 }

@@ -39,7 +39,7 @@ const project_targets_1 = require("../utility/project-targets");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function updateConfigFile(options, tsConfigDirectory) {
-    return workspace_1.updateWorkspace((workspace) => {
+    return (0, workspace_1.updateWorkspace)((workspace) => {
         const clientProject = workspace.projects.get(options.project);
         if (clientProject) {
             // In case the browser builder hashes the assets
@@ -74,14 +74,14 @@ function updateConfigFile(options, tsConfigDirectory) {
                 }
             }
             const mainPath = options.main;
-            const serverTsConfig = core_1.join(tsConfigDirectory, 'tsconfig.server.json');
+            const serverTsConfig = (0, core_1.join)(tsConfigDirectory, 'tsconfig.server.json');
             clientProject.targets.add({
                 name: 'server',
                 builder: workspace_models_1.Builders.Server,
                 defaultConfiguration: 'production',
                 options: {
                     outputPath: `dist/${options.project}/server`,
-                    main: core_1.join(core_1.normalize(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
+                    main: (0, core_1.join)((0, core_1.normalize)(clientProject.root), 'src', mainPath.endsWith('.ts') ? mainPath : mainPath + '.ts'),
                     tsConfig: serverTsConfig,
                     ...((buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) ? getServerOptions(buildTarget === null || buildTarget === void 0 ? void 0 : buildTarget.options) : {}),
                 },
@@ -97,8 +97,8 @@ function findBrowserModuleImport(host, modulePath) {
     }
     const moduleFileText = moduleBuffer.toString('utf-8');
     const source = ts.createSourceFile(modulePath, moduleFileText, ts.ScriptTarget.Latest, true);
-    const decoratorMetadata = ast_utils_1.getDecoratorMetadata(source, 'NgModule', '@angular/core')[0];
-    const browserModuleNode = ast_utils_1.findNode(decoratorMetadata, ts.SyntaxKind.Identifier, 'BrowserModule');
+    const decoratorMetadata = (0, ast_utils_1.getDecoratorMetadata)(source, 'NgModule', '@angular/core')[0];
+    const browserModuleNode = (0, ast_utils_1.findNode)(decoratorMetadata, ts.SyntaxKind.Identifier, 'BrowserModule');
     if (browserModuleNode === null) {
         throw new schematics_1.SchematicsException(`Cannot find BrowserModule import in ${modulePath}`);
     }
@@ -106,8 +106,8 @@ function findBrowserModuleImport(host, modulePath) {
 }
 function wrapBootstrapCall(mainFile) {
     return (host) => {
-        const mainPath = core_1.normalize('/' + mainFile);
-        let bootstrapCall = ng_ast_utils_1.findBootstrapModuleCall(host, mainPath);
+        const mainPath = (0, core_1.normalize)('/' + mainFile);
+        let bootstrapCall = (0, ng_ast_utils_1.findBootstrapModuleCall)(host, mainPath);
         if (bootstrapCall === null) {
             throw new schematics_1.SchematicsException('Bootstrap module not found.');
         }
@@ -163,9 +163,9 @@ function findCallExpressionNode(node, text) {
 }
 function addServerTransition(options, mainFile, clientProjectRoot) {
     return (host) => {
-        const mainPath = core_1.normalize('/' + mainFile);
-        const bootstrapModuleRelativePath = ng_ast_utils_1.findBootstrapModulePath(host, mainPath);
-        const bootstrapModulePath = core_1.normalize(`/${clientProjectRoot}/src/${bootstrapModuleRelativePath}.ts`);
+        const mainPath = (0, core_1.normalize)('/' + mainFile);
+        const bootstrapModuleRelativePath = (0, ng_ast_utils_1.findBootstrapModulePath)(host, mainPath);
+        const bootstrapModulePath = (0, core_1.normalize)(`/${clientProjectRoot}/src/${bootstrapModuleRelativePath}.ts`);
         const browserModuleImport = findBrowserModuleImport(host, bootstrapModulePath);
         const appId = options.appId;
         const transitionCall = `.withServerTransition({ appId: '${appId}' })`;
@@ -178,7 +178,7 @@ function addServerTransition(options, mainFile, clientProjectRoot) {
 }
 function addDependencies() {
     return (host) => {
-        const coreDep = dependencies_1.getPackageJsonDependency(host, '@angular/core');
+        const coreDep = (0, dependencies_1.getPackageJsonDependency)(host, '@angular/core');
         if (coreDep === null) {
             throw new schematics_1.SchematicsException('Could not find version.');
         }
@@ -186,55 +186,55 @@ function addDependencies() {
             ...coreDep,
             name: '@angular/platform-server',
         };
-        dependencies_1.addPackageJsonDependency(host, platformServerDep);
+        (0, dependencies_1.addPackageJsonDependency)(host, platformServerDep);
         return host;
     };
 }
 function default_1(options) {
     return async (host, context) => {
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         const clientProject = workspace.projects.get(options.project);
         if (!clientProject || clientProject.extensions.projectType !== 'application') {
             throw new schematics_1.SchematicsException(`Universal requires a project type of "application".`);
         }
         const clientBuildTarget = clientProject.targets.get('build');
         if (!clientBuildTarget) {
-            throw project_targets_1.targetBuildNotFoundError();
+            throw (0, project_targets_1.targetBuildNotFoundError)();
         }
         const clientBuildOptions = (clientBuildTarget.options ||
             {});
-        const clientTsConfig = core_1.normalize(clientBuildOptions.tsConfig);
-        const tsConfigExtends = core_1.basename(clientTsConfig);
+        const clientTsConfig = (0, core_1.normalize)(clientBuildOptions.tsConfig);
+        const tsConfigExtends = (0, core_1.basename)(clientTsConfig);
         // this is needed because prior to version 8, tsconfig might have been in 'src'
         // and we don't want to break the 'ng add @nguniversal/express-engine schematics'
         const rootInSrc = clientProject.root === '' && clientTsConfig.includes('src/');
-        const tsConfigDirectory = core_1.join(core_1.normalize(clientProject.root), rootInSrc ? 'src' : '');
+        const tsConfigDirectory = (0, core_1.join)((0, core_1.normalize)(clientProject.root), rootInSrc ? 'src' : '');
         if (!options.skipInstall) {
             context.addTask(new tasks_1.NodePackageInstallTask());
         }
-        const templateSource = schematics_1.apply(schematics_1.url('./files/src'), [
-            schematics_1.applyTemplates({
+        const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files/src'), [
+            (0, schematics_1.applyTemplates)({
                 ...core_1.strings,
                 ...options,
                 stripTsExtension: (s) => s.replace(/\.ts$/, ''),
-                hasLocalizePackage: !!dependencies_1.getPackageJsonDependency(host, '@angular/localize'),
+                hasLocalizePackage: !!(0, dependencies_1.getPackageJsonDependency)(host, '@angular/localize'),
             }),
-            schematics_1.move(core_1.join(core_1.normalize(clientProject.root), 'src')),
+            (0, schematics_1.move)((0, core_1.join)((0, core_1.normalize)(clientProject.root), 'src')),
         ]);
-        const rootSource = schematics_1.apply(schematics_1.url('./files/root'), [
-            schematics_1.applyTemplates({
+        const rootSource = (0, schematics_1.apply)((0, schematics_1.url)('./files/root'), [
+            (0, schematics_1.applyTemplates)({
                 ...core_1.strings,
                 ...options,
                 stripTsExtension: (s) => s.replace(/\.ts$/, ''),
                 tsConfigExtends,
-                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(tsConfigDirectory),
+                relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(tsConfigDirectory),
                 rootInSrc,
             }),
-            schematics_1.move(tsConfigDirectory),
+            (0, schematics_1.move)(tsConfigDirectory),
         ]);
-        return schematics_1.chain([
-            schematics_1.mergeWith(templateSource),
-            schematics_1.mergeWith(rootSource),
+        return (0, schematics_1.chain)([
+            (0, schematics_1.mergeWith)(templateSource),
+            (0, schematics_1.mergeWith)(rootSource),
             addDependencies(),
             updateConfigFile(options, tsConfigDirectory),
             wrapBootstrapCall(clientBuildOptions.main),

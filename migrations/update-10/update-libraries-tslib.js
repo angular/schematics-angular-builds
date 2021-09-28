@@ -13,20 +13,20 @@ const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
     return async (host) => {
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         for (const [, project] of workspace.projects) {
             if (project.extensions.projectType !== workspace_models_1.ProjectType.Library) {
                 // Only interested in library projects
                 continue;
             }
-            const packageJsonPath = core_1.join(core_1.normalize(project.root), 'package.json');
+            const packageJsonPath = (0, core_1.join)((0, core_1.normalize)(project.root), 'package.json');
             if (!host.exists(packageJsonPath)) {
                 continue;
             }
             // Remove tslib from any type of dependency
-            dependencies_1.removePackageJsonDependency(host, 'tslib', packageJsonPath);
+            (0, dependencies_1.removePackageJsonDependency)(host, 'tslib', packageJsonPath);
             // Add tslib as a direct dependency
-            dependencies_1.addPackageJsonDependency(host, {
+            (0, dependencies_1.addPackageJsonDependency)(host, {
                 name: 'tslib',
                 version: '^2.0.0',
                 type: dependencies_1.NodeDependencyType.Default,

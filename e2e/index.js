@@ -26,12 +26,12 @@ function addScriptsToPackageJson() {
 function default_1(options) {
     return async (host) => {
         const appProject = options.relatedAppName;
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         const project = workspace.projects.get(appProject);
         if (!project) {
             throw new schematics_1.SchematicsException(`Project name "${appProject}" doesn't not exist.`);
         }
-        const root = core_1.join(core_1.normalize(project.root), 'e2e');
+        const root = (0, core_1.join)((0, core_1.normalize)(project.root), 'e2e');
         project.targets.add({
             name: 'e2e',
             builder: workspace_models_1.Builders.Protractor,
@@ -48,15 +48,15 @@ function default_1(options) {
                 },
             },
         });
-        return schematics_1.chain([
-            workspace_1.updateWorkspace(workspace),
-            schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
-                schematics_1.applyTemplates({
+        return (0, schematics_1.chain)([
+            (0, workspace_1.updateWorkspace)(workspace),
+            (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+                (0, schematics_1.applyTemplates)({
                     utils: core_1.strings,
                     ...options,
-                    relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(root),
+                    relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(root),
                 }),
-                schematics_1.move(root),
+                (0, schematics_1.move)(root),
             ])),
             (host) => [
                 {
@@ -74,7 +74,7 @@ function default_1(options) {
                     name: 'ts-node',
                     version: '~9.1.1',
                 },
-            ].forEach((dep) => dependencies_1.addPackageJsonDependency(host, dep)),
+            ].forEach((dep) => (0, dependencies_1.addPackageJsonDependency)(host, dep)),
             addScriptsToPackageJson(),
         ]);
     };

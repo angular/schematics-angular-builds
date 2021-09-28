@@ -13,7 +13,7 @@ function* visit(directory) {
         if (path !== 'browserslist') {
             continue;
         }
-        yield core_1.join(directory.path, path);
+        yield (0, core_1.join)(directory.path, path);
     }
     for (const path of directory.subdirs) {
         if (path === 'node_modules' || path.startsWith('.')) {

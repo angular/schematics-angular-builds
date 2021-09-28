@@ -39,11 +39,11 @@ function findBootstrapModuleCall(host, mainPath) {
     }
     const mainText = mainBuffer.toString('utf-8');
     const source = ts.createSourceFile(mainPath, mainText, ts.ScriptTarget.Latest, true);
-    const allNodes = ast_utils_1.getSourceNodes(source);
+    const allNodes = (0, ast_utils_1.getSourceNodes)(source);
     let bootstrapCall = null;
     for (const node of allNodes) {
         let bootstrapCallNode = null;
-        bootstrapCallNode = ast_utils_1.findNode(node, ts.SyntaxKind.Identifier, 'bootstrapModule');
+        bootstrapCallNode = (0, ast_utils_1.findNode)(node, ts.SyntaxKind.Identifier, 'bootstrapModule');
         // Walk up the parent until CallExpression is found.
         while (bootstrapCallNode &&
             bootstrapCallNode.parent &&
@@ -72,11 +72,11 @@ function findBootstrapModulePath(host, mainPath) {
     }
     const mainText = mainBuffer.toString('utf-8');
     const source = ts.createSourceFile(mainPath, mainText, ts.ScriptTarget.Latest, true);
-    const allNodes = ast_utils_1.getSourceNodes(source);
+    const allNodes = (0, ast_utils_1.getSourceNodes)(source);
     const bootstrapModuleRelativePath = allNodes
         .filter(ts.isImportDeclaration)
         .filter((imp) => {
-        return ast_utils_1.findNode(imp, ts.SyntaxKind.Identifier, bootstrapModule.getText());
+        return (0, ast_utils_1.findNode)(imp, ts.SyntaxKind.Identifier, bootstrapModule.getText());
     })
         .map((imp) => {
         const modulePathStringLiteral = imp.moduleSpecifier;
@@ -87,8 +87,8 @@ function findBootstrapModulePath(host, mainPath) {
 exports.findBootstrapModulePath = findBootstrapModulePath;
 function getAppModulePath(host, mainPath) {
     const moduleRelativePath = findBootstrapModulePath(host, mainPath);
-    const mainDir = path_1.dirname(mainPath);
-    const modulePath = core_1.normalize(`/${mainDir}/${moduleRelativePath}.ts`);
+    const mainDir = (0, path_1.dirname)(mainPath);
+    const modulePath = (0, core_1.normalize)(`/${mainDir}/${moduleRelativePath}.ts`);
     return modulePath;
 }
 exports.getAppModulePath = getAppModulePath;

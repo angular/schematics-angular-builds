@@ -27,10 +27,10 @@ class JSONFile {
             return this._jsonAst;
         }
         const errors = [];
-        this._jsonAst = jsonc_parser_1.parseTree(this.content, errors, { allowTrailingComma: true });
+        this._jsonAst = (0, jsonc_parser_1.parseTree)(this.content, errors, { allowTrailingComma: true });
         if (errors.length) {
             const { error, offset } = errors[0];
-            throw new Error(`Failed to parse "${this.path}" as JSON AST Object. ${jsonc_parser_1.printParseErrorCode(error)} at location: ${offset}.`);
+            throw new Error(`Failed to parse "${this.path}" as JSON AST Object. ${(0, jsonc_parser_1.printParseErrorCode)(error)} at location: ${offset}.`);
         }
         return this._jsonAst;
     }
@@ -40,10 +40,10 @@ class JSONFile {
             return undefined;
         }
         if (jsonPath.length === 0) {
-            return jsonc_parser_1.getNodeValue(jsonAstNode);
+            return (0, jsonc_parser_1.getNodeValue)(jsonAstNode);
         }
-        const node = jsonc_parser_1.findNodeAtLocation(jsonAstNode, jsonPath);
-        return node === undefined ? undefined : jsonc_parser_1.getNodeValue(node);
+        const node = (0, jsonc_parser_1.findNodeAtLocation)(jsonAstNode, jsonPath);
+        return node === undefined ? undefined : (0, jsonc_parser_1.getNodeValue)(node);
     }
     modify(jsonPath, value, insertInOrder) {
         let getInsertionIndex;
@@ -54,14 +54,14 @@ class JSONFile {
         else if (insertInOrder !== false) {
             getInsertionIndex = insertInOrder;
         }
-        const edits = jsonc_parser_1.modify(this.content, jsonPath, value, {
+        const edits = (0, jsonc_parser_1.modify)(this.content, jsonPath, value, {
             getInsertionIndex,
             formattingOptions: {
                 insertSpaces: true,
                 tabSize: 2,
             },
         });
-        this.content = jsonc_parser_1.applyEdits(this.content, edits);
+        this.content = (0, jsonc_parser_1.applyEdits)(this.content, edits);
         this.host.overwrite(this.path, this.content);
         this._jsonAst = undefined;
     }

@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const workspace_1 = require("../../utility/workspace");
 function default_1() {
-    return workspace_1.updateWorkspace((workspace) => {
+    return (0, workspace_1.updateWorkspace)((workspace) => {
         const optionsToRemove = {
             environment: undefined,
             extractCss: undefined,
@@ -48,12 +48,12 @@ exports.default = default_1;
 function updateLazyScriptsStyleOption(options) {
     function visitor(options, type) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        if (!options[type] || !core_1.isJsonArray(options[type])) {
+        if (!options[type] || !(0, core_1.isJsonArray)(options[type])) {
             return undefined;
         }
         const entries = [];
         for (const entry of options[type]) {
-            if (core_1.isJsonObject(entry) && 'lazy' in entry) {
+            if ((0, core_1.isJsonObject)(entry) && 'lazy' in entry) {
                 entries.push({
                     ...entry,
                     inject: !entry.lazy,

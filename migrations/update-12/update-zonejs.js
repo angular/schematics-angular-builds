@@ -16,7 +16,7 @@ function* visitJavaScriptFiles(directory) {
         if (!fileExtensionRegexp.test(path)) {
             continue;
         }
-        yield core_1.join(directory.path, path);
+        yield (0, core_1.join)(directory.path, path);
     }
     for (const path of directory.subdirs) {
         if (path === 'node_modules' || path.startsWith('.') || path === 'dist') {
@@ -27,9 +27,9 @@ function* visitJavaScriptFiles(directory) {
 }
 function default_1() {
     return (tree, context) => {
-        const current = dependencies_1.getPackageJsonDependency(tree, 'zone.js');
+        const current = (0, dependencies_1.getPackageJsonDependency)(tree, 'zone.js');
         if (current && current.version !== '~0.11.4') {
-            dependencies_1.addPackageJsonDependency(tree, {
+            (0, dependencies_1.addPackageJsonDependency)(tree, {
                 type: current.type,
                 name: 'zone.js',
                 version: '~0.11.4',

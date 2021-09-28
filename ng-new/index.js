@@ -14,7 +14,7 @@ function default_1(options) {
     if (!options.name) {
         throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
     }
-    validation_1.validateProjectName(options.name);
+    (0, validation_1.validateProjectName)(options.name);
     if (!options.directory) {
         options.directory = options.name;
     }
@@ -42,11 +42,11 @@ function default_1(options) {
         strict: options.strict,
         minimal: options.minimal,
     };
-    return schematics_1.chain([
-        schematics_1.mergeWith(schematics_1.apply(schematics_1.empty(), [
-            schematics_1.schematic('workspace', workspaceOptions),
-            options.createApplication ? schematics_1.schematic('application', applicationOptions) : schematics_1.noop,
-            schematics_1.move(options.directory),
+    return (0, schematics_1.chain)([
+        (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.empty)(), [
+            (0, schematics_1.schematic)('workspace', workspaceOptions),
+            options.createApplication ? (0, schematics_1.schematic)('application', applicationOptions) : schematics_1.noop,
+            (0, schematics_1.move)(options.directory),
         ])),
         (_host, context) => {
             let packageTask;
