@@ -17,7 +17,7 @@ function* visitExtendedJsonFiles(directory) {
         const entry = directory.file(path);
         const content = entry === null || entry === void 0 ? void 0 : entry.content.toString();
         if (content === null || content === void 0 ? void 0 : content.includes('tsconfig.base.json')) {
-            yield core_1.join(directory.path, path);
+            yield (0, core_1.join)(directory.path, path);
         }
     }
     for (const path of directory.subdirs) {
@@ -51,11 +51,11 @@ function default_1() {
         const extendsJsonPath = ['extends'];
         for (const path of visitExtendedJsonFiles(host.root)) {
             try {
-                const tsConfigDir = core_1.dirname(core_1.normalize(path));
+                const tsConfigDir = (0, core_1.dirname)((0, core_1.normalize)(path));
                 const tsConfigJson = new json_file_1.JSONFile(host, path);
                 const extendsValue = tsConfigJson.get(extendsJsonPath);
                 if (typeof extendsValue === 'string' &&
-                    '/tsconfig.base.json' === core_1.resolve(tsConfigDir, core_1.normalize(extendsValue))) {
+                    '/tsconfig.base.json' === (0, core_1.resolve)(tsConfigDir, (0, core_1.normalize)(extendsValue))) {
                     // tsconfig extends the workspace tsconfig path.
                     tsConfigJson.modify(extendsJsonPath, extendsValue.replace('tsconfig.base.json', 'tsconfig.json'));
                 }

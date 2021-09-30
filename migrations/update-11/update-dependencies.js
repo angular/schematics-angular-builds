@@ -24,11 +24,11 @@ function default_1() {
         };
         let hasChanges = false;
         for (const [name, version] of Object.entries(dependenciesToUpdate)) {
-            const current = dependencies_1.getPackageJsonDependency(host, name);
+            const current = (0, dependencies_1.getPackageJsonDependency)(host, name);
             if (!current || current.version === version) {
                 continue;
             }
-            dependencies_1.addPackageJsonDependency(host, {
+            (0, dependencies_1.addPackageJsonDependency)(host, {
                 type: current.type,
                 name,
                 version,

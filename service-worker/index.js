@@ -41,7 +41,7 @@ function addDependencies() {
     return (host, context) => {
         const packageName = '@angular/service-worker';
         context.logger.debug(`adding dependency (${packageName})`);
-        const coreDep = dependencies_1.getPackageJsonDependency(host, '@angular/core');
+        const coreDep = (0, dependencies_1.getPackageJsonDependency)(host, '@angular/core');
         if (coreDep === null) {
             throw new schematics_1.SchematicsException('Could not find version.');
         }
@@ -49,31 +49,31 @@ function addDependencies() {
             ...coreDep,
             name: packageName,
         };
-        dependencies_1.addPackageJsonDependency(host, serviceWorkerDep);
+        (0, dependencies_1.addPackageJsonDependency)(host, serviceWorkerDep);
         return host;
     };
 }
 function updateAppModule(mainPath) {
     return (host, context) => {
         context.logger.debug('Updating appmodule');
-        const modulePath = ng_ast_utils_1.getAppModulePath(host, mainPath);
+        const modulePath = (0, ng_ast_utils_1.getAppModulePath)(host, mainPath);
         context.logger.debug(`module path: ${modulePath}`);
         // add import
         let moduleSource = getTsSourceFile(host, modulePath);
         let importModule = 'ServiceWorkerModule';
         let importPath = '@angular/service-worker';
-        if (!ast_utils_1.isImported(moduleSource, importModule, importPath)) {
-            const change = ast_utils_1.insertImport(moduleSource, modulePath, importModule, importPath);
+        if (!(0, ast_utils_1.isImported)(moduleSource, importModule, importPath)) {
+            const change = (0, ast_utils_1.insertImport)(moduleSource, modulePath, importModule, importPath);
             if (change) {
                 const recorder = host.beginUpdate(modulePath);
-                change_1.applyToUpdateRecorder(recorder, [change]);
+                (0, change_1.applyToUpdateRecorder)(recorder, [change]);
                 host.commitUpdate(recorder);
             }
         }
         // add import for environments
         // import { environment } from '../environments/environment';
         moduleSource = getTsSourceFile(host, modulePath);
-        const environmentExportName = ast_utils_1.getEnvironmentExportName(moduleSource);
+        const environmentExportName = (0, ast_utils_1.getEnvironmentExportName)(moduleSource);
         // if environemnt import already exists then use the found one
         // otherwise use the default name
         importModule = environmentExportName || 'environment';
@@ -82,10 +82,10 @@ function updateAppModule(mainPath) {
         if (!environmentExportName) {
             // if environment import was not found then insert the new one
             // with default path and default export name
-            const change = ast_utils_1.insertImport(moduleSource, modulePath, importModule, importPath);
+            const change = (0, ast_utils_1.insertImport)(moduleSource, modulePath, importModule, importPath);
             if (change) {
                 const recorder = host.beginUpdate(modulePath);
-                change_1.applyToUpdateRecorder(recorder, [change]);
+                (0, change_1.applyToUpdateRecorder)(recorder, [change]);
                 host.commitUpdate(recorder);
             }
         }
@@ -99,10 +99,10 @@ function updateAppModule(mainPath) {
       })
     `;
         moduleSource = getTsSourceFile(host, modulePath);
-        const metadataChanges = ast_utils_1.addSymbolToNgModuleMetadata(moduleSource, modulePath, 'imports', importText);
+        const metadataChanges = (0, ast_utils_1.addSymbolToNgModuleMetadata)(moduleSource, modulePath, 'imports', importText);
         if (metadataChanges) {
             const recorder = host.beginUpdate(modulePath);
-            change_1.applyToUpdateRecorder(recorder, metadataChanges);
+            (0, change_1.applyToUpdateRecorder)(recorder, metadataChanges);
             host.commitUpdate(recorder);
         }
         return host;
@@ -119,7 +119,7 @@ function getTsSourceFile(host, path) {
 }
 function default_1(options) {
     return async (host, context) => {
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         const project = workspace.projects.get(options.project);
         if (!project) {
             throw new schematics_1.SchematicsException(`Invalid project name (${options.project})`);
@@ -129,28 +129,28 @@ function default_1(options) {
         }
         const buildTarget = project.targets.get('build');
         if (!buildTarget) {
-            throw project_targets_1.targetBuildNotFoundError();
+            throw (0, project_targets_1.targetBuildNotFoundError)();
         }
         const buildOptions = (buildTarget.options || {});
         const root = project.root;
         buildOptions.serviceWorker = true;
-        buildOptions.ngswConfigPath = core_1.join(core_1.normalize(root), 'ngsw-config.json');
+        buildOptions.ngswConfigPath = (0, core_1.join)((0, core_1.normalize)(root), 'ngsw-config.json');
         let { resourcesOutputPath = '' } = buildOptions;
         if (resourcesOutputPath) {
-            resourcesOutputPath = core_1.normalize(`/${resourcesOutputPath}`);
+            resourcesOutputPath = (0, core_1.normalize)(`/${resourcesOutputPath}`);
         }
-        const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            schematics_1.applyTemplates({
+        const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+            (0, schematics_1.applyTemplates)({
                 ...options,
                 resourcesOutputPath,
-                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(project.root),
+                relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(project.root),
             }),
-            schematics_1.move(project.root),
+            (0, schematics_1.move)(project.root),
         ]);
         context.addTask(new tasks_1.NodePackageInstallTask());
-        return schematics_1.chain([
-            schematics_1.mergeWith(templateSource),
-            workspace_1.updateWorkspace(workspace),
+        return (0, schematics_1.chain)([
+            (0, schematics_1.mergeWith)(templateSource),
+            (0, workspace_1.updateWorkspace)(workspace),
             addDependencies(),
             updateAppModule(buildOptions.main),
         ]);

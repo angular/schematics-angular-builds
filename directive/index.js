@@ -51,9 +51,9 @@ function addDeclarationToNgModule(options) {
             (options.flat ? '' : core_1.strings.dasherize(options.name) + '/') +
             core_1.strings.dasherize(options.name) +
             '.directive';
-        const relativePath = find_module_1.buildRelativePath(modulePath, directivePath);
+        const relativePath = (0, find_module_1.buildRelativePath)(modulePath, directivePath);
         const classifiedName = core_1.strings.classify(`${options.name}Directive`);
-        const declarationChanges = ast_utils_1.addDeclarationToModule(source, modulePath, classifiedName, relativePath);
+        const declarationChanges = (0, ast_utils_1.addDeclarationToModule)(source, modulePath, classifiedName, relativePath);
         const declarationRecorder = host.beginUpdate(modulePath);
         for (const change of declarationChanges) {
             if (change instanceof change_1.InsertChange) {
@@ -70,7 +70,7 @@ function addDeclarationToNgModule(options) {
             const sourceText = text.toString('utf-8');
             const source = ts.createSourceFile(modulePath, sourceText, ts.ScriptTarget.Latest, true);
             const exportRecorder = host.beginUpdate(modulePath);
-            const exportChanges = ast_utils_1.addExportToModule(source, modulePath, core_1.strings.classify(`${options.name}Directive`), relativePath);
+            const exportChanges = (0, ast_utils_1.addExportToModule)(source, modulePath, core_1.strings.classify(`${options.name}Directive`), relativePath);
             for (const change of exportChanges) {
                 if (change instanceof change_1.InsertChange) {
                     exportRecorder.insertLeft(change.pos, change.toAdd);
@@ -93,30 +93,30 @@ function buildSelector(options, projectPrefix) {
 }
 function default_1(options) {
     return async (host) => {
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         const project = workspace.projects.get(options.project);
         if (!project) {
             throw new schematics_1.SchematicsException(`Project "${options.project}" does not exist.`);
         }
         if (options.path === undefined) {
-            options.path = workspace_1.buildDefaultPath(project);
+            options.path = (0, workspace_1.buildDefaultPath)(project);
         }
-        options.module = find_module_1.findModuleFromOptions(host, options);
-        const parsedPath = parse_name_1.parseName(options.path, options.name);
+        options.module = (0, find_module_1.findModuleFromOptions)(host, options);
+        const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
         options.selector = options.selector || buildSelector(options, project.prefix || '');
-        validation_1.validateHtmlSelector(options.selector);
-        const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            options.skipTests ? schematics_1.filter((path) => !path.endsWith('.spec.ts.template')) : schematics_1.noop(),
-            schematics_1.applyTemplates({
+        (0, validation_1.validateHtmlSelector)(options.selector);
+        const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+            options.skipTests ? (0, schematics_1.filter)((path) => !path.endsWith('.spec.ts.template')) : (0, schematics_1.noop)(),
+            (0, schematics_1.applyTemplates)({
                 ...core_1.strings,
                 'if-flat': (s) => (options.flat ? '' : s),
                 ...options,
             }),
-            schematics_1.move(parsedPath.path),
+            (0, schematics_1.move)(parsedPath.path),
         ]);
-        return schematics_1.chain([addDeclarationToNgModule(options), schematics_1.mergeWith(templateSource)]);
+        return (0, schematics_1.chain)([addDeclarationToNgModule(options), (0, schematics_1.mergeWith)(templateSource)]);
     };
 }
 exports.default = default_1;

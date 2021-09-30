@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const workspace_1 = require("../../utility/workspace");
 function default_1() {
-    return workspace_1.updateWorkspace((workspace) => {
+    return (0, workspace_1.updateWorkspace)((workspace) => {
         for (const [, project] of workspace.projects) {
             for (const [name, target] of project.targets) {
                 // Delete removed tslint builder
@@ -21,7 +21,7 @@ function default_1() {
                     continue;
                 }
                 // Only interested in Angular Devkit builders
-                for (const [, options] of workspace_1.allTargetOptions(target)) {
+                for (const [, options] of (0, workspace_1.allTargetOptions)(target)) {
                     delete options.extractCss;
                     delete options.servePathDefaultWarning;
                     delete options.hmrWarning;

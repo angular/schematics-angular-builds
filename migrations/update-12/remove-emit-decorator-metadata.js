@@ -15,7 +15,7 @@ function* visitJsonFiles(directory) {
         if (!path.endsWith('.json')) {
             continue;
         }
-        yield core_1.join(directory.path, path);
+        yield (0, core_1.join)(directory.path, path);
     }
     for (const path of directory.subdirs) {
         if (path === 'node_modules' || path.startsWith('.')) {
@@ -26,8 +26,8 @@ function* visitJsonFiles(directory) {
 }
 function default_1() {
     return async (tree, { logger }) => {
-        const workspace = await workspace_1.getWorkspace(tree);
-        const hasThirdPartyBuilders = [...workspace_1.allWorkspaceTargets(workspace)].some(([, target]) => {
+        const workspace = await (0, workspace_1.getWorkspace)(tree);
+        const hasThirdPartyBuilders = [...(0, workspace_1.allWorkspaceTargets)(workspace)].some(([, target]) => {
             const { builder } = target;
             return !(builder.startsWith('@angular-devkit/build-angular') ||
                 builder.startsWith('@nguniversal/builders'));

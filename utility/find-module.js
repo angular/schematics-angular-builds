@@ -23,17 +23,17 @@ function findModuleFromOptions(host, options) {
     const routingModuleExt = options.routingModuleExt || exports.ROUTING_MODULE_EXT;
     if (!options.module) {
         const pathToCheck = (options.path || '') + '/' + options.name;
-        return core_1.normalize(findModule(host, pathToCheck, moduleExt, routingModuleExt));
+        return (0, core_1.normalize)(findModule(host, pathToCheck, moduleExt, routingModuleExt));
     }
     else {
-        const modulePath = core_1.normalize(`/${options.path}/${options.module}`);
-        const componentPath = core_1.normalize(`/${options.path}/${options.name}`);
-        const moduleBaseName = core_1.normalize(modulePath).split('/').pop();
-        const candidateSet = new Set([core_1.normalize(options.path || '/')]);
-        for (let dir = modulePath; dir != core_1.NormalizedRoot; dir = core_1.dirname(dir)) {
+        const modulePath = (0, core_1.normalize)(`/${options.path}/${options.module}`);
+        const componentPath = (0, core_1.normalize)(`/${options.path}/${options.name}`);
+        const moduleBaseName = (0, core_1.normalize)(modulePath).split('/').pop();
+        const candidateSet = new Set([(0, core_1.normalize)(options.path || '/')]);
+        for (let dir = modulePath; dir != core_1.NormalizedRoot; dir = (0, core_1.dirname)(dir)) {
             candidateSet.add(dir);
         }
-        for (let dir = componentPath; dir != core_1.NormalizedRoot; dir = core_1.dirname(dir)) {
+        for (let dir = componentPath; dir != core_1.NormalizedRoot; dir = (0, core_1.dirname)(dir)) {
             candidateSet.add(dir);
         }
         const candidatesDirs = [...candidateSet].sort((a, b) => b.length - a.length);
@@ -42,10 +42,10 @@ function findModuleFromOptions(host, options) {
                 '',
                 `${moduleBaseName}.ts`,
                 `${moduleBaseName}${moduleExt}`,
-            ].map((x) => core_1.join(c, x));
+            ].map((x) => (0, core_1.join)(c, x));
             for (const sc of candidateFiles) {
                 if (host.exists(sc)) {
-                    return core_1.normalize(sc);
+                    return (0, core_1.normalize)(sc);
                 }
             }
         }
@@ -65,7 +65,7 @@ function findModule(host, generateDir, moduleExt = exports.MODULE_EXT, routingMo
         const filteredMatches = allMatches.filter((p) => !p.endsWith(routingModuleExt));
         foundRoutingModule = foundRoutingModule || allMatches.length !== filteredMatches.length;
         if (filteredMatches.length == 1) {
-            return core_1.join(dir.path, filteredMatches[0]);
+            return (0, core_1.join)(dir.path, filteredMatches[0]);
         }
         else if (filteredMatches.length > 1) {
             throw new Error('More than one module matches. Use the skip-import option to skip importing ' +
@@ -85,15 +85,15 @@ exports.findModule = findModule;
  * Build a relative path from one file path to another file path.
  */
 function buildRelativePath(from, to) {
-    from = core_1.normalize(from);
-    to = core_1.normalize(to);
+    from = (0, core_1.normalize)(from);
+    to = (0, core_1.normalize)(to);
     // Convert to arrays.
     const fromParts = from.split('/');
     const toParts = to.split('/');
     // Remove file names (preserving destination)
     fromParts.pop();
     const toFileName = toParts.pop();
-    const relativePath = core_1.relative(core_1.normalize(fromParts.join('/') || '/'), core_1.normalize(toParts.join('/') || '/'));
+    const relativePath = (0, core_1.relative)((0, core_1.normalize)(fromParts.join('/') || '/'), (0, core_1.normalize)(toParts.join('/') || '/'));
     let pathPrefix = '';
     // Set the path prefix for same dir or child dir, parent dir starts with `..`
     if (!relativePath) {

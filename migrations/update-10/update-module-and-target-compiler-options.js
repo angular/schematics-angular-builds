@@ -24,14 +24,14 @@ function default_1() {
         catch (error) {
             logger.warn(`Unable to update 'tsconfig.json' module option from 'esnext' to 'es2020': ${error.message || error}`);
         }
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         // Find all tsconfig which are refereces used by builders
         for (const [, project] of workspace.projects) {
             for (const [, target] of project.targets) {
                 // E2E builder doesn't reference a tsconfig but it uses one found in the root folder.
                 if (target.builder === workspace_models_1.Builders.Protractor &&
                     typeof ((_a = target.options) === null || _a === void 0 ? void 0 : _a.protractorConfig) === 'string') {
-                    const tsConfigPath = core_1.join(core_1.dirname(core_1.normalize(target.options.protractorConfig)), 'tsconfig.json');
+                    const tsConfigPath = (0, core_1.join)((0, core_1.dirname)((0, core_1.normalize)(target.options.protractorConfig)), 'tsconfig.json');
                     try {
                         updateModuleAndTarget(host, tsConfigPath, {
                             oldTarget: 'es5',

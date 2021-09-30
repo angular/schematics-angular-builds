@@ -13,7 +13,7 @@ const workspace_1 = require("../../utility/workspace");
 function* visit(directory) {
     for (const path of directory.subfiles) {
         if (path === 'ng-package.json') {
-            yield core_1.join(directory.path, path);
+            yield (0, core_1.join)(directory.path, path);
         }
     }
     for (const path of directory.subdirs) {
@@ -32,7 +32,7 @@ function default_1() {
         ['lib', 'umdId'],
     ];
     return async (tree) => {
-        const workspace = await workspace_1.getWorkspace(tree);
+        const workspace = await (0, workspace_1.getWorkspace)(tree);
         const librariesTsConfig = new Set();
         const ngPackagrConfig = new Set();
         for (const [, project] of workspace.projects) {
@@ -40,7 +40,7 @@ function default_1() {
                 if (target.builder !== '@angular-devkit/build-angular:ng-packagr') {
                     continue;
                 }
-                for (const [, options] of workspace_1.allTargetOptions(target)) {
+                for (const [, options] of (0, workspace_1.allTargetOptions)(target)) {
                     if (typeof options.tsConfig === 'string') {
                         librariesTsConfig.add(options.tsConfig);
                     }

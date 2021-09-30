@@ -56,12 +56,12 @@ function addDependenciesToPackageJson() {
                 name: 'typescript',
                 version: latest_versions_1.latestVersions['typescript'],
             },
-        ].forEach((dependency) => dependencies_1.addPackageJsonDependency(host, dependency));
+        ].forEach((dependency) => (0, dependencies_1.addPackageJsonDependency)(host, dependency));
         return host;
     };
 }
 function addLibToWorkspaceFile(options, projectRoot, projectName) {
-    return workspace_1.updateWorkspace((workspace) => {
+    return (0, workspace_1.updateWorkspace)((workspace) => {
         if (workspace.projects.size === 0) {
             workspace.extensions.defaultProject = projectName;
         }
@@ -105,7 +105,7 @@ function default_1(options) {
             throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
         }
         const prefix = options.prefix;
-        validation_1.validateProjectName(options.name);
+        (0, validation_1.validateProjectName)(options.name);
         // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
         const projectName = options.name;
         const packageName = core_1.strings.dasherize(projectName);
@@ -115,42 +115,42 @@ function default_1(options) {
             scopeName = scope.replace(/^@/, '');
             options.name = name;
         }
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
         const scopeFolder = scopeName ? core_1.strings.dasherize(scopeName) + '/' : '';
         const folderName = `${scopeFolder}${core_1.strings.dasherize(options.name)}`;
-        const projectRoot = core_1.join(core_1.normalize(newProjectRoot), folderName);
+        const projectRoot = (0, core_1.join)((0, core_1.normalize)(newProjectRoot), folderName);
         const distRoot = `dist/${folderName}`;
         const pathImportLib = `${distRoot}/${folderName.replace('/', '-')}`;
         const sourceDir = `${projectRoot}/src/lib`;
-        const templateSource = schematics_1.apply(schematics_1.url('./files'), [
-            schematics_1.applyTemplates({
+        const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+            (0, schematics_1.applyTemplates)({
                 ...core_1.strings,
                 ...options,
                 packageName,
                 projectRoot,
                 distRoot,
-                relativePathToWorkspaceRoot: paths_1.relativePathToWorkspaceRoot(projectRoot),
+                relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(projectRoot),
                 prefix,
                 angularLatestVersion: latest_versions_1.latestVersions.Angular.replace(/~|\^/, ''),
                 tsLibLatestVersion: latest_versions_1.latestVersions['tslib'].replace(/~|\^/, ''),
                 folderName,
             }),
-            schematics_1.move(projectRoot),
+            (0, schematics_1.move)(projectRoot),
         ]);
-        return schematics_1.chain([
-            schematics_1.mergeWith(templateSource),
+        return (0, schematics_1.chain)([
+            (0, schematics_1.mergeWith)(templateSource),
             addLibToWorkspaceFile(options, projectRoot, projectName),
-            options.skipPackageJson ? schematics_1.noop() : addDependenciesToPackageJson(),
-            options.skipTsConfig ? schematics_1.noop() : updateTsConfig(packageName, pathImportLib, distRoot),
-            schematics_1.schematic('module', {
+            options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(),
+            options.skipTsConfig ? (0, schematics_1.noop)() : updateTsConfig(packageName, pathImportLib, distRoot),
+            (0, schematics_1.schematic)('module', {
                 name: options.name,
                 commonModule: false,
                 flat: true,
                 path: sourceDir,
                 project: projectName,
             }),
-            schematics_1.schematic('component', {
+            (0, schematics_1.schematic)('component', {
                 name: options.name,
                 selector: `${prefix}-${options.name}`,
                 inlineStyle: true,
@@ -160,7 +160,7 @@ function default_1(options) {
                 export: true,
                 project: projectName,
             }),
-            schematics_1.schematic('service', {
+            (0, schematics_1.schematic)('service', {
                 name: options.name,
                 flat: true,
                 path: sourceDir,

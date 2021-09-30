@@ -31,7 +31,7 @@ const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 function default_1() {
     return async (host, context) => {
-        const workspace = await workspace_1.getWorkspace(host);
+        const workspace = await (0, workspace_1.getWorkspace)(host);
         for (const [projectName, project] of workspace.projects) {
             if (project.extensions.projectType !== workspace_models_1.ProjectType.Application) {
                 // Only interested in application projects
@@ -42,7 +42,7 @@ function default_1() {
                 if ((target === null || target === void 0 ? void 0 : target.builder) !== workspace_models_1.Builders.Browser) {
                     continue;
                 }
-                const isES5Needed = await isES5SupportNeeded(core_1.resolve(core_1.normalize(host.root.path), core_1.normalize(project.root)));
+                const isES5Needed = await isES5SupportNeeded((0, core_1.resolve)((0, core_1.normalize)(host.root.path), (0, core_1.normalize)(project.root)));
                 // Check options
                 if (target.options) {
                     target.options = removeE5BrowserSupportOption(projectName, target.options, isES5Needed, context.logger);
@@ -56,7 +56,7 @@ function default_1() {
                 }
             }
         }
-        return workspace_1.updateWorkspace(workspace);
+        return (0, workspace_1.updateWorkspace)(workspace);
     };
 }
 exports.default = default_1;
@@ -93,7 +93,7 @@ async function isES5SupportNeeded(projectRoot) {
         // eslint-disable-next-line import/no-extraneous-dependencies
         const browserslist = (await Promise.resolve().then(() => __importStar(require('browserslist')))).default;
         const supportedBrowsers = browserslist(undefined, {
-            path: core_1.getSystemPath(projectRoot),
+            path: (0, core_1.getSystemPath)(projectRoot),
         });
         // eslint-disable-next-line import/no-extraneous-dependencies
         const { feature, features } = await Promise.resolve().then(() => __importStar(require('caniuse-lite')));

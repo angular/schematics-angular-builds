@@ -11,9 +11,9 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const latest_versions_1 = require("../utility/latest-versions");
 function default_1(options) {
-    return schematics_1.mergeWith(schematics_1.apply(schematics_1.url('./files'), [
-        options.minimal ? schematics_1.filter((path) => !path.endsWith('editorconfig.template')) : schematics_1.noop(),
-        schematics_1.applyTemplates({
+    return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+        options.minimal ? (0, schematics_1.filter)((path) => !path.endsWith('editorconfig.template')) : (0, schematics_1.noop)(),
+        (0, schematics_1.applyTemplates)({
             utils: core_1.strings,
             ...options,
             'dot': '.',

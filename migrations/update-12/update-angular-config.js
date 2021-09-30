@@ -23,8 +23,8 @@ const ServerBuilderOptions = [
     ['optimization', false, true],
 ];
 function default_1() {
-    return (_tree, context) => workspace_1.updateWorkspace((workspace) => {
-        for (const [targetName, target, projectName] of workspace_1.allWorkspaceTargets(workspace)) {
+    return (_tree, context) => (0, workspace_1.updateWorkspace)((workspace) => {
+        for (const [targetName, target, projectName] of (0, workspace_1.allWorkspaceTargets)(workspace)) {
             if (!target.builder.startsWith('@angular-devkit/') &&
                 !target.builder.startsWith('@nguniversal/')) {
                 context.logger.warn(core_1.tags.stripIndent `
@@ -43,7 +43,7 @@ function default_1() {
                     updateOptions(target, BrowserBuilderOptions);
                     break;
             }
-            for (const [, options] of workspace_1.allTargetOptions(target)) {
+            for (const [, options] of (0, workspace_1.allTargetOptions)(target)) {
                 delete options.experimentalRollupPass;
                 delete options.lazyModules;
                 delete options.forkTypeChecker;
