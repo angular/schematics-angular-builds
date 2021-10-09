@@ -3,10 +3,15 @@
   "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
   "compilerOptions": {
     "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/lib",
+    "target": "es2015",
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": []
+    "types": [],
+    "lib": [
+      "dom",
+      "es2018"
+    ]
   },
   "exclude": [
     "src/test.ts",
