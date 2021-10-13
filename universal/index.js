@@ -130,9 +130,16 @@ function wrapBootstrapCall(mainFile) {
         }
         // indent contents
         const triviaWidth = bootstrapCall.getLeadingTriviaWidth();
-        const beforeText = `document.addEventListener('DOMContentLoaded', () => {\n` +
-            ' '.repeat(triviaWidth > 2 ? triviaWidth + 1 : triviaWidth);
-        const afterText = `\n${triviaWidth > 2 ? ' '.repeat(triviaWidth - 1) : ''}});`;
+        const beforeText = `function bootstrap() {\n` + ' '.repeat(triviaWidth > 2 ? triviaWidth + 1 : triviaWidth);
+        const afterText = `\n${triviaWidth > 2 ? ' '.repeat(triviaWidth - 1) : ''}};\n` +
+            `
+
+if (document.readyState === 'complete') {
+  bootstrap();
+} else {
+  document.addEventListener('DOMContentLoaded', bootstrap);
+}
+`;
         // in some cases we need to cater for a trailing semicolon such as;
         // bootstrap().catch(err => console.log(err));
         const lastToken = bootstrapCall.parent.getLastToken();
