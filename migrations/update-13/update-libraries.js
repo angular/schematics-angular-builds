@@ -31,7 +31,7 @@ function default_1() {
         ['lib', 'amdId'],
         ['lib', 'umdId'],
     ];
-    return async (tree) => {
+    return async (tree, context) => {
         const workspace = await (0, workspace_1.getWorkspace)(tree);
         const librariesTsConfig = new Set();
         const ngPackagrConfig = new Set();
@@ -45,7 +45,15 @@ function default_1() {
                         librariesTsConfig.add(options.tsConfig);
                     }
                     if (typeof options.project === 'string') {
-                        ngPackagrConfig.add(options.project);
+                        if (options.project.endsWith('.json')) {
+                            ngPackagrConfig.add(options.project);
+                        }
+                        else {
+                            context.logger
+                                .warn(core_1.tags.stripIndent `Expected a JSON configuration file but found "${options.project}".
+                  You may need to adjust the configuration file to remove invalid options.
+                  For more information, see the breaking changes section within the release notes: https://github.com/ng-packagr/ng-packagr/releases/tag/v13.0.0/.`);
+                        }
                     }
                 }
             }
