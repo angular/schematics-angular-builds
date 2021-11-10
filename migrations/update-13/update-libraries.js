@@ -12,9 +12,16 @@ const json_file_1 = require("../../utility/json-file");
 const workspace_1 = require("../../utility/workspace");
 function* visit(directory) {
     for (const path of directory.subfiles) {
-        if (path === 'ng-package.json') {
-            yield (0, core_1.join)(directory.path, path);
+        if (path === 'package.json') {
+            const entry = directory.file(path);
+            if ((entry === null || entry === void 0 ? void 0 : entry.content.toString().includes('ngPackage')) !== true) {
+                continue;
+            }
         }
+        else if (path !== 'ng-package.json') {
+            continue;
+        }
+        yield (0, core_1.join)(directory.path, path);
     }
     for (const path of directory.subdirs) {
         if (path === 'node_modules' || path.startsWith('.')) {
@@ -30,6 +37,9 @@ function default_1() {
         ['lib', 'umdModuleIds'],
         ['lib', 'amdId'],
         ['lib', 'umdId'],
+        ['ngPackage', 'lib', 'umdModuleIds'],
+        ['ngPackage', 'lib', 'amdId'],
+        ['ngPackage', 'lib', 'umdId'],
     ];
     return async (tree, context) => {
         const workspace = await (0, workspace_1.getWorkspace)(tree);
