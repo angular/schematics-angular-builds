@@ -9,7 +9,7 @@ export interface Schema {
     /**
      * The name of the library.
      */
-    name?: string;
+    name: string;
     /**
      * A prefix to apply to generated selectors.
      */

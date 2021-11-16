@@ -14,7 +14,6 @@ const dependencies_1 = require("../utility/dependencies");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const paths_1 = require("../utility/paths");
-const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 function updateTsConfig(packageName, ...paths) {
@@ -101,24 +100,19 @@ function addLibToWorkspaceFile(options, projectRoot, projectName) {
 }
 function default_1(options) {
     return async (host) => {
-        if (!options.name) {
-            throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
-        }
         const prefix = options.prefix;
-        (0, validation_1.validateProjectName)(options.name);
         // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
-        const projectName = options.name;
-        const packageName = core_1.strings.dasherize(projectName);
-        let scopeName = null;
+        const packageName = options.name;
         if (/^@.*\/.*/.test(options.name)) {
-            const [scope, name] = options.name.split('/');
-            scopeName = scope.replace(/^@/, '');
+            const [, name] = options.name.split('/');
             options.name = name;
         }
         const workspace = await (0, workspace_1.getWorkspace)(host);
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
-        const scopeFolder = scopeName ? core_1.strings.dasherize(scopeName) + '/' : '';
-        const folderName = `${scopeFolder}${core_1.strings.dasherize(options.name)}`;
+        let folderName = packageName.startsWith('@') ? packageName.substr(1) : packageName;
+        if (/[A-Z]/.test(folderName)) {
+            folderName = core_1.strings.dasherize(folderName);
+        }
         const projectRoot = (0, core_1.join)((0, core_1.normalize)(newProjectRoot), folderName);
         const distRoot = `dist/${folderName}`;
         const pathImportLib = `${distRoot}/${folderName.replace('/', '-')}`;
@@ -140,7 +134,7 @@ function default_1(options) {
         ]);
         return (0, schematics_1.chain)([
             (0, schematics_1.mergeWith)(templateSource),
-            addLibToWorkspaceFile(options, projectRoot, projectName),
+            addLibToWorkspaceFile(options, projectRoot, packageName),
             options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(),
             options.skipTsConfig ? (0, schematics_1.noop)() : updateTsConfig(packageName, pathImportLib, distRoot),
             (0, schematics_1.schematic)('module', {
@@ -148,7 +142,7 @@ function default_1(options) {
                 commonModule: false,
                 flat: true,
                 path: sourceDir,
-                project: projectName,
+                project: packageName,
             }),
             (0, schematics_1.schematic)('component', {
                 name: options.name,
@@ -158,13 +152,13 @@ function default_1(options) {
                 flat: true,
                 path: sourceDir,
                 export: true,
-                project: projectName,
+                project: packageName,
             }),
             (0, schematics_1.schematic)('service', {
                 name: options.name,
                 flat: true,
                 path: sourceDir,
-                project: projectName,
+                project: packageName,
             }),
             (_tree, context) => {
                 if (!options.skipPackageJson && !options.skipInstall) {

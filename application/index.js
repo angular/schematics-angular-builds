@@ -13,7 +13,6 @@ const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../utility/dependencies");
 const latest_versions_1 = require("../utility/latest-versions");
 const paths_1 = require("../utility/paths");
-const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 const schema_1 = require("./schema");
@@ -42,7 +41,7 @@ function addDependenciesToPackageJson(options) {
         return host;
     };
 }
-function addAppToWorkspaceFile(options, appDir) {
+function addAppToWorkspaceFile(options, appDir, folderName) {
     var _a, _b;
     let projectRoot = appDir;
     if (projectRoot) {
@@ -121,7 +120,7 @@ function addAppToWorkspaceFile(options, appDir) {
                 builder: workspace_models_1.Builders.Browser,
                 defaultConfiguration: 'production',
                 options: {
-                    outputPath: `dist/${options.name}`,
+                    outputPath: `dist/${folderName}`,
                     index: `${sourceRoot}/index.html`,
                     main: `${sourceRoot}/main.ts`,
                     polyfills: `${sourceRoot}/polyfills.ts`,
@@ -205,10 +204,6 @@ function minimalPathFilter(path) {
 function default_1(options) {
     return async (host) => {
         var _a, _b;
-        if (!options.name) {
-            throw new schematics_1.SchematicsException(`Invalid options, "name" is required.`);
-        }
-        (0, validation_1.validateProjectName)(options.name);
         const appRootSelector = `${options.prefix}-root`;
         const componentOptions = !options.minimal
             ? {
@@ -228,12 +223,17 @@ function default_1(options) {
         const workspace = await (0, workspace_1.getWorkspace)(host);
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
         const isRootApp = options.projectRoot !== undefined;
+        // If scoped project (i.e. "@foo/bar"), convert dir to "foo/bar".
+        let folderName = options.name.startsWith('@') ? options.name.substr(1) : options.name;
+        if (/[A-Z]/.test(folderName)) {
+            folderName = core_1.strings.dasherize(folderName);
+        }
         const appDir = isRootApp
             ? (0, core_1.normalize)(options.projectRoot || '')
-            : (0, core_1.join)((0, core_1.normalize)(newProjectRoot), core_1.strings.dasherize(options.name));
+            : (0, core_1.join)((0, core_1.normalize)(newProjectRoot), folderName);
         const sourceDir = `${appDir}/src/app`;
         return (0, schematics_1.chain)([
-            addAppToWorkspaceFile(options, appDir),
+            addAppToWorkspaceFile(options, appDir, folderName),
             (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
                 options.minimal ? (0, schematics_1.filter)(minimalPathFilter) : (0, schematics_1.noop)(),
                 (0, schematics_1.applyTemplates)({
@@ -242,6 +242,7 @@ function default_1(options) {
                     relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(appDir),
                     appName: options.name,
                     isRootApp,
+                    folderName,
                 }),
                 (0, schematics_1.move)(appDir),
             ]), schematics_1.MergeStrategy.Overwrite),
