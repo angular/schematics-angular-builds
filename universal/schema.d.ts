@@ -7,7 +7,7 @@ export interface Schema {
      */
     appDir?: string;
     /**
-     * The app identifier to use for transition.
+     * The application identifier to use for transition.
      */
     appId?: string;
     /**

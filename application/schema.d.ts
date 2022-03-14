@@ -1,5 +1,5 @@
 /**
- * Generates a new basic app definition in the "projects" subfolder of the workspace.
+ * Generates a new basic application definition in the "projects" subfolder of the workspace.
  */
 export interface Schema {
     /**
