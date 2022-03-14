@@ -3,7 +3,7 @@
  */
 export interface Schema {
     /**
-     * The name of the app being tested.
+     * The name of the application being tested.
      */
     relatedAppName: string;
     /**

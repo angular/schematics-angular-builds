@@ -1,5 +1,5 @@
 /**
- * Generates an app shell for running a server-side version of an app.
+ * Generates an application shell for running a server-side version of an app.
  */
 export interface Schema {
     /**
@@ -7,7 +7,7 @@ export interface Schema {
      */
     appDir?: string;
     /**
-     * The app ID to use in withServerTransition().
+     * The application ID to use in withServerTransition().
      */
     appId?: string;
     /**
@@ -27,7 +27,7 @@ export interface Schema {
      */
     rootModuleFileName?: string;
     /**
-     * Route path used to produce the app shell.
+     * Route path used to produce the application shell.
      */
     route?: string;
 }
