@@ -110,12 +110,15 @@ export declare type TestBuilderTarget = BuilderTarget<Builders.Karma, TestBuilde
 export declare type ServeBuilderTarget = BuilderTarget<Builders.DevServer, ServeBuilderOptions>;
 export declare type ExtractI18nBuilderTarget = BuilderTarget<Builders.ExtractI18n, ExtractI18nOptions>;
 export declare type E2EBuilderTarget = BuilderTarget<Builders.Protractor, E2EOptions>;
+interface WorkspaceCLISchema {
+    warnings?: Record<string, boolean>;
+    schematicCollections?: string[];
+    defaultCollection?: string;
+}
 export interface WorkspaceSchema {
     version: 1;
     defaultProject?: string;
-    cli?: {
-        warnings?: Record<string, boolean>;
-    };
+    cli?: WorkspaceCLISchema;
     projects: {
         [key: string]: WorkspaceProject<ProjectType.Application | ProjectType.Library>;
     };
@@ -128,9 +131,7 @@ export interface WorkspaceProject<TProjectType extends ProjectType = ProjectType
     root: string;
     sourceRoot: string;
     prefix: string;
-    cli?: {
-        warnings?: Record<string, boolean>;
-    };
+    cli?: WorkspaceCLISchema;
     /**
      * Tool options.
      */
@@ -150,3 +151,4 @@ export interface WorkspaceTargets<TProjectType extends ProjectType = ProjectType
     'extract-i18n'?: ExtractI18nBuilderTarget;
     [key: string]: any;
 }
+export {};
