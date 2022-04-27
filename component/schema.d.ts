@@ -66,6 +66,10 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
+     * Whether the generated component is standalone.
+     */
+    standalone?: boolean;
+    /**
      * The file extension or preprocessor to use for style files, or 'none' to skip generating
      * the style file.
      */

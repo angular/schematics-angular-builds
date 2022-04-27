@@ -34,4 +34,8 @@ export interface Schema {
      * Do not create "spec.ts" test files for the new pipe.
      */
     skipTests?: boolean;
+    /**
+     * Whether the generated pipe is standalone.
+     */
+    standalone?: boolean;
 }

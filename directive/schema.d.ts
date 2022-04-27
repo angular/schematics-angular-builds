@@ -43,4 +43,8 @@ export interface Schema {
      * Do not create "spec.ts" test files for the new class.
      */
     skipTests?: boolean;
+    /**
+     * Whether the generated directive is standalone.
+     */
+    standalone?: boolean;
 }
