@@ -4,6 +4,7 @@
 export interface Schema {
     /**
      * The name of the application folder.
+     * @deprecated This option has no effect.
      */
     appDir?: string;
     /**
