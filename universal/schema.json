@@ -29,8 +29,7 @@
       "type": "string",
       "format": "path",
       "description": "The name of the application folder.",
-      "default": "app",
-      "x-deprecated": "This option has no effect."
+      "default": "app"
     },
     "rootModuleFileName": {
       "type": "string",
