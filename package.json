@@ -1,12 +1,17 @@
 {
   "name": "@schematics/angular",
-  "version": "14.1.0-rc.3+sha-f698c2c",
+  "version": "14.1.0-rc.3+sha-b5f6d86",
   "description": "Schematics specific to Angular",
   "homepage": "https://github.com/angular/angular-cli",
   "keywords": [
+    "Angular CLI",
+    "Angular DevKit",
+    "angular",
     "blueprints",
     "code generation",
-    "schematics"
+    "devkit",
+    "schematics",
+    "sdk"
   ],
   "exports": {
     "./package.json": "./package.json",
@@ -18,8 +23,22 @@
   },
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "14.1.0-rc.3+sha-f698c2c",
-    "@angular-devkit/schematics": "14.1.0-rc.3+sha-f698c2c",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#b5f6d862b",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#b5f6d862b",
     "jsonc-parser": "3.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/angular/angular-cli.git"
+  },
+  "engines": {
+    "node": "^14.15.0 || >=16.10.0",
+    "npm": "^6.11.0 || ^7.5.6 || >=8.0.0",
+    "yarn": ">= 1.13.0"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
   }
 }
