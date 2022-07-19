@@ -39,6 +39,23 @@ export declare enum InstallBehavior {
     Always = 2
 }
 /**
+ * An enum used to specify the existing dependency behavior for the {@link addDependency}
+ * schematics rule. The existing behavior affects whether the named dependency will be added
+ * to the `package.json` when the dependency is already present with a differing specifier.
+ */
+export declare enum ExistingBehavior {
+    /**
+     * The dependency will not be added or otherwise changed if it already exists.
+     */
+    Skip = 0,
+    /**
+     * The dependency's existing specifier will be replaced with the specifier provided in the
+     * {@link addDependency} call. A warning will also be shown during schematic execution to
+     * notify the user of the replacement.
+     */
+    Replace = 1
+}
+/**
  * Adds a package as a dependency to a `package.json`. By default the `package.json` located
  * at the schematic's root will be used. The `manifestPath` option can be used to explicitly specify
  * a `package.json` in different location. The type of the dependency can also be specified instead
@@ -71,4 +88,9 @@ export declare function addDependency(name: string, specifier: string, options?:
      * Defaults to {@link InstallBehavior.Auto}.
      */
     install?: InstallBehavior;
+    /**
+     * The behavior to use when the dependency already exists within the `package.json`.
+     * Defaults to {@link ExistingBehavior.Replace}.
+     */
+    existing?: ExistingBehavior;
 }): Rule;
