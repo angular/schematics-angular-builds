@@ -7,4 +7,3 @@
  */
 export declare const htmlSelectorRe: RegExp;
 export declare function validateHtmlSelector(selector: string): void;
-export declare function validateClassName(className: string): void;
