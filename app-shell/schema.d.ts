@@ -3,10 +3,6 @@
  */
 export interface Schema {
     /**
-     * The name of the application directory.
-     */
-    appDir?: string;
-    /**
      * The application ID to use in withServerTransition().
      */
     appId?: string;
