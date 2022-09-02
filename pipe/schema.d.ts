@@ -25,7 +25,7 @@ export interface Schema {
     /**
      * The name of the project.
      */
-    project?: string;
+    project: string;
     /**
      * Do not import this pipe into the owning NgModule.
      */

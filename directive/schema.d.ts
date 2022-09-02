@@ -30,7 +30,7 @@ export interface Schema {
     /**
      * The name of the project.
      */
-    project?: string;
+    project: string;
     /**
      * The HTML selector to use for this directive.
      */

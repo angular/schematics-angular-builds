@@ -13,7 +13,7 @@ export interface Schema {
     /**
      * The name of the project.
      */
-    project?: string;
+    project: string;
     /**
      * Do not create "spec.ts" test files for the new class.
      */

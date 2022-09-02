@@ -17,7 +17,7 @@ export interface Schema {
     /**
      * The name of the project.
      */
-    project?: string;
+    project: string;
     /**
      * Adds a developer-defined type to the filename, in the format "name.type.ts".
      */

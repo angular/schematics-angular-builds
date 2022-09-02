@@ -25,7 +25,7 @@ export interface Schema {
     /**
      * The name of the project.
      */
-    project?: string;
+    project: string;
     /**
      * The route path for a lazy-loaded module. When supplied, creates a component in the new
      * module, and adds the route to that component in the `Routes` array declared in the module

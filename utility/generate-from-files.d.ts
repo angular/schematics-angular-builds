@@ -11,7 +11,7 @@ export interface GenerateFromFilesOptions {
     name: string;
     path?: string;
     prefix?: string;
-    project?: string;
+    project: string;
     skipTests?: boolean;
 }
 export declare function generateFromFiles(options: GenerateFromFilesOptions, extraTemplateValues?: Record<string, string | ((v: string) => string)>): Rule;
