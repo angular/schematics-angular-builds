@@ -19,7 +19,7 @@ export interface Schema {
      */
     minimal?: boolean;
     /**
-     * The name of the new app.
+     * The name of the new application.
      */
     name: string;
     /**
@@ -27,7 +27,7 @@ export interface Schema {
      */
     prefix?: string;
     /**
-     * The root directory of the new app.
+     * The root directory of the new application.
      */
     projectRoot?: string;
     /**
