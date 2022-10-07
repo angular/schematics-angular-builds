@@ -15,6 +15,10 @@ export interface Schema {
      */
     prefix?: string;
     /**
+     * The root directory of the new library.
+     */
+    projectRoot?: string;
+    /**
      * Do not install dependency packages.
      */
     skipInstall?: boolean;
