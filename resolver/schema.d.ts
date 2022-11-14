@@ -7,10 +7,6 @@ export interface Schema {
      */
     flat?: boolean;
     /**
-     * Creates the resolver as a `ResolveFn`.
-     */
-    functional?: boolean;
-    /**
      * The name of the new resolver.
      */
     name: string;

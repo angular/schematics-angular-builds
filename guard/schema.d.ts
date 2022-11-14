@@ -7,11 +7,7 @@ export interface Schema {
      */
     flat?: boolean;
     /**
-     * Specifies whether to generate a guard as a function.
-     */
-    functional?: boolean;
-    /**
-     * Specifies which type of guard to create.
+     * Specifies which interfaces to implement.
      */
     implements?: Implement[];
     /**
