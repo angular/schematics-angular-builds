@@ -41,9 +41,14 @@
         "$source": "projectName"
       }
     },
+    "functional": {
+      "type": "boolean",
+      "description": "Specifies whether to generate a guard as a function.",
+      "default": false
+    },
     "implements": {
       "type": "array",
-      "description": "Specifies which interfaces to implement.",
+      "description": "Specifies which type of guard to create.",
       "uniqueItems": true,
       "minItems": 1,
       "items": {
@@ -51,7 +56,7 @@
         "type": "string"
       },
       "default": ["CanActivate"],
-      "x-prompt": "Which interfaces would you like to implement?"
+      "x-prompt": "Which type of guard would you like to create?"
     }
   },
   "required": ["name", "project"]
