@@ -7,6 +7,10 @@ export interface Schema {
      */
     flat?: boolean;
     /**
+     * Creates the interceptor as a `HttpInterceptorFn`.
+     */
+    functional?: boolean;
+    /**
      * The name of the interceptor.
      */
     name: string;
