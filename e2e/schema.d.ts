@@ -1,5 +1,5 @@
 /**
- * Generates a new, generic end-to-end test definition for the given or default project.
+ * Generates a new, generic end-to-end test definition in the given project.
  */
 export interface Schema {
     /**

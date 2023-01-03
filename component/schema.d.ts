@@ -1,5 +1,5 @@
 /**
- * Creates a new, generic component definition in the given or default project.
+ * Creates a new, generic component definition in the given project.
  */
 export interface Schema {
     /**

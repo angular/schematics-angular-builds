@@ -1,5 +1,5 @@
 /**
- * Generates a new, generic enum definition for the given or default project.
+ * Generates a new, generic enum definition in the given project.
  */
 export interface Schema {
     /**

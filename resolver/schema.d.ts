@@ -1,5 +1,5 @@
 /**
- * Generates a new, generic resolver definition in the given or default project.
+ * Generates a new, generic resolver definition in the given project.
  */
 export interface Schema {
     /**
