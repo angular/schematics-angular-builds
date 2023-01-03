@@ -88,7 +88,7 @@ export interface Schema {
 /**
  * Initial git repository commit information.
  */
-export declare type CommitUnion = boolean | CommitObject;
+export type CommitUnion = boolean | CommitObject;
 export interface CommitObject {
     email: string;
     message?: string;
