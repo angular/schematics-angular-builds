@@ -1,5 +1,5 @@
 /**
- * Generates a new, generic route guard definition in the given or default project.
+ * Generates a new, generic route guard definition in the given project.
  */
 export interface Schema {
     /**
