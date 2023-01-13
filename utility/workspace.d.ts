@@ -7,9 +7,9 @@
  */
 import { json, workspaces } from '@angular-devkit/core';
 import { Rule, Tree } from '@angular-devkit/schematics';
-export declare type WorkspaceDefinition = workspaces.WorkspaceDefinition;
-export declare type ProjectDefinition = workspaces.ProjectDefinition;
-export declare type TargetDefinition = workspaces.TargetDefinition;
+export type WorkspaceDefinition = workspaces.WorkspaceDefinition;
+export type ProjectDefinition = workspaces.ProjectDefinition;
+export type TargetDefinition = workspaces.TargetDefinition;
 /**
  * Updates the workspace file (`angular.json`) found within the root of the schematic's tree.
  * The workspace object model can be directly modified within the provided updater function

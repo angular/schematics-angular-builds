@@ -43,7 +43,7 @@ export interface BrowserBuilderBaseOptions {
     scripts?: (object | string)[];
     sourceMap?: boolean;
 }
-export declare type OutputHashing = 'all' | 'media' | 'none' | 'bundles';
+export type OutputHashing = 'all' | 'media' | 'none' | 'bundles';
 export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
     serviceWorker?: boolean;
     optimization?: boolean;
@@ -108,14 +108,14 @@ export interface BuilderTarget<TBuilder extends Builders, TOptions> {
         [key: string]: Partial<TOptions>;
     };
 }
-export declare type LibraryBuilderTarget = BuilderTarget<Builders.NgPackagr, LibraryBuilderOptions>;
-export declare type BrowserBuilderTarget = BuilderTarget<Builders.Browser, BrowserBuilderOptions>;
-export declare type ServerBuilderTarget = BuilderTarget<Builders.Server, ServerBuilderOptions>;
-export declare type AppShellBuilderTarget = BuilderTarget<Builders.AppShell, AppShellBuilderOptions>;
-export declare type TestBuilderTarget = BuilderTarget<Builders.Karma, TestBuilderOptions>;
-export declare type ServeBuilderTarget = BuilderTarget<Builders.DevServer, ServeBuilderOptions>;
-export declare type ExtractI18nBuilderTarget = BuilderTarget<Builders.ExtractI18n, ExtractI18nOptions>;
-export declare type E2EBuilderTarget = BuilderTarget<Builders.Protractor, E2EOptions>;
+export type LibraryBuilderTarget = BuilderTarget<Builders.NgPackagr, LibraryBuilderOptions>;
+export type BrowserBuilderTarget = BuilderTarget<Builders.Browser, BrowserBuilderOptions>;
+export type ServerBuilderTarget = BuilderTarget<Builders.Server, ServerBuilderOptions>;
+export type AppShellBuilderTarget = BuilderTarget<Builders.AppShell, AppShellBuilderOptions>;
+export type TestBuilderTarget = BuilderTarget<Builders.Karma, TestBuilderOptions>;
+export type ServeBuilderTarget = BuilderTarget<Builders.DevServer, ServeBuilderOptions>;
+export type ExtractI18nBuilderTarget = BuilderTarget<Builders.ExtractI18n, ExtractI18nOptions>;
+export type E2EBuilderTarget = BuilderTarget<Builders.Protractor, E2EOptions>;
 interface WorkspaceCLISchema {
     warnings?: Record<string, boolean>;
     schematicCollections?: string[];
