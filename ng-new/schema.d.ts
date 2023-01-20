@@ -93,6 +93,7 @@ export interface CommitObject {
     email: string;
     message?: string;
     name: string;
+    [property: string]: any;
 }
 /**
  * The package manager used to install dependencies.
