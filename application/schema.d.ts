@@ -47,6 +47,10 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
+     * Creates an application based upon the standalone API, without NgModules.
+     */
+    standalone?: boolean;
+    /**
      * Creates an application with stricter bundle budgets settings.
      */
     strict?: boolean;

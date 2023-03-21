@@ -67,6 +67,10 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
+     * Creates an application based upon the standalone API, without NgModules.
+     */
+    standalone?: boolean;
+    /**
      * Creates a workspace with stricter type checking and stricter bundle budgets settings.
      * This setting helps improve maintainability and catch bugs ahead of time. For more
      * information, see https://angular.io/guide/strict-mode
