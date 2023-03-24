@@ -4,6 +4,7 @@
 export interface Schema {
     /**
      * The application ID to use in withServerTransition().
+     * @deprecated This option is no longer used.
      */
     appId?: string;
     /**

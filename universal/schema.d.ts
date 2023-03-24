@@ -4,6 +4,7 @@
 export interface Schema {
     /**
      * The application identifier to use for transition.
+     * @deprecated This option is no longer used.
      */
     appId?: string;
     /**
