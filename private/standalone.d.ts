@@ -36,7 +36,8 @@ export declare function addModuleImportToStandaloneBootstrap(tree: Tree, filePat
  * @param functionName Name of the function that should be called.
  * @param importPath Path from which to import the function.
  * @param args Arguments to use when calling the function.
+ * @returns The file path that the provider was added to.
  */
-export declare function addFunctionalProvidersToStandaloneBootstrap(tree: Tree, filePath: string, functionName: string, importPath: string, args?: ts.Expression[]): void;
+export declare function addFunctionalProvidersToStandaloneBootstrap(tree: Tree, filePath: string, functionName: string, importPath: string, args?: ts.Expression[]): string;
 /** Finds the call to `bootstrapApplication` within a file. */
 export declare function findBootstrapApplicationCall(sourceFile: ts.SourceFile): ts.CallExpression | null;
