@@ -15,6 +15,13 @@ import ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
  */
 export declare function importsProvidersFrom(tree: Tree, filePath: string, className: string): boolean;
 /**
+ * Checks whether a providers function is being called in a `bootstrapApplication` call.
+ * @param tree File tree of the project.
+ * @param filePath Path of the file in which to check.
+ * @param functionName Name of the function to search for.
+ */
+export declare function callsProvidersFunction(tree: Tree, filePath: string, functionName: string): boolean;
+/**
  * Adds an `importProvidersFrom` call to the `bootstrapApplication` call.
  * @param tree File tree of the project.
  * @param filePath Path to the file that should be updated.
@@ -22,5 +29,15 @@ export declare function importsProvidersFrom(tree: Tree, filePath: string, class
  * @param modulePath Path from which to import the module.
  */
 export declare function addModuleImportToStandaloneBootstrap(tree: Tree, filePath: string, moduleName: string, modulePath: string): void;
+/**
+ * Adds a providers function call to the `bootstrapApplication` call.
+ * @param tree File tree of the project.
+ * @param filePath Path to the file that should be updated.
+ * @param functionName Name of the function that should be called.
+ * @param importPath Path from which to import the function.
+ * @param args Arguments to use when calling the function.
+ * @returns The file path that the provider was added to.
+ */
+export declare function addFunctionalProvidersToStandaloneBootstrap(tree: Tree, filePath: string, functionName: string, importPath: string, args?: ts.Expression[]): string;
 /** Finds the call to `bootstrapApplication` within a file. */
 export declare function findBootstrapApplicationCall(sourceFile: ts.SourceFile): ts.CallExpression | null;
