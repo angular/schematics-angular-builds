@@ -31,4 +31,8 @@ export interface Schema {
      * is needed to use the library in an app, but can be disabled here to simplify development.
      */
     skipTsConfig?: boolean;
+    /**
+     * Creates a library based upon the standalone API, without NgModules.
+     */
+    standalone?: boolean;
 }
