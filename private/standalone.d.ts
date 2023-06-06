@@ -12,6 +12,8 @@ import ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
  * @param tree File tree of the project.
  * @param filePath Path of the file in which to check.
  * @param className Class name of the module to search for.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
  */
 export declare function importsProvidersFrom(tree: Tree, filePath: string, className: string): boolean;
 /**
@@ -19,6 +21,8 @@ export declare function importsProvidersFrom(tree: Tree, filePath: string, class
  * @param tree File tree of the project.
  * @param filePath Path of the file in which to check.
  * @param functionName Name of the function to search for.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
  */
 export declare function callsProvidersFunction(tree: Tree, filePath: string, functionName: string): boolean;
 /**
@@ -27,6 +31,8 @@ export declare function callsProvidersFunction(tree: Tree, filePath: string, fun
  * @param filePath Path to the file that should be updated.
  * @param moduleName Name of the module that should be imported.
  * @param modulePath Path from which to import the module.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
  */
 export declare function addModuleImportToStandaloneBootstrap(tree: Tree, filePath: string, moduleName: string, modulePath: string): void;
 /**
@@ -37,7 +43,13 @@ export declare function addModuleImportToStandaloneBootstrap(tree: Tree, filePat
  * @param importPath Path from which to import the function.
  * @param args Arguments to use when calling the function.
  * @returns The file path that the provider was added to.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
  */
 export declare function addFunctionalProvidersToStandaloneBootstrap(tree: Tree, filePath: string, functionName: string, importPath: string, args?: ts.Expression[]): string;
-/** Finds the call to `bootstrapApplication` within a file. */
+/**
+ * Finds the call to `bootstrapApplication` within a file.
+ * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
+ * `@schematics/angular/utility` instead.
+ */
 export declare function findBootstrapApplicationCall(sourceFile: ts.SourceFile): ts.CallExpression | null;

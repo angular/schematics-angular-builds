@@ -7,4 +7,5 @@
  */
 export { ProjectDefinition, TargetDefinition, WorkspaceDefinition, getWorkspace as readWorkspace, updateWorkspace, writeWorkspace, } from './workspace';
 export { Builders as AngularBuilder } from './workspace-models';
+export * from './standalone';
 export { DependencyType, ExistingBehavior, InstallBehavior, addDependency } from './dependency';

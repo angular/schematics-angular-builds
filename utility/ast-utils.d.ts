@@ -10,13 +10,14 @@ import { Change } from './change';
 /**
  * Add Import `import { symbolName } from fileName` if the import doesn't exit
  * already. Assumes fileToEdit can be resolved and accessed.
- * @param fileToEdit (file we want to add import to)
- * @param symbolName (item to import)
- * @param fileName (path to the file)
- * @param isDefault (if true, import follows style for importing default exports)
+ * @param fileToEdit File we want to add import to.
+ * @param symbolName Item to import.
+ * @param fileName Path to the file.
+ * @param isDefault If true, import follows style for importing default exports.
+ * @param alias Alias that the symbol should be inserted under.
  * @return Change
  */
-export declare function insertImport(source: ts.SourceFile, fileToEdit: string, symbolName: string, fileName: string, isDefault?: boolean): Change;
+export declare function insertImport(source: ts.SourceFile, fileToEdit: string, symbolName: string, fileName: string, isDefault?: boolean, alias?: string): Change;
 /**
  * Find all nodes from the AST in the subtree of node of SyntaxKind kind.
  * @param node
@@ -57,7 +58,7 @@ export declare function findNode(node: ts.Node, kind: ts.SyntaxKind, text: strin
  * @return Change instance
  * @throw Error if toInsert is first occurence but fall back is not set
  */
-export declare function insertAfterLastOccurrence(nodes: ts.Node[], toInsert: string, file: string, fallbackPos: number, syntaxKind?: ts.SyntaxKind): Change;
+export declare function insertAfterLastOccurrence(nodes: ts.Node[] | ts.NodeArray<ts.Node>, toInsert: string, file: string, fallbackPos: number, syntaxKind?: ts.SyntaxKind): Change;
 export declare function getDecoratorMetadata(source: ts.SourceFile, identifier: string, module: string): ts.Node[];
 export declare function getMetadataField(node: ts.ObjectLiteralExpression, metadataField: string): ts.ObjectLiteralElement[];
 export declare function addSymbolToNgModuleMetadata(source: ts.SourceFile, ngModulePath: string, metadataField: string, symbolName: string, importPath?: string | null): Change[];
@@ -94,3 +95,12 @@ export declare function getRouterModuleDeclaration(source: ts.SourceFile): ts.Ex
  * Adds a new route declaration to a router module (i.e. has a RouterModule declaration)
  */
 export declare function addRouteDeclarationToModule(source: ts.SourceFile, fileToAdd: string, routeLiteral: string): Change;
+/**
+ * Determines if a SourceFile has a top-level declaration whose name matches a specific symbol.
+ * Can be used to avoid conflicts when inserting new imports into a file.
+ * @param sourceFile File in which to search.
+ * @param symbolName Name of the symbol to search for.
+ * @param skipModule Path of the module that the symbol may have been imported from. Used to
+ * avoid false positives where the same symbol we're looking for may have been imported.
+ */
+export declare function hasTopLevelIdentifier(sourceFile: ts.SourceFile, symbolName: string, skipModule?: string | null): boolean;
