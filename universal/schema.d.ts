@@ -3,11 +3,6 @@
  */
 export interface Schema {
     /**
-     * The application identifier to use for transition.
-     * @deprecated This option is no longer used.
-     */
-    appId?: string;
-    /**
      * The name of the main entry-point file.
      */
     main?: string;
