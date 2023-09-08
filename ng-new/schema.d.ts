@@ -51,7 +51,7 @@ export interface Schema {
      */
     prefix?: string;
     /**
-     * Generate a routing module for the initial project.
+     * Enable routing in the initial project.
      */
     routing?: boolean;
     /**

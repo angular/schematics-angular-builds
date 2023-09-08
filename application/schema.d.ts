@@ -31,7 +31,7 @@ export interface Schema {
      */
     projectRoot?: string;
     /**
-     * Create a routing NgModule.
+     * Creates an application with routing enabled.
      */
     routing?: boolean;
     /**
