@@ -3,21 +3,9 @@
  */
 export interface Schema {
     /**
-     * The name of the main entry-point file.
-     */
-    main?: string;
-    /**
      * The name of the project.
      */
     project: string;
-    /**
-     * The name of the root NgModule class.
-     */
-    rootModuleClassName?: string;
-    /**
-     * The name of the root NgModule file.
-     */
-    rootModuleFileName?: string;
     /**
      * Do not install packages for dependencies.
      */

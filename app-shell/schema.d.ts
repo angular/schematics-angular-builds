@@ -3,23 +3,7 @@
  */
 export interface Schema {
     /**
-     * The name of the main entry-point file.
-     */
-    main?: string;
-    /**
      * The name of the related client app.
      */
     project: string;
-    /**
-     * The name of the root module class.
-     */
-    rootModuleClassName?: string;
-    /**
-     * The name of the root module file
-     */
-    rootModuleFileName?: string;
-    /**
-     * Route path used to produce the application shell.
-     */
-    route?: string;
 }
