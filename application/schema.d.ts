@@ -47,6 +47,11 @@ export interface Schema {
      */
     skipTests?: boolean;
     /**
+     * Creates an application with Server-Side Rendering (SSR) and Static Site Generation
+     * (SSG/Prerendering) enabled.
+     */
+    ssr?: boolean;
+    /**
      * Creates an application based upon the standalone API, without NgModules.
      */
     standalone?: boolean;
