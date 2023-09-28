@@ -163,7 +163,7 @@ function updateWebpackBuilderServerTsConfigRule(options) {
 }
 function addDependencies() {
     return (0, schematics_1.chain)([
-        (0, utility_1.addDependency)('@angular/ssr', '^17.0.0-next.6+sha-e516a4b', {
+        (0, utility_1.addDependency)('@angular/ssr', '^17.0.0-next.6+sha-5f42ee4', {
             type: utility_1.DependencyType.Default,
         }),
         (0, utility_1.addDependency)('express', latest_versions_1.latestVersions['express'], {
