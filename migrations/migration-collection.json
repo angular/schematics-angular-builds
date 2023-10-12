@@ -1,19 +1,19 @@
 {
   "schematics": {
-    "remove-default-project-option": {
-      "version": "16.0.0",
-      "factory": "./update-16/remove-default-project-option",
-      "description": "Remove 'defaultProject' option from workspace configuration. The project to use will be determined from the current working directory."
+    "replace-nguniversal-builders": {
+      "version": "17.0.0",
+      "factory": "./update-17/replace-nguniversal-builders",
+      "description": "Replace usages of '@nguniversal/builders' with '@angular-devkit/build-angular'."
     },
-    "replace-default-collection-option": {
-      "version": "16.0.0",
-      "factory": "./update-16/replace-default-collection-option",
-      "description": "Replace removed 'defaultCollection' option in workspace configuration with 'schematicCollections'."
+    "replace-nguniversal-engines": {
+      "version": "17.0.0",
+      "factory": "./update-17/replace-nguniversal-engines",
+      "description": "Replace usages of '@nguniversal/' packages with '@angular/ssr'."
     },
-    "update-server-builder-config": {
-      "version": "16.0.0",
-      "factory": "./update-16/update-server-builder-config",
-      "description": "Update the '@angular-devkit/build-angular:server' builder configuration to disable 'buildOptimizer' for non optimized builds."
+    "update-workspace-config": {
+      "version": "17.0.0",
+      "factory": "./update-17/update-workspace-config",
+      "description": "Replace deprecated options in 'angular.json'."
     }
   }
 }

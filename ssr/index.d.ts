@@ -5,8 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-export declare const latestVersions: Record<string, string> & {
-    Angular: string;
-    DevkitBuildAngular: string;
-    AngularSSR: string;
-};
+import { Rule } from '@angular-devkit/schematics';
+import { Schema as SSROptions } from './schema';
+export default function (options: SSROptions): Rule;
