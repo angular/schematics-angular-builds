@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const utility_1 = require("../../utility");
 const dependencies_1 = require("../../utility/dependencies");
@@ -69,16 +70,33 @@ function default_1() {
                             }
                         }
                     }
-                    // Replace server file
+                    // Replace all import specifiers in all files.
+                    let hasExpressTokens = false;
+                    const root = project.sourceRoot ?? `${project.root}/src`;
+                    const tokensFilePath = `/${root}/express.tokens.ts`;
+                    for (const file of visit(tree.getDir(root))) {
+                        const [path, content] = file;
+                        let updatedContent = content;
+                        // Check if file is importing tokens
+                        if (content.includes('@nguniversal/express-engine/tokens')) {
+                            hasExpressTokens ||= true;
+                            let tokensFileRelativePath = (0, core_1.relative)((0, core_1.dirname)((0, core_1.normalize)(path)), (0, core_1.normalize)(tokensFilePath));
+                            if (tokensFileRelativePath.charAt(0) !== '.') {
+                                tokensFileRelativePath = './' + tokensFileRelativePath;
+                            }
+                            updatedContent = updatedContent.replaceAll('@nguniversal/express-engine/tokens', tokensFileRelativePath.slice(0, -3));
+                        }
+                        updatedContent = updatedContent.replaceAll(NGUNIVERSAL_PACKAGE_REGEXP, '@angular/ssr');
+                        tree.overwrite(path, updatedContent);
+                    }
+                    // Replace server file and add tokens file if needed
                     for (const [path, outputPath] of serverMainFiles.entries()) {
                         tree.rename(path, path + '.bak');
-                        tree.create(path, getServerFileContents(outputPath));
+                        tree.create(path, getServerFileContents(outputPath, hasExpressTokens));
+                        if (hasExpressTokens) {
+                            tree.create(tokensFilePath, TOKENS_FILE_CONTENT);
+                        }
                     }
-                }
-                // Replace all import specifiers in all files.
-                for (const file of visit(tree.root)) {
-                    const [path, content] = file;
-                    tree.overwrite(path, content.replaceAll(NGUNIVERSAL_PACKAGE_REGEXP, '@angular/ssr'));
                 }
                 // Remove universal packages from deps.
                 for (const name of UNIVERSAL_PACKAGES) {
@@ -90,8 +108,15 @@ function default_1() {
     };
 }
 exports.default = default_1;
-function getServerFileContents(outputPath) {
-    return `
+const TOKENS_FILE_CONTENT = `
+import { InjectionToken } from '@angular/core';
+import { Request, Response } from 'express';
+
+export const REQUEST = new InjectionToken<Request>('REQUEST');
+export const RESPONSE = new InjectionToken<Response>('RESPONSE');
+`;
+function getServerFileContents(outputPath, hasExpressTokens) {
+    return (`
 import 'zone.js/node';
 
 import { APP_BASE_HREF } from '@angular/common';
@@ -99,7 +124,9 @@ import { CommonEngine } from '@angular/ssr';
 import * as express from 'express';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
-import bootstrap from './src/main.server';
+import bootstrap from './src/main.server';` +
+        (hasExpressTokens ? `\nimport { REQUEST, RESPONSE } from './src/express.tokens';` : '') +
+        `
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
@@ -131,7 +158,12 @@ export function app(): express.Express {
         documentFilePath: indexHtml,
         url: \`\${protocol}://\${headers.host}\${originalUrl}\`,
         publicPath: distFolder,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+        providers: [
+          { provide: APP_BASE_HREF, useValue: baseUrl },` +
+        (hasExpressTokens
+            ? '\n          { provide: RESPONSE, useValue: res },\n          { provide: REQUEST, useValue: req }\n'
+            : '') +
+        `],
       })
       .then((html) => res.send(html))
       .catch((err) => next(err));
@@ -161,5 +193,5 @@ if (moduleFilename === __filename || moduleFilename.includes('iisnode')) {
 }
 
 export default bootstrap;
-`;
+`);
 }
