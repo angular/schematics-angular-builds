@@ -14,6 +14,6 @@ exports.latestVersions = {
     ...require('./latest-versions/package.json')['dependencies'],
     // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
     Angular: '^17.0.0-next.0',
-    DevkitBuildAngular: '^17.0.0-rc.4+sha-455aed8',
-    AngularSSR: '^17.0.0-rc.4+sha-455aed8',
+    DevkitBuildAngular: '^17.0.0-rc.4+sha-569b714',
+    AngularSSR: '^17.0.0-rc.4+sha-569b714',
 };
