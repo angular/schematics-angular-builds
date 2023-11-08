@@ -13,7 +13,7 @@ exports.latestVersions = {
     // but ts_library doesn't support JSON inputs.
     ...require('./latest-versions/package.json')['dependencies'],
     // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
-    Angular: '^17.0.0-next.0',
-    DevkitBuildAngular: '^17.0.0-rc.5+sha-8bae6ad',
-    AngularSSR: '^17.0.0-rc.5+sha-8bae6ad',
+    Angular: '^17.0.0',
+    DevkitBuildAngular: '^17.0.0-rc.5+sha-180dfa3',
+    AngularSSR: '^17.0.0-rc.5+sha-180dfa3',
 };
