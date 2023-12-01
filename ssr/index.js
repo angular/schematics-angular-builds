@@ -214,7 +214,7 @@ function default_1(options) {
         }
         const isUsingApplicationBuilder = clientProject.targets.get('build')?.builder === workspace_models_1.Builders.Application;
         return (0, schematics_1.chain)([
-            (0, schematics_1.externalSchematic)('@schematics/angular', 'server', {
+            (0, schematics_1.schematic)('server', {
                 ...options,
                 skipInstall: true,
             }),

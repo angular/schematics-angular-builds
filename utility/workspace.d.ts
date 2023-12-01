@@ -11,6 +11,17 @@ export type WorkspaceDefinition = workspaces.WorkspaceDefinition;
 export type ProjectDefinition = workspaces.ProjectDefinition;
 export type TargetDefinition = workspaces.TargetDefinition;
 /**
+ * A {@link workspaces.WorkspaceHost} backed by a Schematics {@link Tree} instance.
+ */
+export declare class TreeWorkspaceHost implements workspaces.WorkspaceHost {
+    private readonly tree;
+    constructor(tree: Tree);
+    readFile(path: string): Promise<string>;
+    writeFile(path: string, data: string): Promise<void>;
+    isDirectory(path: string): Promise<boolean>;
+    isFile(path: string): Promise<boolean>;
+}
+/**
  * Updates the workspace file (`angular.json`) found within the root of the schematic's tree.
  * The workspace object model can be directly modified within the provided updater function
  * with changes being written to the workspace file after the updater function returns.

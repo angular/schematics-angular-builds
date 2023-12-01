@@ -25,6 +25,8 @@ var Builders;
     Builders["AppShell"] = "@angular-devkit/build-angular:app-shell";
     Builders["Server"] = "@angular-devkit/build-angular:server";
     Builders["Browser"] = "@angular-devkit/build-angular:browser";
+    Builders["SsrDevServer"] = "@angular-devkit/build-angular:ssr-dev-server";
+    Builders["Prerender"] = "@angular-devkit/build-angular:prerender";
     Builders["BrowserEsbuild"] = "@angular-devkit/build-angular:browser-esbuild";
     Builders["Karma"] = "@angular-devkit/build-angular:karma";
     Builders["TsLint"] = "@angular-devkit/build-angular:tslint";

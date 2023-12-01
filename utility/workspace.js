@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allTargetOptions = exports.allWorkspaceTargets = exports.createDefaultPath = exports.buildDefaultPath = exports.writeWorkspace = exports.getWorkspace = exports.updateWorkspace = void 0;
+exports.allTargetOptions = exports.allWorkspaceTargets = exports.createDefaultPath = exports.buildDefaultPath = exports.writeWorkspace = exports.getWorkspace = exports.updateWorkspace = exports.TreeWorkspaceHost = void 0;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const workspace_models_1 = require("./workspace-models");
@@ -39,6 +39,7 @@ class TreeWorkspaceHost {
         return this.tree.exists(path);
     }
 }
+exports.TreeWorkspaceHost = TreeWorkspaceHost;
 /**
  * Updates the workspace file (`angular.json`) found within the root of the schematic's tree.
  * The workspace object model can be directly modified within the provided updater function
@@ -50,11 +51,10 @@ class TreeWorkspaceHost {
  * workspace. A {@link WorkspaceDefinition} is provided as the first argument to the function.
  */
 function updateWorkspace(updater) {
-    return async (tree) => {
-        const host = new TreeWorkspaceHost(tree);
-        const { workspace } = await core_1.workspaces.readWorkspace(DEFAULT_WORKSPACE_PATH, host);
+    return async (host) => {
+        const workspace = await getWorkspace(host);
         const result = await updater(workspace);
-        await core_1.workspaces.writeWorkspace(workspace, host);
+        await core_1.workspaces.writeWorkspace(workspace, new TreeWorkspaceHost(host));
         return result || schematics_1.noop;
     };
 }
