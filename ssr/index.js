@@ -169,8 +169,8 @@ function updateWebpackBuilderServerTsConfigRule(options) {
         }
     };
 }
-function addDependencies() {
-    return (0, schematics_1.chain)([
+function addDependencies(isUsingApplicationBuilder) {
+    const rules = [
         (0, utility_1.addDependency)('@angular/ssr', latest_versions_1.latestVersions.AngularSSR, {
             type: utility_1.DependencyType.Default,
         }),
@@ -180,7 +180,13 @@ function addDependencies() {
         (0, utility_1.addDependency)('@types/express', latest_versions_1.latestVersions['@types/express'], {
             type: utility_1.DependencyType.Dev,
         }),
-    ]);
+    ];
+    if (!isUsingApplicationBuilder) {
+        rules.push((0, utility_1.addDependency)('browser-sync', latest_versions_1.latestVersions['browser-sync'], {
+            type: utility_1.DependencyType.Dev,
+        }));
+    }
+    return (0, schematics_1.chain)(rules);
 }
 function addServerFile(options, isStandalone) {
     return async (host) => {
@@ -229,7 +235,7 @@ function default_1(options) {
                 ]),
             addServerFile(options, isStandalone),
             addScriptsRule(options, isUsingApplicationBuilder),
-            addDependencies(),
+            addDependencies(isUsingApplicationBuilder),
         ]);
     };
 }
