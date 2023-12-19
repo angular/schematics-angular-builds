@@ -142,6 +142,7 @@ function default_1(options) {
             name: options.name,
             path: options.path,
             project: options.project,
+            standalone: false,
         };
         return (0, schematics_1.chain)([
             !isLazyLoadedModuleGen ? addImportToNgModule(options) : (0, schematics_1.noop)(),
