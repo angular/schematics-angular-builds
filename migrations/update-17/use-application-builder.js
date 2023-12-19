@@ -9,7 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const node_path_1 = require("node:path");
+const posix_1 = require("node:path/posix");
 const json_file_1 = require("../../utility/json-file");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
@@ -43,14 +43,36 @@ function default_1() {
                 // Rename and transform options
                 options['browser'] = options['main'];
                 if (hasServerTarget && typeof options['browser'] === 'string') {
-                    options['server'] = (0, node_path_1.dirname)(options['browser']) + '/main.server.ts';
+                    options['server'] = (0, posix_1.dirname)(options['browser']) + '/main.server.ts';
                 }
                 options['serviceWorker'] = options['ngswConfigPath'] ?? options['serviceWorker'];
                 if (typeof options['polyfills'] === 'string') {
                     options['polyfills'] = [options['polyfills']];
                 }
-                if (typeof options['outputPath'] === 'string') {
-                    options['outputPath'] = options['outputPath']?.replace(/\/browser\/?$/, '');
+                let outputPath = options['outputPath'];
+                if (typeof outputPath === 'string') {
+                    if (!/\/browser\/?$/.test(outputPath)) {
+                        // TODO: add prompt.
+                        context.logger.warn(`The output location of the browser build has been updated from "${outputPath}" to ` +
+                            `"${(0, posix_1.join)(outputPath, 'browser')}". ` +
+                            'You might need to adjust your deployment pipeline or, as an alternative, ' +
+                            'set outputPath.browser to "" in order to maintain the previous functionality.');
+                    }
+                    else {
+                        outputPath = outputPath.replace(/\/browser\/?$/, '');
+                    }
+                    options['outputPath'] = {
+                        base: outputPath,
+                    };
+                    if (typeof options['resourcesOutputPath'] === 'string') {
+                        const media = options['resourcesOutputPath'].replaceAll('/', '');
+                        if (media && media !== 'media') {
+                            options['outputPath'] = {
+                                base: outputPath,
+                                media: media,
+                            };
+                        }
+                    }
                 }
                 // Delete removed options
                 delete options['deployUrl'];
@@ -131,11 +153,6 @@ function usesNoLongerSupportedOptions({ deployUrl, resourcesOutputPath }, contex
     if (typeof deployUrl === 'string') {
         hasUsage = true;
         context.logger.warn(`Skipping migration for project "${projectName}". "deployUrl" option is not available in the application builder.`);
-    }
-    if (typeof resourcesOutputPath === 'string' && /^\/?media\/?$/.test(resourcesOutputPath)) {
-        hasUsage = true;
-        context.logger.warn(`Skipping migration for project "${projectName}". "resourcesOutputPath" option is not available in the application builder.` +
-            `Media files will be output into a "media" directory within the output location.`);
     }
     return hasUsage;
 }

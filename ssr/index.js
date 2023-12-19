@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
+const node_path_1 = require("node:path");
 const utility_1 = require("../utility");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
@@ -19,19 +20,54 @@ const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 const PRERENDER_TARGET_NAME = 'prerender';
-async function getOutputPath(host, projectName, target) {
+const DEFAULT_BROWSER_DIR = 'browser';
+const DEFAULT_MEDIA_DIR = 'media';
+const DEFAULT_SERVER_DIR = 'server';
+async function getLegacyOutputPaths(host, projectName, target) {
     // Generate new output paths
     const workspace = await (0, utility_1.readWorkspace)(host);
     const project = workspace.projects.get(projectName);
-    const serverTarget = project?.targets.get(target);
-    if (!serverTarget || !serverTarget.options) {
+    const architectTarget = project?.targets.get(target);
+    if (!architectTarget?.options) {
         throw new schematics_1.SchematicsException(`Cannot find 'options' for ${projectName} ${target} target.`);
     }
-    const { outputPath } = serverTarget.options;
+    const { outputPath } = architectTarget.options;
     if (typeof outputPath !== 'string') {
         throw new schematics_1.SchematicsException(`outputPath for ${projectName} ${target} target is not a string.`);
     }
     return outputPath;
+}
+async function getApplicationBuilderOutputPaths(host, projectName) {
+    // Generate new output paths
+    const target = 'build';
+    const workspace = await (0, utility_1.readWorkspace)(host);
+    const project = workspace.projects.get(projectName);
+    const architectTarget = project?.targets.get(target);
+    if (!architectTarget?.options) {
+        throw new schematics_1.SchematicsException(`Cannot find 'options' for ${projectName} ${target} target.`);
+    }
+    const { outputPath } = architectTarget.options;
+    if (outputPath === null || outputPath === undefined) {
+        throw new schematics_1.SchematicsException(`outputPath for ${projectName} ${target} target is undeined or null.`);
+    }
+    const defaultDirs = {
+        server: DEFAULT_SERVER_DIR,
+        browser: DEFAULT_BROWSER_DIR,
+    };
+    if (outputPath && (0, core_1.isJsonObject)(outputPath)) {
+        return {
+            ...defaultDirs,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            ...outputPath,
+        };
+    }
+    if (typeof outputPath !== 'string') {
+        throw new schematics_1.SchematicsException(`outputPath for ${projectName} ${target} target is not a string.`);
+    }
+    return {
+        base: outputPath,
+        ...defaultDirs,
+    };
 }
 function addScriptsRule({ project }, isUsingApplicationBuilder) {
     return async (host) => {
@@ -41,12 +77,12 @@ function addScriptsRule({ project }, isUsingApplicationBuilder) {
             throw new schematics_1.SchematicsException('Could not find package.json');
         }
         if (isUsingApplicationBuilder) {
-            const distPath = await getOutputPath(host, project, 'build');
+            const { base, server } = await getApplicationBuilderOutputPaths(host, project);
             pkg.scripts ??= {};
-            pkg.scripts[`serve:ssr:${project}`] = `node ${distPath}/server/server.mjs`;
+            pkg.scripts[`serve:ssr:${project}`] = `node ${node_path_1.posix.join(base, server)}/server.mjs`;
         }
         else {
-            const serverDist = await getOutputPath(host, project, 'server');
+            const serverDist = await getLegacyOutputPaths(host, project, 'server');
             pkg.scripts = {
                 ...pkg.scripts,
                 'dev:ssr': `ng run ${project}:${SERVE_SSR_TARGET_NAME}`,
@@ -79,14 +115,30 @@ function updateApplicationBuilderTsConfigRule(options) {
         }
     };
 }
-function updateApplicationBuilderWorkspaceConfigRule(projectRoot, options) {
+function updateApplicationBuilderWorkspaceConfigRule(projectRoot, options, { logger }) {
     return (0, utility_1.updateWorkspace)((workspace) => {
         const buildTarget = workspace.projects.get(options.project)?.targets.get('build');
         if (!buildTarget) {
             return;
         }
+        let outputPath = buildTarget.options?.outputPath;
+        if (outputPath && (0, core_1.isJsonObject)(outputPath)) {
+            if (outputPath.browser === '') {
+                const base = outputPath.base;
+                logger.warn(`The output location of the browser build has been updated from "${base}" to "${node_path_1.posix.join(base, DEFAULT_BROWSER_DIR)}".
+          You might need to adjust your deployment pipeline.`);
+                if ((outputPath.media && outputPath.media !== DEFAULT_MEDIA_DIR) ||
+                    (outputPath.server && outputPath.server !== DEFAULT_SERVER_DIR)) {
+                    delete outputPath.browser;
+                }
+                else {
+                    outputPath = outputPath.base;
+                }
+            }
+        }
         buildTarget.options = {
             ...buildTarget.options,
+            outputPath,
             prerender: true,
             ssr: {
                 entry: (0, core_1.join)((0, core_1.normalize)(projectRoot), 'server.ts'),
@@ -190,15 +242,17 @@ function addDependencies(isUsingApplicationBuilder) {
 }
 function addServerFile(options, isStandalone) {
     return async (host) => {
+        const projectName = options.project;
         const workspace = await (0, utility_1.readWorkspace)(host);
-        const project = workspace.projects.get(options.project);
+        const project = workspace.projects.get(projectName);
         if (!project) {
-            throw new schematics_1.SchematicsException(`Invalid project name (${options.project})`);
+            throw new schematics_1.SchematicsException(`Invalid project name (${projectName})`);
         }
-        const browserDistDirectory = await getOutputPath(host, options.project, 'build');
-        return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)(`./files/${project?.targets?.get('build')?.builder === workspace_models_1.Builders.Application
-            ? 'application-builder'
-            : 'server-builder'}`), [
+        const isUsingApplicationBuilder = project?.targets?.get('build')?.builder === workspace_models_1.Builders.Application;
+        const browserDistDirectory = isUsingApplicationBuilder
+            ? (await getApplicationBuilderOutputPaths(host, projectName)).browser
+            : await getLegacyOutputPaths(host, projectName, 'build');
+        return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)(`./files/${isUsingApplicationBuilder ? 'application-builder' : 'server-builder'}`), [
             (0, schematics_1.applyTemplates)({
                 ...core_1.strings,
                 ...options,
@@ -210,7 +264,7 @@ function addServerFile(options, isStandalone) {
     };
 }
 function default_1(options) {
-    return async (host) => {
+    return async (host, context) => {
         const browserEntryPoint = await (0, util_1.getMainFilePath)(host, options.project);
         const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(host, browserEntryPoint);
         const workspace = await (0, workspace_1.getWorkspace)(host);
@@ -226,7 +280,7 @@ function default_1(options) {
             }),
             ...(isUsingApplicationBuilder
                 ? [
-                    updateApplicationBuilderWorkspaceConfigRule(clientProject.root, options),
+                    updateApplicationBuilderWorkspaceConfigRule(clientProject.root, options, context),
                     updateApplicationBuilderTsConfigRule(options),
                 ]
                 : [
