@@ -40,6 +40,9 @@ function default_1() {
                 if (usesNoLongerSupportedOptions(options, context, name)) {
                     continue;
                 }
+                if (options['index'] === '') {
+                    options['index'] = false;
+                }
                 // Rename and transform options
                 options['browser'] = options['main'];
                 if (hasServerTarget && typeof options['browser'] === 'string') {
