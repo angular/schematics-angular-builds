@@ -64,7 +64,11 @@ export interface BrowserBuilderOptions extends BrowserBuilderBaseOptions {
     webWorkerTsConfig?: string;
 }
 export interface ServeBuilderOptions {
+    /**
+     * @deprecated not used since version 17.0.0. Use the property "buildTarget" instead.
+     */
     browserTarget: string;
+    buildTarget?: string;
 }
 export interface LibraryBuilderOptions {
     tsConfig: string;
