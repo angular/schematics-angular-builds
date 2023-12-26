@@ -77,6 +77,7 @@ function default_1(options) {
             options.ssr
                 ? (0, schematics_1.schematic)('ssr', {
                     project: options.name,
+                    skipInstall: true,
                 })
                 : (0, schematics_1.noop)(),
             options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(options),
