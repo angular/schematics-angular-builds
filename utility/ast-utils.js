@@ -324,7 +324,7 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
         !ts.isArrayLiteralExpression(assignment.initializer)) {
         return [];
     }
-    let expresssion;
+    let expression;
     const assignmentInit = assignment.initializer;
     const elements = assignmentInit.elements;
     if (elements.length) {
@@ -332,21 +332,21 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
         if (symbolsArray.includes(core_1.tags.oneLine `${symbolName}`)) {
             return [];
         }
-        expresssion = elements[elements.length - 1];
+        expression = elements[elements.length - 1];
     }
     else {
-        expresssion = assignmentInit;
+        expression = assignmentInit;
     }
     let toInsert;
-    let position = expresssion.getEnd();
-    if (ts.isArrayLiteralExpression(expresssion)) {
+    let position = expression.getEnd();
+    if (ts.isArrayLiteralExpression(expression)) {
         // We found the field but it's empty. Insert it just before the `]`.
         position--;
         toInsert = `\n${core_1.tags.indentBy(4) `${symbolName}`}\n  `;
     }
     else {
         // Get the indentation of the last element, if any.
-        const text = expresssion.getFullText(source);
+        const text = expression.getFullText(source);
         const matches = text.match(/^(\r?\n)(\s*)/);
         if (matches) {
             toInsert = `,${matches[1]}${core_1.tags.indentBy(matches[2].length) `${symbolName}`}`;
