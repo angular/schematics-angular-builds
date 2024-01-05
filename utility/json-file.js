@@ -9,15 +9,18 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONFile = void 0;
 const jsonc_parser_1 = require("jsonc-parser");
+const eol_1 = require("./eol");
 /** @private */
 class JSONFile {
     host;
     path;
     content;
+    eol;
     constructor(host, path) {
         this.host = host;
         this.path = path;
         this.content = this.host.readText(this.path);
+        this.eol = (0, eol_1.getEOL)(this.content);
     }
     _jsonAst;
     get JsonAst() {
@@ -55,6 +58,7 @@ class JSONFile {
         const edits = (0, jsonc_parser_1.modify)(this.content, jsonPath, value, {
             getInsertionIndex,
             formattingOptions: {
+                eol: this.eol,
                 insertSpaces: true,
                 tabSize: 2,
             },
