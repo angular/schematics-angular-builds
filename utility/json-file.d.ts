@@ -14,6 +14,7 @@ export declare class JSONFile {
     private readonly host;
     private readonly path;
     content: string;
+    private eol;
     constructor(host: Tree, path: string);
     private _jsonAst;
     private get JsonAst();

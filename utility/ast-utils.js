@@ -34,6 +34,7 @@ exports.hasTopLevelIdentifier = exports.addRouteDeclarationToModule = exports.ge
 const core_1 = require("@angular-devkit/core");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const change_1 = require("./change");
+const eol_1 = require("./eol");
 /**
  * Add Import `import { symbolName } from fileName` if the import doesn't exit
  * already. Assumes fileToEdit can be resolved and accessed.
@@ -81,11 +82,12 @@ function insertImport(source, fileToEdit, symbolName, fileName, isDefault = fals
     }
     const open = isDefault ? '' : '{ ';
     const close = isDefault ? '' : ' }';
+    const eol = (0, eol_1.getEOL)(rootNode.getText());
     // if there are no imports or 'use strict' statement, insert import at beginning of file
     const insertAtBeginning = allImports.length === 0 && useStrict.length === 0;
-    const separator = insertAtBeginning ? '' : ';\n';
+    const separator = insertAtBeginning ? '' : `;${eol}`;
     const toInsert = `${separator}import ${open}${importExpression}${close}` +
-        ` from '${fileName}'${insertAtBeginning ? ';\n' : ''}`;
+        ` from '${fileName}'${insertAtBeginning ? `;${eol}` : ''}`;
     return insertAfterLastOccurrence(allImports, toInsert, fileToEdit, fallbackPos, ts.SyntaxKind.StringLiteral);
 }
 exports.insertImport = insertImport;
