@@ -9,7 +9,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const tasks_1 = require("@angular-devkit/schematics/tasks");
 const node_path_1 = require("node:path");
 const utility_1 = require("../utility");
 const dependencies_1 = require("../utility/dependencies");
@@ -103,22 +102,23 @@ function updateTsConfigFile(tsConfigPath) {
         json.modify(typePath, [...types]);
     };
 }
-function addDependencies() {
+function addDependencies(skipInstall) {
     return (host) => {
         const coreDep = (0, dependencies_1.getPackageJsonDependency)(host, '@angular/core');
         if (coreDep === null) {
             throw new schematics_1.SchematicsException('Could not find version.');
         }
-        const platformServerDep = {
-            ...coreDep,
-            name: '@angular/platform-server',
-        };
-        (0, dependencies_1.addPackageJsonDependency)(host, platformServerDep);
-        (0, dependencies_1.addPackageJsonDependency)(host, {
-            type: dependencies_1.NodeDependencyType.Dev,
-            name: '@types/node',
-            version: latest_versions_1.latestVersions['@types/node'],
-        });
+        const install = skipInstall ? utility_1.InstallBehavior.None : utility_1.InstallBehavior.Auto;
+        return (0, schematics_1.chain)([
+            (0, utility_1.addDependency)('@angular/platform-server', coreDep.version, {
+                type: utility_1.DependencyType.Default,
+                install,
+            }),
+            (0, utility_1.addDependency)('@types/node', latest_versions_1.latestVersions['@types/node'], {
+                type: utility_1.DependencyType.Dev,
+                install,
+            }),
+        ]);
     };
 }
 function default_1(options) {
@@ -137,9 +137,6 @@ function default_1(options) {
             (isUsingApplicationBuilder && clientBuildTarget.options?.server !== undefined)) {
             // Server has already been added.
             return;
-        }
-        if (!options.skipInstall) {
-            context.addTask(new tasks_1.NodePackageInstallTask());
         }
         const clientBuildOptions = clientBuildTarget.options;
         const browserEntryPoint = await (0, util_1.getMainFilePath)(host, options.project);
@@ -175,7 +172,7 @@ function default_1(options) {
                     ])),
                     updateConfigFileBrowserBuilder(options, tsConfigDirectory),
                 ]),
-            addDependencies(),
+            addDependencies(options.skipInstall),
             (0, utility_1.addRootProvider)(options.project, ({ code, external }) => code `${external('provideClientHydration', '@angular/platform-browser')}()`),
         ]);
     };
