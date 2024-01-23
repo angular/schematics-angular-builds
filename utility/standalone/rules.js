@@ -166,9 +166,8 @@ function addProvidersExpressionToAppConfig(tree, appConfig, expression) {
     // If there's a `providers` property, we can add the provider
     // to it, otherwise we need to declare it ourselves.
     if (providersLiteral) {
-        const hasTrailingComma = providersLiteral.elements.hasTrailingComma;
         (0, util_1.applyChangesToFile)(tree, filePath, [
-            (0, ast_utils_1.insertAfterLastOccurrence)(providersLiteral.elements, (hasTrailingComma || providersLiteral.elements.length === 0 ? '' : ', ') + expression, filePath, providersLiteral.getStart() + 1),
+            (0, ast_utils_1.insertAfterLastOccurrence)(providersLiteral.elements, (providersLiteral.elements.length === 0 ? '' : ', ') + expression, filePath, providersLiteral.getStart() + 1),
         ]);
     }
     else {
