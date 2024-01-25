@@ -108,6 +108,7 @@ export interface CommitObject {
  * The package manager used to install dependencies.
  */
 export declare enum PackageManager {
+    Bun = "bun",
     Cnpm = "cnpm",
     Npm = "npm",
     Pnpm = "pnpm",

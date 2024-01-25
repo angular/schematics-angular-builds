@@ -8,6 +8,7 @@ exports.ViewEncapsulation = exports.Style = exports.PackageManager = void 0;
  */
 var PackageManager;
 (function (PackageManager) {
+    PackageManager["Bun"] = "bun";
     PackageManager["Cnpm"] = "cnpm";
     PackageManager["Npm"] = "npm";
     PackageManager["Pnpm"] = "pnpm";
