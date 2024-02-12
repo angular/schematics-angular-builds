@@ -13,7 +13,7 @@ export interface PendingCode {
     /** Imports that need to be added to the file in which the code is inserted. */
     imports: PendingImports;
 }
-/** Map keeping track of imports and aliases under which they're referred to in an expresion. */
+/** Map keeping track of imports and aliases under which they're referred to in an expression. */
 type PendingImports = Map<string, Map<string, string>>;
 /**
  * Callback invoked by a Rule that produces the code

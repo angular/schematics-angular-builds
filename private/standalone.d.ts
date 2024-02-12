@@ -42,7 +42,7 @@ export declare function addModuleImportToStandaloneBootstrap(tree: Tree, filePat
  * @param functionName Name of the function that should be called.
  * @param importPath Path from which to import the function.
  * @param args Arguments to use when calling the function.
- * @returns The file path that the provider was added to.
+ * @return The file path that the provider was added to.
  * @deprecated Private utility that will be removed. Use `addRootImport` or `addRootProvider` from
  * `@schematics/angular/utility` instead.
  */
