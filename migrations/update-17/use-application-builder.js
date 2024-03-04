@@ -36,10 +36,6 @@ function default_1() {
             buildTarget.builder = workspace_models_1.Builders.Application;
             const hasServerTarget = project.targets.has('server');
             for (const [, options] of (0, workspace_1.allTargetOptions)(buildTarget, false)) {
-                // Show warnings for using no longer supported options
-                if (usesNoLongerSupportedOptions(options, context, name)) {
-                    continue;
-                }
                 if (options['index'] === '') {
                     options['index'] = false;
                 }
@@ -78,7 +74,6 @@ function default_1() {
                     }
                 }
                 // Delete removed options
-                delete options['deployUrl'];
                 delete options['vendorChunk'];
                 delete options['commonChunk'];
                 delete options['resourcesOutputPath'];
@@ -151,11 +146,3 @@ function default_1() {
     };
 }
 exports.default = default_1;
-function usesNoLongerSupportedOptions({ deployUrl, resourcesOutputPath }, context, projectName) {
-    let hasUsage = false;
-    if (typeof deployUrl === 'string') {
-        hasUsage = true;
-        context.logger.warn(`Skipping migration for project "${projectName}". "deployUrl" option is not available in the application builder.`);
-    }
-    return hasUsage;
-}
