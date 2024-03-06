@@ -34,9 +34,9 @@ exports.isStandaloneApp = exports.getAppModulePath = exports.findBootstrapModule
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const path_1 = require("path");
-const standalone_1 = require("../private/standalone");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const ast_utils_1 = require("../utility/ast-utils");
+const util_1 = require("./standalone/util");
 function findBootstrapModuleCall(host, mainPath) {
     const mainText = host.readText(mainPath);
     const source = ts.createSourceFile(mainPath, mainText, ts.ScriptTarget.Latest, true);
@@ -89,8 +89,15 @@ function getAppModulePath(host, mainPath) {
 }
 exports.getAppModulePath = getAppModulePath;
 function isStandaloneApp(host, mainPath) {
-    const source = ts.createSourceFile(mainPath, host.readText(mainPath), ts.ScriptTarget.Latest, true);
-    const bootstrapCall = (0, standalone_1.findBootstrapApplicationCall)(source);
-    return bootstrapCall !== null;
+    try {
+        (0, util_1.findBootstrapApplicationCall)(host, mainPath);
+        return true;
+    }
+    catch (error) {
+        if (error instanceof schematics_1.SchematicsException) {
+            return false;
+        }
+        throw error;
+    }
 }
 exports.isStandaloneApp = isStandaloneApp;

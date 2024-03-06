@@ -32,7 +32,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const standalone_1 = require("../private/standalone");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const utility_1 = require("../utility");
 const ast_utils_1 = require("../utility/ast-utils");
@@ -41,6 +40,8 @@ const dependencies_1 = require("../utility/dependencies");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const paths_1 = require("../utility/paths");
 const project_targets_1 = require("../utility/project-targets");
+const app_config_1 = require("../utility/standalone/app_config");
+const util_1 = require("../utility/standalone/util");
 const workspace_models_1 = require("../utility/workspace-models");
 function addDependencies() {
     return (host) => {
@@ -77,17 +78,15 @@ function updateAppModule(mainPath) {
         return host;
     };
 }
-function addProvideServiceWorker(mainPath) {
+function addProvideServiceWorker(projectName, mainPath) {
     return (host) => {
-        const updatedFilePath = (0, standalone_1.addFunctionalProvidersToStandaloneBootstrap)(host, mainPath, 'provideServiceWorker', '@angular/service-worker', [
-            ts.factory.createStringLiteral('ngsw-worker.js', true),
-            ts.factory.createObjectLiteralExpression([
-                ts.factory.createPropertyAssignment(ts.factory.createIdentifier('enabled'), ts.factory.createPrefixUnaryExpression(ts.SyntaxKind.ExclamationToken, ts.factory.createCallExpression(ts.factory.createIdentifier('isDevMode'), undefined, []))),
-                ts.factory.createPropertyAssignment(ts.factory.createIdentifier('registrationStrategy'), ts.factory.createStringLiteral('registerWhenStable:30000', true)),
-            ], true),
-        ]);
-        addImport(host, updatedFilePath, 'isDevMode', '@angular/core');
-        return host;
+        const bootstrapCall = (0, util_1.findBootstrapApplicationCall)(host, mainPath);
+        const appConfig = (0, app_config_1.findAppConfig)(bootstrapCall, host, mainPath)?.filePath || mainPath;
+        addImport(host, appConfig, 'isDevMode', '@angular/core');
+        return (0, utility_1.addRootProvider)(projectName, ({ code, external }) => code `${external('provideServiceWorker', '@angular/service-worker')}('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })`);
     };
 }
 function getTsSourceFile(host, path) {
@@ -141,7 +140,7 @@ function default_1(options) {
                 (0, schematics_1.move)(project.root),
             ])),
             (0, ng_ast_utils_1.isStandaloneApp)(host, browserEntryPoint)
-                ? addProvideServiceWorker(browserEntryPoint)
+                ? addProvideServiceWorker(options.project, browserEntryPoint)
                 : updateAppModule(browserEntryPoint),
         ]);
     };

@@ -32,7 +32,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const standalone_1 = require("../private/standalone");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
@@ -82,16 +81,15 @@ function getComponentTemplate(host, compPath, tmplInfo) {
     return template;
 }
 function getBootstrapComponentPath(host, mainPath) {
-    const mainSource = getSourceFile(host, mainPath);
-    const bootstrapAppCall = (0, standalone_1.findBootstrapApplicationCall)(mainSource);
     let bootstrappingFilePath;
     let bootstrappingSource;
     let componentName;
-    if (bootstrapAppCall) {
+    if ((0, ng_ast_utils_1.isStandaloneApp)(host, mainPath)) {
         // Standalone Application
-        componentName = bootstrapAppCall.arguments[0].getText();
+        const bootstrapCall = (0, util_1.findBootstrapApplicationCall)(host, mainPath);
+        componentName = bootstrapCall.arguments[0].getText();
         bootstrappingFilePath = mainPath;
-        bootstrappingSource = mainSource;
+        bootstrappingSource = getSourceFile(host, mainPath);
     }
     else {
         // NgModule Application
