@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
+const posix_1 = require("node:path/posix");
 const utility_1 = require("../../utility");
 const dependencies_1 = require("../../utility/dependencies");
 const latest_versions_1 = require("../../utility/latest-versions");
@@ -80,7 +80,7 @@ function default_1() {
                         // Check if file is importing tokens
                         if (content.includes('@nguniversal/express-engine/tokens')) {
                             hasExpressTokens ||= true;
-                            let tokensFileRelativePath = (0, core_1.relative)((0, core_1.dirname)((0, core_1.normalize)(path)), (0, core_1.normalize)(tokensFilePath));
+                            let tokensFileRelativePath = (0, posix_1.relative)((0, posix_1.dirname)(path), tokensFilePath);
                             if (tokensFileRelativePath.charAt(0) !== '.') {
                                 tokensFileRelativePath = './' + tokensFileRelativePath;
                             }

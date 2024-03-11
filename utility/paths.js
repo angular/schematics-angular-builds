@@ -8,14 +8,11 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.relativePathToWorkspaceRoot = void 0;
-const core_1 = require("@angular-devkit/core");
+const posix_1 = require("node:path/posix");
 function relativePathToWorkspaceRoot(projectRoot) {
-    const normalizedPath = (0, core_1.split)((0, core_1.normalize)(projectRoot || ''));
-    if (normalizedPath.length === 0 || !normalizedPath[0]) {
+    if (!projectRoot) {
         return '.';
     }
-    else {
-        return normalizedPath.map(() => '..').join('/');
-    }
+    return (0, posix_1.relative)((0, posix_1.join)('/', projectRoot), '/') || '.';
 }
 exports.relativePathToWorkspaceRoot = relativePathToWorkspaceRoot;

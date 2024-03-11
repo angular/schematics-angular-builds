@@ -30,8 +30,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
+const posix_1 = require("node:path/posix");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
@@ -41,10 +41,7 @@ const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const schema_1 = require("./schema");
 function buildRelativeModulePath(options, modulePath) {
-    const importModulePath = (0, core_1.normalize)(`/${options.path}/` +
-        (options.flat ? '' : schematics_1.strings.dasherize(options.name) + '/') +
-        schematics_1.strings.dasherize(options.name) +
-        '.module');
+    const importModulePath = (0, posix_1.join)(options.path ?? '', options.flat ? '' : schematics_1.strings.dasherize(options.name), schematics_1.strings.dasherize(options.name) + '.module');
     return (0, find_module_1.buildRelativePath)(modulePath, importModulePath);
 }
 function addImportToNgModule(options) {
@@ -94,7 +91,7 @@ function getRoutingModulePath(host, modulePath) {
     const routingModulePath = modulePath.endsWith(find_module_1.ROUTING_MODULE_EXT)
         ? modulePath
         : modulePath.replace(find_module_1.MODULE_EXT, find_module_1.ROUTING_MODULE_EXT);
-    return host.exists(routingModulePath) ? (0, core_1.normalize)(routingModulePath) : undefined;
+    return host.exists(routingModulePath) ? routingModulePath : undefined;
 }
 function buildRoute(options, modulePath) {
     const relativeModulePath = buildRelativeModulePath(options, modulePath);

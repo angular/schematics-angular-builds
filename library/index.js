@@ -7,9 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
+const posix_1 = require("node:path/posix");
 const dependencies_1 = require("../utility/dependencies");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
@@ -110,8 +110,8 @@ function default_1(options) {
             folderName = schematics_1.strings.dasherize(folderName);
         }
         const libDir = options.projectRoot !== undefined
-            ? (0, core_1.normalize)(options.projectRoot)
-            : (0, core_1.join)((0, core_1.normalize)(newProjectRoot), folderName);
+            ? (0, posix_1.join)(options.projectRoot)
+            : (0, posix_1.join)(newProjectRoot, folderName);
         const distRoot = `dist/${folderName}`;
         const sourceDir = `${libDir}/src/lib`;
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [

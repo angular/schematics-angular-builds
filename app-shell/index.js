@@ -6,33 +6,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const posix_1 = require("node:path/posix");
+const typescript_1 = __importDefault(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
@@ -42,18 +22,18 @@ const workspace_models_1 = require("../utility/workspace-models");
 const APP_SHELL_ROUTE = 'shell';
 function getSourceFile(host, path) {
     const content = host.readText(path);
-    const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
+    const source = typescript_1.default.createSourceFile(path, content, typescript_1.default.ScriptTarget.Latest, true);
     return source;
 }
 function getServerModulePath(host, sourceRoot, mainPath) {
-    const mainSource = getSourceFile(host, (0, core_1.join)((0, core_1.normalize)(sourceRoot), mainPath));
+    const mainSource = getSourceFile(host, (0, posix_1.join)(sourceRoot, mainPath));
     const allNodes = (0, ast_utils_1.getSourceNodes)(mainSource);
-    const expNode = allNodes.find((node) => ts.isExportDeclaration(node));
+    const expNode = allNodes.find((node) => typescript_1.default.isExportDeclaration(node));
     if (!expNode) {
         return null;
     }
     const relativePath = expNode.moduleSpecifier;
-    const modulePath = (0, core_1.normalize)(`/${sourceRoot}/${relativePath.text}.ts`);
+    const modulePath = (0, posix_1.join)(sourceRoot, `${relativePath.text}.ts`);
     return modulePath;
 }
 function getComponentTemplateInfo(host, componentPath) {
@@ -71,8 +51,8 @@ function getComponentTemplate(host, compPath, tmplInfo) {
     }
     else if (tmplInfo.templateUrlProp) {
         const templateUrl = tmplInfo.templateUrlProp.initializer.text;
-        const dir = (0, core_1.dirname)((0, core_1.normalize)(compPath));
-        const templatePath = (0, core_1.join)(dir, templateUrl);
+        const dir = (0, posix_1.dirname)(compPath);
+        const templatePath = (0, posix_1.join)(dir, templateUrl);
         try {
             template = host.readText(templatePath);
         }
@@ -103,15 +83,15 @@ function getBootstrapComponentPath(host, mainPath) {
         bootstrappingFilePath = modulePath;
     }
     const componentRelativeFilePath = (0, ast_utils_1.getSourceNodes)(bootstrappingSource)
-        .filter(ts.isImportDeclaration)
+        .filter(typescript_1.default.isImportDeclaration)
         .filter((imp) => {
-        return (0, ast_utils_1.findNode)(imp, ts.SyntaxKind.Identifier, componentName);
+        return (0, ast_utils_1.findNode)(imp, typescript_1.default.SyntaxKind.Identifier, componentName);
     })
         .map((imp) => {
         const pathStringLiteral = imp.moduleSpecifier;
         return pathStringLiteral.text;
     })[0];
-    return (0, core_1.join)((0, core_1.dirname)((0, core_1.normalize)(bootstrappingFilePath)), componentRelativeFilePath + '.ts');
+    return (0, posix_1.join)((0, posix_1.dirname)(bootstrappingFilePath), componentRelativeFilePath + '.ts');
 }
 // end helper functions.
 function validateProject(mainPath) {
@@ -191,12 +171,12 @@ function addRouterModule(mainPath) {
 }
 function getMetadataProperty(metadata, propertyName) {
     const properties = metadata.properties;
-    const property = properties.filter(ts.isPropertyAssignment).filter((prop) => {
+    const property = properties.filter(typescript_1.default.isPropertyAssignment).filter((prop) => {
         const name = prop.name;
         switch (name.kind) {
-            case ts.SyntaxKind.Identifier:
+            case typescript_1.default.SyntaxKind.Identifier:
                 return name.getText() === propertyName;
-            case ts.SyntaxKind.StringLiteral:
+            case typescript_1.default.SyntaxKind.StringLiteral:
                 return name.text === propertyName;
         }
         return false;
@@ -223,7 +203,7 @@ function addServerRoutes(options) {
                 (0, change_1.applyToUpdateRecorder)(recorder, [routesChange]);
             }
             const imports = (0, ast_utils_1.getSourceNodes)(moduleSource)
-                .filter((node) => node.kind === ts.SyntaxKind.ImportDeclaration)
+                .filter((node) => node.kind === typescript_1.default.SyntaxKind.ImportDeclaration)
                 .sort((a, b) => a.getStart() - b.getStart());
             const insertPosition = imports[imports.length - 1].getEnd();
             const routeText = `\n\nconst routes: Routes = [ { path: '${APP_SHELL_ROUTE}', component: AppShellComponent }];`;
@@ -252,7 +232,7 @@ function addStandaloneServerRoute(options) {
         if (!project) {
             throw new schematics_1.SchematicsException(`Project name "${options.project}" doesn't not exist.`);
         }
-        const configFilePath = (0, core_1.join)((0, core_1.normalize)(project.sourceRoot ?? 'src'), 'app/app.config.server.ts');
+        const configFilePath = (0, posix_1.join)(project.sourceRoot ?? 'src', 'app/app.config.server.ts');
         if (!host.exists(configFilePath)) {
             throw new schematics_1.SchematicsException(`Cannot find "${configFilePath}".`);
         }
@@ -266,28 +246,28 @@ function addStandaloneServerRoute(options) {
             }
         }
         configSourceFile = getSourceFile(host, configFilePath);
-        const providersLiteral = (0, ast_utils_1.findNodes)(configSourceFile, ts.isPropertyAssignment).find((n) => ts.isArrayLiteralExpression(n.initializer) && n.name.getText() === 'providers')?.initializer;
+        const providersLiteral = (0, ast_utils_1.findNodes)(configSourceFile, typescript_1.default.isPropertyAssignment).find((n) => typescript_1.default.isArrayLiteralExpression(n.initializer) && n.name.getText() === 'providers')?.initializer;
         if (!providersLiteral) {
             throw new schematics_1.SchematicsException(`Cannot find the "providers" configuration in "${configFilePath}".`);
         }
         // Add route to providers literal.
-        const newProvidersLiteral = ts.factory.updateArrayLiteralExpression(providersLiteral, [
+        const newProvidersLiteral = typescript_1.default.factory.updateArrayLiteralExpression(providersLiteral, [
             ...providersLiteral.elements,
-            ts.factory.createObjectLiteralExpression([
-                ts.factory.createPropertyAssignment('provide', ts.factory.createIdentifier('ROUTES')),
-                ts.factory.createPropertyAssignment('multi', ts.factory.createIdentifier('true')),
-                ts.factory.createPropertyAssignment('useValue', ts.factory.createArrayLiteralExpression([
-                    ts.factory.createObjectLiteralExpression([
-                        ts.factory.createPropertyAssignment('path', ts.factory.createIdentifier(`'${APP_SHELL_ROUTE}'`)),
-                        ts.factory.createPropertyAssignment('component', ts.factory.createIdentifier('AppShellComponent')),
+            typescript_1.default.factory.createObjectLiteralExpression([
+                typescript_1.default.factory.createPropertyAssignment('provide', typescript_1.default.factory.createIdentifier('ROUTES')),
+                typescript_1.default.factory.createPropertyAssignment('multi', typescript_1.default.factory.createIdentifier('true')),
+                typescript_1.default.factory.createPropertyAssignment('useValue', typescript_1.default.factory.createArrayLiteralExpression([
+                    typescript_1.default.factory.createObjectLiteralExpression([
+                        typescript_1.default.factory.createPropertyAssignment('path', typescript_1.default.factory.createIdentifier(`'${APP_SHELL_ROUTE}'`)),
+                        typescript_1.default.factory.createPropertyAssignment('component', typescript_1.default.factory.createIdentifier('AppShellComponent')),
                     ], true),
                 ], true)),
             ], true),
         ]);
         const recorder = host.beginUpdate(configFilePath);
         recorder.remove(providersLiteral.getStart(), providersLiteral.getWidth());
-        const printer = ts.createPrinter();
-        recorder.insertRight(providersLiteral.getStart(), printer.printNode(ts.EmitHint.Unspecified, newProvidersLiteral, configSourceFile));
+        const printer = typescript_1.default.createPrinter();
+        recorder.insertRight(providersLiteral.getStart(), printer.printNode(typescript_1.default.EmitHint.Unspecified, newProvidersLiteral, configSourceFile));
         // Add AppShellComponent import
         const appShellImportChange = (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'AppShellComponent', './app-shell/app-shell.component');
         (0, change_1.applyToUpdateRecorder)(recorder, [appShellImportChange]);
