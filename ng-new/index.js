@@ -53,9 +53,6 @@ function default_1(options) {
                     workingDirectory: options.directory,
                     packageManager: options.packageManager,
                 }));
-                if (options.linkCli) {
-                    packageTask = context.addTask(new tasks_1.NodePackageLinkTask('@angular/cli', options.directory), [packageTask]);
-                }
             }
             if (!options.skipGit) {
                 const commit = typeof options.commit == 'object' ? options.commit : options.commit ? {} : false;
