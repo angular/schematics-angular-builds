@@ -26,7 +26,7 @@ function default_1(options) {
             .map((implement) => (implement === 'CanDeactivate' ? 'CanDeactivate<unknown>' : implement))
             .join(', ');
         const commonRouterNameImports = ['ActivatedRouteSnapshot', 'RouterStateSnapshot'];
-        const routerNamedImports = [...options.implements, 'UrlTree'];
+        const routerNamedImports = [...options.implements, 'MaybeAsync', 'GuardResult'];
         if (options.implements.includes(schema_1.Implement.CanMatch)) {
             routerNamedImports.push('Route', 'UrlSegment');
             if (options.implements.length > 1) {
