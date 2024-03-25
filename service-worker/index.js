@@ -110,11 +110,9 @@ function default_1(options) {
         }
         const buildOptions = buildTarget.options;
         let browserEntryPoint;
-        let resourcesOutputPath = '';
         const ngswConfigPath = (0, core_1.join)((0, core_1.normalize)(project.root), 'ngsw-config.json');
         if (buildTarget.builder === workspace_models_1.Builders.Application) {
             browserEntryPoint = buildOptions.browser;
-            resourcesOutputPath = '/media';
             const productionConf = buildTarget.configurations?.production;
             if (productionConf) {
                 productionConf.serviceWorker = ngswConfigPath;
@@ -124,9 +122,6 @@ function default_1(options) {
             browserEntryPoint = buildOptions.main;
             buildOptions.serviceWorker = true;
             buildOptions.ngswConfigPath = ngswConfigPath;
-            if (buildOptions.resourcesOutputPath) {
-                resourcesOutputPath = (0, core_1.normalize)(`/${buildOptions.resourcesOutputPath}`);
-            }
         }
         await (0, utility_1.writeWorkspace)(host, workspace);
         return (0, schematics_1.chain)([
@@ -134,7 +129,6 @@ function default_1(options) {
             (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
                 (0, schematics_1.applyTemplates)({
                     ...options,
-                    resourcesOutputPath,
                     relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(project.root),
                 }),
                 (0, schematics_1.move)(project.root),
