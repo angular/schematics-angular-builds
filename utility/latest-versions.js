@@ -8,12 +8,13 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.latestVersions = void 0;
+// We could have used TypeScripts' `resolveJsonModule` to make the `latestVersion` object typesafe,
+// but ts_library doesn't support JSON inputs.
+const dependencies = require('./latest-versions/package.json')['dependencies'];
 exports.latestVersions = {
-    // We could have used TypeScripts' `resolveJsonModule` to make the `latestVersion` object typesafe,
-    // but ts_library doesn't support JSON inputs.
-    ...require('./latest-versions/package.json')['dependencies'],
+    ...dependencies,
     // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
-    Angular: '^17.3.0',
-    DevkitBuildAngular: '^17.3.2+sha-8a6550d',
-    AngularSSR: '^17.3.2+sha-8a6550d',
+    Angular: dependencies['@angular/core'],
+    DevkitBuildAngular: '^17.3.2+sha-9bb6ea0',
+    AngularSSR: '^17.3.2+sha-9bb6ea0',
 };
