@@ -9,7 +9,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
+const dependencies_1 = require("../../utility/dependencies");
+const dependency_1 = require("../../utility/dependency");
 const json_file_1 = require("../../utility/json-file");
+const latest_versions_1 = require("../../utility/latest-versions");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 const css_import_lexer_1 = require("./css-import-lexer");
@@ -17,10 +20,6 @@ function* updateBuildTarget(projectName, buildTarget, serverTarget, tree, contex
     // Update builder target and options
     buildTarget.builder = workspace_models_1.Builders.Application;
     for (const [, options] of (0, workspace_1.allTargetOptions)(buildTarget, false)) {
-        // Show warnings for using no longer supported options
-        if (usesNoLongerSupportedOptions(options, context, projectName)) {
-            continue;
-        }
         if (options['index'] === '') {
             options['index'] = false;
         }
@@ -59,7 +58,6 @@ function* updateBuildTarget(projectName, buildTarget, serverTarget, tree, contex
             }
         }
         // Delete removed options
-        delete options['deployUrl'];
         delete options['vendorChunk'];
         delete options['commonChunk'];
         delete options['resourcesOutputPath'];
@@ -141,6 +139,45 @@ function updateProjects(tree, context) {
             // Update CSS/Sass import specifiers
             const projectSourceRoot = (0, posix_1.join)(project.root, project.sourceRoot ?? 'src');
             updateStyleImports(tree, projectSourceRoot, buildTarget);
+        }
+        // Check for @angular-devkit/build-angular Webpack usage
+        let hasAngularDevkitUsage = false;
+        for (const [, target] of (0, workspace_1.allWorkspaceTargets)(workspace)) {
+            switch (target.builder) {
+                case workspace_models_1.Builders.Application:
+                case workspace_models_1.Builders.DevServer:
+                case workspace_models_1.Builders.ExtractI18n:
+                    // Ignore application, dev server, and i18n extraction for devkit usage check.
+                    // Both will be replaced if no other usage is found.
+                    continue;
+            }
+            if (target.builder.startsWith('@angular-devkit/build-angular:')) {
+                hasAngularDevkitUsage = true;
+                break;
+            }
+        }
+        // Use @angular/build directly if there is no devkit package usage
+        if (!hasAngularDevkitUsage) {
+            for (const [, target] of (0, workspace_1.allWorkspaceTargets)(workspace)) {
+                switch (target.builder) {
+                    case workspace_models_1.Builders.Application:
+                        target.builder = '@angular/build:application';
+                        break;
+                    case workspace_models_1.Builders.DevServer:
+                        target.builder = '@angular/build:dev-server';
+                        break;
+                    case workspace_models_1.Builders.ExtractI18n:
+                        target.builder = '@angular/build:extract-i18n';
+                        break;
+                }
+            }
+            // Add direct @angular/build dependencies and remove @angular-devkit/build-angular
+            rules.push((0, dependency_1.addDependency)('@angular/build', latest_versions_1.latestVersions.DevkitBuildAngular, {
+                type: dependency_1.DependencyType.Dev,
+                install: dependency_1.InstallBehavior.Always,
+                existing: dependency_1.ExistingBehavior.Replace,
+            }));
+            (0, dependencies_1.removePackageJsonDependency)(tree, '@angular-devkit/build-angular');
         }
         return (0, schematics_1.chain)(rules);
     });
@@ -262,11 +299,3 @@ function default_1() {
     ]);
 }
 exports.default = default_1;
-function usesNoLongerSupportedOptions({ deployUrl }, context, projectName) {
-    let hasUsage = false;
-    if (typeof deployUrl === 'string') {
-        hasUsage = true;
-        context.logger.warn(`Skipping migration for project "${projectName}". "deployUrl" option is not available in the application builder.`);
-    }
-    return hasUsage;
-}
