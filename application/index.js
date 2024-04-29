@@ -232,9 +232,6 @@ function addAppToWorkspaceFile(options, appDir, folderName) {
             },
             'extract-i18n': {
                 builder: workspace_models_1.Builders.ExtractI18n,
-                options: {
-                    buildTarget: `${options.name}:build`,
-                },
             },
             test: options.minimal
                 ? undefined
