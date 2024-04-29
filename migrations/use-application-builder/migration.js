@@ -174,13 +174,48 @@ function updateProjects(tree, context) {
             // Add direct @angular/build dependencies and remove @angular-devkit/build-angular
             rules.push((0, dependency_1.addDependency)('@angular/build', latest_versions_1.latestVersions.DevkitBuildAngular, {
                 type: dependency_1.DependencyType.Dev,
+                // Always is set here since removePackageJsonDependency below does not automatically
+                // trigger the package manager execution.
                 install: dependency_1.InstallBehavior.Always,
                 existing: dependency_1.ExistingBehavior.Replace,
             }));
             (0, dependencies_1.removePackageJsonDependency)(tree, '@angular-devkit/build-angular');
+            // Add less dependency if any projects contain a Less stylesheet file.
+            // This check does not consider Node.js packages due to the performance
+            // cost of searching such a large directory structure. A build time error
+            // will provide instructions to install the package in this case.
+            if (hasLessStylesheets(tree)) {
+                rules.push((0, dependency_1.addDependency)('less', latest_versions_1.latestVersions['less'], {
+                    type: dependency_1.DependencyType.Dev,
+                    existing: dependency_1.ExistingBehavior.Skip,
+                }));
+            }
         }
         return (0, schematics_1.chain)(rules);
     });
+}
+/**
+ * Searches the schematic tree for files that have a `.less` extension.
+ *
+ * @param tree A Schematics tree instance to search
+ * @returns true if Less stylesheet files are found; otherwise, false
+ */
+function hasLessStylesheets(tree) {
+    const directories = [tree.getDir('/')];
+    let current;
+    while ((current = directories.pop())) {
+        for (const path of current.subfiles) {
+            if (path.endsWith('.less')) {
+                return true;
+            }
+        }
+        for (const path of current.subdirs) {
+            if (path === 'node_modules' || path.startsWith('.')) {
+                continue;
+            }
+            directories.push(current.dir(path));
+        }
+    }
 }
 function* visit(directory) {
     for (const path of directory.subfiles) {
