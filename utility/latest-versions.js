@@ -15,6 +15,6 @@ exports.latestVersions = {
     ...dependencies,
     // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
     Angular: dependencies['@angular/core'],
-    DevkitBuildAngular: '^18.0.0-rc.0+sha-a8a4d1f',
-    AngularSSR: '^18.0.0-rc.0+sha-a8a4d1f',
+    DevkitBuildAngular: '^18.0.0-rc.0+sha-b7a0792',
+    AngularSSR: '^18.0.0-rc.0+sha-b7a0792',
 };
