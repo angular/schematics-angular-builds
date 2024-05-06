@@ -159,13 +159,13 @@ function addAppToWorkspaceFile(options, appDir, folderName) {
         budgets = [
             {
                 type: 'initial',
-                maximumWarning: '500kb',
-                maximumError: '1mb',
+                maximumWarning: '500kB',
+                maximumError: '1MB',
             },
             {
                 type: 'anyComponentStyle',
-                maximumWarning: '2kb',
-                maximumError: '4kb',
+                maximumWarning: '2kB',
+                maximumError: '4kB',
             },
         ];
     }
@@ -173,13 +173,13 @@ function addAppToWorkspaceFile(options, appDir, folderName) {
         budgets = [
             {
                 type: 'initial',
-                maximumWarning: '2mb',
-                maximumError: '5mb',
+                maximumWarning: '2MB',
+                maximumError: '5MB',
             },
             {
                 type: 'anyComponentStyle',
-                maximumWarning: '6kb',
-                maximumError: '10kb',
+                maximumWarning: '6kB',
+                maximumError: '10kB',
             },
         ];
     }
