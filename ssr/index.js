@@ -253,7 +253,7 @@ function addServerFile(options, isStandalone) {
         if (!project) {
             throw new schematics_1.SchematicsException(`Invalid project name (${projectName})`);
         }
-        const isUsingApplicationBuilder = project?.targets?.get('build')?.builder === workspace_models_1.Builders.Application;
+        const isUsingApplicationBuilder = usingApplicationBuilder(project);
         const browserDistDirectory = isUsingApplicationBuilder
             ? (await getApplicationBuilderOutputPaths(host, projectName)).browser
             : await getLegacyOutputPaths(host, projectName, 'build');
@@ -277,7 +277,7 @@ function default_1(options) {
         if (!clientProject) {
             throw (0, project_targets_1.targetBuildNotFoundError)();
         }
-        const isUsingApplicationBuilder = clientProject.targets.get('build')?.builder === workspace_models_1.Builders.Application;
+        const isUsingApplicationBuilder = usingApplicationBuilder(clientProject);
         return (0, schematics_1.chain)([
             (0, schematics_1.schematic)('server', {
                 ...options,
@@ -299,3 +299,8 @@ function default_1(options) {
     };
 }
 exports.default = default_1;
+function usingApplicationBuilder(project) {
+    const buildBuilder = project.targets.get('build')?.builder;
+    const isUsingApplicationBuilder = buildBuilder === workspace_models_1.Builders.Application || buildBuilder === workspace_models_1.Builders.BuildApplication;
+    return isUsingApplicationBuilder;
+}
