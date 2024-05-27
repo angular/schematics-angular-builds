@@ -28,7 +28,8 @@ export declare enum Builders {
     NgPackagr = "@angular-devkit/build-angular:ng-packagr",
     DevServer = "@angular-devkit/build-angular:dev-server",
     ExtractI18n = "@angular-devkit/build-angular:extract-i18n",
-    Protractor = "@angular-devkit/build-angular:protractor"
+    Protractor = "@angular-devkit/build-angular:protractor",
+    BuildApplication = "@angular/build:application"
 }
 export interface FileReplacements {
     replace: string;

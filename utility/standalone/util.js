@@ -30,7 +30,10 @@ async function getMainFilePath(tree, projectName) {
         throw (0, project_targets_1.targetBuildNotFoundError)();
     }
     const options = buildTarget.options;
-    return buildTarget.builder === workspace_models_1.Builders.Application ? options.browser : options.main;
+    return buildTarget.builder === workspace_models_1.Builders.Application ||
+        buildTarget.builder === workspace_models_1.Builders.BuildApplication
+        ? options.browser
+        : options.main;
 }
 exports.getMainFilePath = getMainFilePath;
 /**
