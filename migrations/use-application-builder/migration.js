@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
 const dependencies_1 = require("../../utility/dependencies");
@@ -361,4 +362,3 @@ function default_1() {
         }),
     ]);
 }
-exports.default = default_1;

@@ -7,7 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPackageJsonDependency = exports.removePackageJsonDependency = exports.addPackageJsonDependency = exports.NodeDependencyType = void 0;
+exports.NodeDependencyType = void 0;
+exports.addPackageJsonDependency = addPackageJsonDependency;
+exports.removePackageJsonDependency = removePackageJsonDependency;
+exports.getPackageJsonDependency = getPackageJsonDependency;
 const json_file_1 = require("./json-file");
 const PKG_JSON_PATH = '/package.json';
 var NodeDependencyType;
@@ -31,14 +34,12 @@ function addPackageJsonDependency(tree, dependency, pkgJsonPath = PKG_JSON_PATH)
         json.modify(path, version);
     }
 }
-exports.addPackageJsonDependency = addPackageJsonDependency;
 function removePackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
     const json = new json_file_1.JSONFile(tree, pkgJsonPath);
     for (const depType of ALL_DEPENDENCY_TYPE) {
         json.remove([depType, name]);
     }
 }
-exports.removePackageJsonDependency = removePackageJsonDependency;
 function getPackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
     const json = new json_file_1.JSONFile(tree, pkgJsonPath);
     for (const depType of ALL_DEPENDENCY_TYPE) {
@@ -53,4 +54,3 @@ function getPackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
     }
     return null;
 }
-exports.getPackageJsonDependency = getPackageJsonDependency;

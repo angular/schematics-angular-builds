@@ -10,7 +10,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findAppConfig = void 0;
+exports.findAppConfig = findAppConfig;
 const path_1 = require("path");
 const typescript_1 = __importDefault(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const util_1 = require("./util");
@@ -32,7 +32,6 @@ function findAppConfig(bootstrapCall, tree, filePath) {
     }
     return null;
 }
-exports.findAppConfig = findAppConfig;
 /**
  * Resolves the app config from an identifier referring to it.
  * @param identifier Identifier referring to the app config.

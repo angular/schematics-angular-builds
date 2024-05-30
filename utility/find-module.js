@@ -7,7 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildRelativePath = exports.findModule = exports.findModuleFromOptions = exports.ROUTING_MODULE_EXT = exports.MODULE_EXT = void 0;
+exports.ROUTING_MODULE_EXT = exports.MODULE_EXT = void 0;
+exports.findModuleFromOptions = findModuleFromOptions;
+exports.findModule = findModule;
+exports.buildRelativePath = buildRelativePath;
 const core_1 = require("@angular-devkit/core");
 exports.MODULE_EXT = '.module.ts';
 exports.ROUTING_MODULE_EXT = '-routing.module.ts';
@@ -48,7 +51,6 @@ function findModuleFromOptions(host, options) {
             `Looked in the following directories:\n    ${candidatesDirs.join('\n    ')}`);
     }
 }
-exports.findModuleFromOptions = findModuleFromOptions;
 /**
  * Function to find the "closest" module to a generated file's path.
  */
@@ -75,7 +77,6 @@ function findModule(host, generateDir, moduleExt = exports.MODULE_EXT, routingMo
         : `Could not find an NgModule. Use the '--skip-import' option to skip importing in NgModule.`;
     throw new Error(errorMsg);
 }
-exports.findModule = findModule;
 /**
  * Build a relative path from one file path to another file path.
  */
@@ -102,4 +103,3 @@ function buildRelativePath(from, to) {
     }
     return pathPrefix + (relativePath ? relativePath + '/' : '') + toFileName;
 }
-exports.buildRelativePath = buildRelativePath;

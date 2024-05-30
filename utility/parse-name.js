@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseName = void 0;
+exports.parseName = parseName;
 const core_1 = require("@angular-devkit/core");
 function parseName(path, name) {
     const nameWithoutPath = (0, core_1.basename)((0, core_1.normalize)(name));
@@ -17,4 +17,3 @@ function parseName(path, name) {
         path: (0, core_1.normalize)('/' + namePath),
     };
 }
-exports.parseName = parseName;

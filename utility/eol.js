@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEOL = void 0;
+exports.getEOL = getEOL;
 const node_os_1 = require("node:os");
 const CRLF = '\r\n';
 const LF = '\n';
@@ -20,4 +20,3 @@ function getEOL(content) {
     }
     return node_os_1.EOL;
 }
-exports.getEOL = getEOL;

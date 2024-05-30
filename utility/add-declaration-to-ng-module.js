@@ -30,7 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addDeclarationToNgModule = void 0;
+exports.addDeclarationToNgModule = addDeclarationToNgModule;
 const schematics_1 = require("@angular-devkit/schematics");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const ast_utils_1 = require("./ast-utils");
@@ -65,4 +65,3 @@ function addDeclarationToNgModule(options) {
         return host;
     };
 }
-exports.addDeclarationToNgModule = addDeclarationToNgModule;

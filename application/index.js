@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
@@ -84,7 +85,6 @@ function default_1(options) {
         ]);
     };
 }
-exports.default = default_1;
 function addDependenciesToPackageJson(options) {
     return (host, context) => {
         [

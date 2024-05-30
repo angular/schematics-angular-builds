@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findImports = void 0;
+exports.findImports = findImports;
 /**
  * Determines if a unicode code point is a CSS whitespace character.
  * @param code The unicode code point to test.
@@ -40,7 +40,6 @@ function* findImports(contents, sass) {
         }
     }
 }
-exports.findImports = findImports;
 /**
  * Scans a CSS or Sass file and locates all valid function/directive values as defined by the
  * syntax specification.

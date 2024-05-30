@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.relativePathToWorkspaceRoot = void 0;
+exports.relativePathToWorkspaceRoot = relativePathToWorkspaceRoot;
 const posix_1 = require("node:path/posix");
 function relativePathToWorkspaceRoot(projectRoot) {
     if (!projectRoot) {
@@ -15,4 +15,3 @@ function relativePathToWorkspaceRoot(projectRoot) {
     }
     return (0, posix_1.relative)((0, posix_1.join)('/', projectRoot), '/') || '.';
 }
-exports.relativePathToWorkspaceRoot = relativePathToWorkspaceRoot;

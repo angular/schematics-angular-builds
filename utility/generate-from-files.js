@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateFromFiles = void 0;
+exports.generateFromFiles = generateFromFiles;
 const schematics_1 = require("@angular-devkit/schematics");
 const parse_name_1 = require("./parse-name");
 const validation_1 = require("./validation");
@@ -34,4 +34,3 @@ function generateFromFiles(options, extraTemplateValues = {}) {
         return (0, schematics_1.chain)([(0, schematics_1.mergeWith)(templateSource)]);
     };
 }
-exports.generateFromFiles = generateFromFiles;

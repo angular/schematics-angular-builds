@@ -30,6 +30,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
@@ -139,7 +140,6 @@ function default_1(options) {
         ]);
     };
 }
-exports.default = default_1;
 function addImport(host, filePath, symbolName, moduleName) {
     const moduleSource = getTsSourceFile(host, filePath);
     const change = (0, ast_utils_1.insertImport)(moduleSource, filePath, symbolName, moduleName);

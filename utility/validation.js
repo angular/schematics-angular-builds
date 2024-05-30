@@ -7,7 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateClassName = exports.validateHtmlSelector = exports.htmlSelectorRe = void 0;
+exports.htmlSelectorRe = void 0;
+exports.validateHtmlSelector = validateHtmlSelector;
+exports.validateClassName = validateClassName;
 const schematics_1 = require("@angular-devkit/schematics");
 // Must start with a letter, and must contain only alphanumeric characters or dashes.
 // When adding a dash the segment after the dash must also start with a letter.
@@ -19,10 +21,8 @@ function validateHtmlSelector(selector) {
         throw new schematics_1.SchematicsException(`Selector "${selector}" is invalid.`);
     }
 }
-exports.validateHtmlSelector = validateHtmlSelector;
 function validateClassName(className) {
     if (!ecmaIdentifierNameRegExp.test(className)) {
         throw new schematics_1.SchematicsException(`Class name "${className}" is invalid.`);
     }
 }
-exports.validateClassName = validateClassName;

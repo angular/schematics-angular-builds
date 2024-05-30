@@ -7,10 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const generate_from_files_1 = require("../utility/generate-from-files");
 function default_1(options) {
     return options.functional
         ? (0, generate_from_files_1.generateFromFiles)({ ...options, templateFilesDirectory: './functional-files' })
         : (0, generate_from_files_1.generateFromFiles)({ ...options, templateFilesDirectory: './class-files' });
 }
-exports.default = default_1;

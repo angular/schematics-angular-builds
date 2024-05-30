@@ -7,7 +7,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allTargetOptions = exports.allWorkspaceTargets = exports.createDefaultPath = exports.buildDefaultPath = exports.writeWorkspace = exports.getWorkspace = exports.updateWorkspace = exports.TreeWorkspaceHost = void 0;
+exports.TreeWorkspaceHost = void 0;
+exports.updateWorkspace = updateWorkspace;
+exports.getWorkspace = getWorkspace;
+exports.writeWorkspace = writeWorkspace;
+exports.buildDefaultPath = buildDefaultPath;
+exports.createDefaultPath = createDefaultPath;
+exports.allWorkspaceTargets = allWorkspaceTargets;
+exports.allTargetOptions = allTargetOptions;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const workspace_models_1 = require("./workspace-models");
@@ -58,7 +65,6 @@ function updateWorkspace(updater) {
         return result || schematics_1.noop;
     };
 }
-exports.updateWorkspace = updateWorkspace;
 // TODO: This should be renamed `readWorkspace` once deep imports are restricted (already exported from `utility` with that name)
 /**
  * Reads a workspace file (`angular.json`) from the provided {@link Tree} instance.
@@ -74,7 +80,6 @@ async function getWorkspace(tree, path = DEFAULT_WORKSPACE_PATH) {
     const { workspace } = await core_1.workspaces.readWorkspace(path, host);
     return workspace;
 }
-exports.getWorkspace = getWorkspace;
 /**
  * Writes a workspace file (`angular.json`) to the provided {@link Tree} instance.
  * The spacing and overall layout of an exisitng file (including comments) will be maintained where
@@ -90,7 +95,6 @@ async function writeWorkspace(tree, workspace, path) {
     const host = new TreeWorkspaceHost(tree);
     return core_1.workspaces.writeWorkspace(workspace, host, path);
 }
-exports.writeWorkspace = writeWorkspace;
 /**
  * Build a default project path for generating.
  * @param project The project which will have its default path generated.
@@ -100,7 +104,6 @@ function buildDefaultPath(project) {
     const projectDirName = project.extensions['projectType'] === workspace_models_1.ProjectType.Application ? 'app' : 'lib';
     return `${root}${projectDirName}`;
 }
-exports.buildDefaultPath = buildDefaultPath;
 async function createDefaultPath(tree, projectName) {
     const workspace = await getWorkspace(tree);
     const project = workspace.projects.get(projectName);
@@ -109,7 +112,6 @@ async function createDefaultPath(tree, projectName) {
     }
     return buildDefaultPath(project);
 }
-exports.createDefaultPath = createDefaultPath;
 function* allWorkspaceTargets(workspace) {
     for (const [projectName, project] of workspace.projects) {
         for (const [targetName, target] of project.targets) {
@@ -117,7 +119,6 @@ function* allWorkspaceTargets(workspace) {
         }
     }
 }
-exports.allWorkspaceTargets = allWorkspaceTargets;
 function* allTargetOptions(target, skipBaseOptions = false) {
     if (!skipBaseOptions && target.options) {
         yield [undefined, target.options];
@@ -131,4 +132,3 @@ function* allTargetOptions(target, skipBaseOptions = false) {
         }
     }
 }
-exports.allTargetOptions = allTargetOptions;

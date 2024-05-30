@@ -7,7 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addRootProvider = exports.addRootImport = void 0;
+exports.addRootImport = addRootImport;
+exports.addRootProvider = addRootProvider;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const ast_utils_1 = require("../ast-utils");
@@ -39,7 +40,6 @@ function addRootImport(project, callback) {
         module: '@angular/core',
     });
 }
-exports.addRootImport = addRootImport;
 /**
  * Adds a provider to the root of the project.
  * @param project Name of the project to which to add the import.
@@ -60,7 +60,6 @@ exports.addRootImport = addRootImport;
 function addRootProvider(project, callback) {
     return getRootInsertionRule(project, callback, 'providers');
 }
-exports.addRootProvider = addRootProvider;
 /**
  * Creates a rule that inserts code at the root of either a standalone or NgModule-based project.
  * @param project Name of the project into which to inser tthe code.

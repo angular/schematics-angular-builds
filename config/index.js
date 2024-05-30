@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const utility_1 = require("@schematics/angular/utility");
 const path_1 = require("path");
@@ -22,7 +23,6 @@ function default_1(options) {
             throw new schematics_1.SchematicsException(`"${options.type}" is an unknown configuration file type.`);
     }
 }
-exports.default = default_1;
 function addBrowserslistConfig(options) {
     return async (host) => {
         const workspace = await (0, utility_1.readWorkspace)(host);

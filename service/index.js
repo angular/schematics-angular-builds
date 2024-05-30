@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const generate_from_files_1 = require("../utility/generate-from-files");
 function default_1(options) {
     // This schematic uses an older method to implement the flat option
@@ -16,4 +17,3 @@ function default_1(options) {
         'if-flat': (s) => (flat ? '' : s),
     });
 }
-exports.default = default_1;

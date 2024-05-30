@@ -30,7 +30,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isStandaloneApp = exports.getAppModulePath = exports.findBootstrapModuleCall = void 0;
+exports.findBootstrapModuleCall = findBootstrapModuleCall;
+exports.getAppModulePath = getAppModulePath;
+exports.isStandaloneApp = isStandaloneApp;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
@@ -59,7 +61,6 @@ function findBootstrapModuleCall(host, mainPath) {
     }
     return bootstrapCall;
 }
-exports.findBootstrapModuleCall = findBootstrapModuleCall;
 function findBootstrapModulePath(host, mainPath) {
     const bootstrapCall = findBootstrapModuleCall(host, mainPath);
     if (!bootstrapCall) {
@@ -86,7 +87,6 @@ function getAppModulePath(host, mainPath) {
     const modulePath = (0, posix_1.join)(mainDir, `${moduleRelativePath}.ts`);
     return modulePath;
 }
-exports.getAppModulePath = getAppModulePath;
 function isStandaloneApp(host, mainPath) {
     try {
         (0, util_1.findBootstrapApplicationCall)(host, mainPath);
@@ -99,4 +99,3 @@ function isStandaloneApp(host, mainPath) {
         throw error;
     }
 }
-exports.isStandaloneApp = isStandaloneApp;

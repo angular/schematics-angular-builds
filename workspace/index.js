@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const latest_versions_1 = require("../utility/latest-versions");
 function default_1(options) {
@@ -20,4 +21,3 @@ function default_1(options) {
         }),
     ]));
 }
-exports.default = default_1;

@@ -30,7 +30,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.hasTopLevelIdentifier = exports.addRouteDeclarationToModule = exports.getRouterModuleDeclaration = exports.isImported = exports.addBootstrapToModule = exports.addExportToModule = exports.addProviderToModule = exports.addImportToModule = exports.addDeclarationToModule = exports.addSymbolToNgModuleMetadata = exports.getMetadataField = exports.getDecoratorMetadata = exports.insertAfterLastOccurrence = exports.findNode = exports.getSourceNodes = exports.findNodes = exports.insertImport = void 0;
+exports.insertImport = insertImport;
+exports.findNodes = findNodes;
+exports.getSourceNodes = getSourceNodes;
+exports.findNode = findNode;
+exports.insertAfterLastOccurrence = insertAfterLastOccurrence;
+exports.getDecoratorMetadata = getDecoratorMetadata;
+exports.getMetadataField = getMetadataField;
+exports.addSymbolToNgModuleMetadata = addSymbolToNgModuleMetadata;
+exports.addDeclarationToModule = addDeclarationToModule;
+exports.addImportToModule = addImportToModule;
+exports.addProviderToModule = addProviderToModule;
+exports.addExportToModule = addExportToModule;
+exports.addBootstrapToModule = addBootstrapToModule;
+exports.isImported = isImported;
+exports.getRouterModuleDeclaration = getRouterModuleDeclaration;
+exports.addRouteDeclarationToModule = addRouteDeclarationToModule;
+exports.hasTopLevelIdentifier = hasTopLevelIdentifier;
 const core_1 = require("@angular-devkit/core");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const change_1 = require("./change");
@@ -90,7 +106,6 @@ function insertImport(source, fileToEdit, symbolName, fileName, isDefault = fals
         ` from '${fileName}'${insertAtBeginning ? `;${eol}` : ''}`;
     return insertAfterLastOccurrence(allImports, toInsert, fileToEdit, fallbackPos, ts.SyntaxKind.StringLiteral);
 }
-exports.insertImport = insertImport;
 function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
     if (!node || max == 0) {
         return [];
@@ -118,7 +133,6 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
     }
     return arr;
 }
-exports.findNodes = findNodes;
 /**
  * Get all the nodes from a source.
  * @param sourceFile The source file object.
@@ -138,7 +152,6 @@ function getSourceNodes(sourceFile) {
     }
     return result;
 }
-exports.getSourceNodes = getSourceNodes;
 function findNode(node, kind, text) {
     if (node.kind === kind && node.getText() === text) {
         return node;
@@ -149,7 +162,6 @@ function findNode(node, kind, text) {
     });
     return foundNode;
 }
-exports.findNode = findNode;
 /**
  * Helper for sorting nodes.
  * @return function to sort nodes in increasing order of position in sourceFile
@@ -186,7 +198,6 @@ function insertAfterLastOccurrence(nodes, toInsert, file, fallbackPos, syntaxKin
     const lastItemPosition = lastItem ? lastItem.getEnd() : fallbackPos;
     return new change_1.InsertChange(file, lastItemPosition, toInsert);
 }
-exports.insertAfterLastOccurrence = insertAfterLastOccurrence;
 function _angularImportsFromNode(node) {
     const ms = node.moduleSpecifier;
     let modulePath;
@@ -267,7 +278,6 @@ function getDecoratorMetadata(source, identifier, module) {
         .filter((expr) => expr.arguments[0] && expr.arguments[0].kind == ts.SyntaxKind.ObjectLiteralExpression)
         .map((expr) => expr.arguments[0]);
 }
-exports.getDecoratorMetadata = getDecoratorMetadata;
 function getMetadataField(node, metadataField) {
     return (node.properties
         .filter(ts.isPropertyAssignment)
@@ -277,7 +287,6 @@ function getMetadataField(node, metadataField) {
         return (ts.isIdentifier(name) || ts.isStringLiteral(name)) && name.text === metadataField;
     }));
 }
-exports.getMetadataField = getMetadataField;
 function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbolName, importPath = null) {
     const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
     const node = nodes[0];
@@ -365,7 +374,6 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
     }
     return [new change_1.InsertChange(ngModulePath, position, toInsert)];
 }
-exports.addSymbolToNgModuleMetadata = addSymbolToNgModuleMetadata;
 /**
  * Custom function to insert a declaration (component, pipe, directive)
  * into NgModule declarations. It also imports the component.
@@ -373,35 +381,30 @@ exports.addSymbolToNgModuleMetadata = addSymbolToNgModuleMetadata;
 function addDeclarationToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'declarations', classifiedName, importPath);
 }
-exports.addDeclarationToModule = addDeclarationToModule;
 /**
  * Custom function to insert an NgModule into NgModule imports. It also imports the module.
  */
 function addImportToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'imports', classifiedName, importPath);
 }
-exports.addImportToModule = addImportToModule;
 /**
  * Custom function to insert a provider into NgModule. It also imports it.
  */
 function addProviderToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'providers', classifiedName, importPath);
 }
-exports.addProviderToModule = addProviderToModule;
 /**
  * Custom function to insert an export into NgModule. It also imports it.
  */
 function addExportToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'exports', classifiedName, importPath);
 }
-exports.addExportToModule = addExportToModule;
 /**
  * Custom function to insert an export into NgModule. It also imports it.
  */
 function addBootstrapToModule(source, modulePath, classifiedName, importPath) {
     return addSymbolToNgModuleMetadata(source, modulePath, 'bootstrap', classifiedName, importPath);
 }
-exports.addBootstrapToModule = addBootstrapToModule;
 /**
  * Determine if an import already exists.
  */
@@ -419,7 +422,6 @@ function isImported(source, classifiedName, importPath) {
     });
     return matchingNodes.length > 0;
 }
-exports.isImported = isImported;
 /**
  * Returns the RouterModule declaration from NgModule metadata, if any.
  */
@@ -442,7 +444,6 @@ function getRouterModuleDeclaration(source) {
         .filter((el) => el.kind === ts.SyntaxKind.CallExpression)
         .find((el) => el.getText().startsWith('RouterModule'));
 }
-exports.getRouterModuleDeclaration = getRouterModuleDeclaration;
 /**
  * Adds a new route declaration to a router module (i.e. has a RouterModule declaration)
  */
@@ -506,7 +507,6 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
     }
     return new change_1.InsertChange(fileToAdd, insertPos, route);
 }
-exports.addRouteDeclarationToModule = addRouteDeclarationToModule;
 /** Asserts if the specified node is a named declaration (e.g. class, interface). */
 function isNamedNode(node) {
     return !!node.name && ts.isIdentifier(node.name);
@@ -541,4 +541,3 @@ function hasTopLevelIdentifier(sourceFile, symbolName, skipModule = null) {
     }
     return false;
 }
-exports.hasTopLevelIdentifier = hasTopLevelIdentifier;

@@ -10,7 +10,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findProvidersLiteral = exports.isMergeAppConfigCall = exports.applyChangesToFile = exports.findBootstrapApplicationCall = exports.getSourceFile = exports.getMainFilePath = void 0;
+exports.getMainFilePath = getMainFilePath;
+exports.getSourceFile = getSourceFile;
+exports.findBootstrapApplicationCall = findBootstrapApplicationCall;
+exports.applyChangesToFile = applyChangesToFile;
+exports.isMergeAppConfigCall = isMergeAppConfigCall;
+exports.findProvidersLiteral = findProvidersLiteral;
 const schematics_1 = require("@angular-devkit/schematics");
 const typescript_1 = __importDefault(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const change_1 = require("../change");
@@ -35,7 +40,6 @@ async function getMainFilePath(tree, projectName) {
         ? options.browser
         : options.main;
 }
-exports.getMainFilePath = getMainFilePath;
 /**
  * Gets a TypeScript source file at a specific path.
  * @param tree File tree of a project.
@@ -46,7 +50,6 @@ function getSourceFile(tree, path) {
     const source = typescript_1.default.createSourceFile(path, content, typescript_1.default.ScriptTarget.Latest, true);
     return source;
 }
-exports.getSourceFile = getSourceFile;
 /** Finds the call to `bootstrapApplication` within a file. */
 function findBootstrapApplicationCall(tree, mainFilePath) {
     const sourceFile = getSourceFile(tree, mainFilePath);
@@ -69,7 +72,6 @@ function findBootstrapApplicationCall(tree, mainFilePath) {
     }
     throw new schematics_1.SchematicsException(`Could not find bootstrapApplication call in ${mainFilePath}`);
 }
-exports.findBootstrapApplicationCall = findBootstrapApplicationCall;
 /**
  * Finds the local name of an imported symbol. Could be the symbol name itself or its alias.
  * @param sourceFile File within which to search for the import.
@@ -113,7 +115,6 @@ function applyChangesToFile(tree, path, changes) {
         tree.commitUpdate(recorder);
     }
 }
-exports.applyChangesToFile = applyChangesToFile;
 /** Checks whether a node is a call to `mergeApplicationConfig`. */
 function isMergeAppConfigCall(node) {
     if (!typescript_1.default.isCallExpression(node)) {
@@ -122,7 +123,6 @@ function isMergeAppConfigCall(node) {
     const localName = findImportLocalName(node.getSourceFile(), 'mergeApplicationConfig', '@angular/core');
     return !!localName && typescript_1.default.isIdentifier(node.expression) && node.expression.text === localName;
 }
-exports.isMergeAppConfigCall = isMergeAppConfigCall;
 /** Finds the `providers` array literal within an application config. */
 function findProvidersLiteral(config) {
     for (const prop of config.properties) {
@@ -135,4 +135,3 @@ function findProvidersLiteral(config) {
     }
     return null;
 }
-exports.findProvidersLiteral = findProvidersLiteral;

@@ -30,7 +30,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addDependency = exports.ExistingBehavior = exports.InstallBehavior = exports.DependencyType = void 0;
+exports.ExistingBehavior = exports.InstallBehavior = exports.DependencyType = void 0;
+exports.addDependency = addDependency;
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const path = __importStar(require("path"));
 const installTasks = new WeakMap();
@@ -142,4 +143,3 @@ function addDependency(name, specifier, options = {}) {
         }
     };
 }
-exports.addDependency = addDependency;

@@ -7,7 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.applyToUpdateRecorder = exports.ReplaceChange = exports.RemoveChange = exports.InsertChange = exports.NoopChange = void 0;
+exports.ReplaceChange = exports.RemoveChange = exports.InsertChange = exports.NoopChange = void 0;
+exports.applyToUpdateRecorder = applyToUpdateRecorder;
 /**
  * An operation that does nothing.
  */
@@ -132,4 +133,3 @@ function applyToUpdateRecorder(recorder, changes) {
         }
     }
 }
-exports.applyToUpdateRecorder = applyToUpdateRecorder;
