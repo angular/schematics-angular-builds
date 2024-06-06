@@ -22,7 +22,7 @@ export interface Schema {
     /**
      * Create a workspace with stricter type checking options. This setting helps improve
      * maintainability and catch bugs ahead of time. For more information, see
-     * https://angular.io/strict
+     * https://angular.dev/tools/cli/template-typecheck#strict-mode
      */
     strict?: boolean;
     /**
