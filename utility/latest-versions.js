@@ -4,7 +4,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.latestVersions = void 0;
@@ -15,6 +15,6 @@ exports.latestVersions = {
     ...dependencies,
     // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
     Angular: dependencies['@angular/core'],
-    DevkitBuildAngular: '^18.1.0-next.1+sha-f3ed0fe',
-    AngularSSR: '^18.1.0-next.1+sha-f3ed0fe',
+    DevkitBuildAngular: '^18.1.0-next.1+sha-1284b43',
+    AngularSSR: '^18.1.0-next.1+sha-1284b43',
 };
