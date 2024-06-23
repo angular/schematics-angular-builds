@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 export { addRootImport, addRootProvider } from './rules';
-export { PendingCode, CodeBlockCallback, type CodeBlock } from './code_block';
+export type { PendingCode, CodeBlockCallback, CodeBlock } from './code_block';
