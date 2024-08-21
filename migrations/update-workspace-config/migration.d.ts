@@ -9,12 +9,25 @@ import { Rule } from '@angular-devkit/schematics';
 /**
  * Main entry point for the migration rule.
  *
- * This migration performs the following tasks:
- * - Loops through all application projects in the workspace.
- * - Identifies the build target for each application.
- * - If the `localize` option is enabled but the polyfill `@angular/localize/init` is not present,
- *   it adds the polyfill to the `polyfills` option of the build target.
+ * This schematic migration performs updates to the Angular workspace configuration
+ * to ensure that application projects are properly configured with polyfills
+ * required for internationalization (`localize`).
  *
- * This migration is specifically for application projects that use either the `application` or `browser-esbuild` builders.
+ * It specifically targets application projects that use either the `application`
+ * or `browser-esbuild` builders.
+ *
+ * The migration process involves:
+ *
+ * 1. Iterating over all projects in the workspace.
+ * 2. Checking each project to determine if it is an application-type project.
+ * 3. For each application project, examining the associated build targets.
+ * 4. If a build target's `localize` option is enabled but the polyfill
+ *    `@angular/localize/init` is missing from the `polyfills` array, the polyfill
+ *    is automatically added to ensure proper internationalization support.
+ *
+ * Additionally, this migration updates projects that use the `dev-server` or `extract-i18n`
+ * builders to ensure that deprecated `browserTarget` options are migrated to the
+ * newer `buildTarget` field.
+ *
  */
 export default function (): Rule;
