@@ -15,6 +15,10 @@ export interface Schema {
      */
     export?: boolean;
     /**
+     * Use default export for the component instead of a named export.
+     */
+    exportDefault?: boolean;
+    /**
      * Create the new files at the top level of the current project.
      */
     flat?: boolean;
