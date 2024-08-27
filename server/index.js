@@ -111,6 +111,10 @@ function addDependencies(skipInstall) {
         }
         const install = skipInstall ? utility_1.InstallBehavior.None : utility_1.InstallBehavior.Auto;
         return (0, schematics_1.chain)([
+            (0, utility_1.addDependency)('@angular/ssr', latest_versions_1.latestVersions.AngularSSR, {
+                type: utility_1.DependencyType.Default,
+                install,
+            }),
             (0, utility_1.addDependency)('@angular/platform-server', coreDep.version, {
                 type: utility_1.DependencyType.Default,
                 install,
@@ -123,7 +127,7 @@ function addDependencies(skipInstall) {
     };
 }
 function default_1(options) {
-    return async (host, context) => {
+    return async (host) => {
         const workspace = await (0, workspace_1.getWorkspace)(host);
         const clientProject = workspace.projects.get(options.project);
         if (clientProject?.extensions.projectType !== 'application') {

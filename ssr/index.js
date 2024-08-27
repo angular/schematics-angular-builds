@@ -225,10 +225,6 @@ function updateWebpackBuilderServerTsConfigRule(options) {
 function addDependencies({ skipInstall }, isUsingApplicationBuilder) {
     const install = skipInstall ? utility_1.InstallBehavior.None : utility_1.InstallBehavior.Auto;
     const rules = [
-        (0, utility_1.addDependency)('@angular/ssr', latest_versions_1.latestVersions.AngularSSR, {
-            type: utility_1.DependencyType.Default,
-            install,
-        }),
         (0, utility_1.addDependency)('express', latest_versions_1.latestVersions['express'], {
             type: utility_1.DependencyType.Default,
             install,
