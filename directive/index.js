@@ -40,6 +40,7 @@ function default_1(options) {
         options.path = parsedPath.path;
         options.selector = options.selector || buildSelector(options, project.prefix || '');
         (0, validation_1.validateHtmlSelector)(options.selector);
+        (0, validation_1.validateClassName)(schematics_1.strings.classify(options.name));
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
             options.skipTests ? (0, schematics_1.filter)((path) => !path.endsWith('.spec.ts.template')) : (0, schematics_1.noop)(),
             (0, schematics_1.applyTemplates)({
