@@ -108,15 +108,14 @@ function updateApplicationBuilderTsConfigRule(options) {
             // No tsconfig path
             return;
         }
-        const tsConfig = new json_file_1.JSONFile(host, tsConfigPath);
-        const filesAstNode = tsConfig.get(['files']);
-        const serverFilePath = 'server.ts';
-        if (Array.isArray(filesAstNode) && !filesAstNode.some(({ text }) => text === serverFilePath)) {
-            tsConfig.modify(['files'], [...filesAstNode, serverFilePath]);
-        }
+        const json = new json_file_1.JSONFile(host, tsConfigPath);
+        const filesPath = ['files'];
+        const files = new Set(json.get(filesPath) ?? []);
+        files.add('src/server.ts');
+        json.modify(filesPath, [...files]);
     };
 }
-function updateApplicationBuilderWorkspaceConfigRule(projectRoot, options, { logger }) {
+function updateApplicationBuilderWorkspaceConfigRule(projectSourceRoot, options, { logger }) {
     return (0, utility_1.updateWorkspace)((workspace) => {
         const buildTarget = workspace.projects.get(options.project)?.targets.get('build');
         if (!buildTarget) {
@@ -140,14 +139,14 @@ function updateApplicationBuilderWorkspaceConfigRule(projectRoot, options, { log
         buildTarget.options = {
             ...buildTarget.options,
             outputPath,
-            prerender: true,
+            outputMode: 'server',
             ssr: {
-                entry: (0, core_1.join)((0, core_1.normalize)(projectRoot), 'server.ts'),
+                entry: (0, core_1.join)((0, core_1.normalize)(projectSourceRoot), 'server.ts'),
             },
         };
     });
 }
-function updateWebpackBuilderWorkspaceConfigRule(options) {
+function updateWebpackBuilderWorkspaceConfigRule(projectSourceRoot, options) {
     return (0, utility_1.updateWorkspace)((workspace) => {
         const projectName = options.project;
         const project = workspace.projects.get(projectName);
@@ -156,7 +155,7 @@ function updateWebpackBuilderWorkspaceConfigRule(options) {
         }
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const serverTarget = project.targets.get('server');
-        (serverTarget.options ??= {}).main = (0, core_1.join)((0, core_1.normalize)(project.root), 'server.ts');
+        (serverTarget.options ??= {}).main = node_path_1.posix.join(projectSourceRoot, 'server.ts');
         const serveSSRTarget = project.targets.get(SERVE_SSR_TARGET_NAME);
         if (serveSSRTarget) {
             return;
@@ -216,7 +215,7 @@ function updateWebpackBuilderServerTsConfigRule(options) {
         }
         const tsConfig = new json_file_1.JSONFile(host, tsConfigPath);
         const filesAstNode = tsConfig.get(['files']);
-        const serverFilePath = 'server.ts';
+        const serverFilePath = 'src/server.ts';
         if (Array.isArray(filesAstNode) && !filesAstNode.some(({ text }) => text === serverFilePath)) {
             tsConfig.modify(['files'], [...filesAstNode, serverFilePath]);
         }
@@ -242,7 +241,7 @@ function addDependencies({ skipInstall }, isUsingApplicationBuilder) {
     }
     return (0, schematics_1.chain)(rules);
 }
-function addServerFile(options, isStandalone) {
+function addServerFile(projectSourceRoot, options, isStandalone) {
     return async (host) => {
         const projectName = options.project;
         const workspace = await (0, utility_1.readWorkspace)(host);
@@ -261,7 +260,7 @@ function addServerFile(options, isStandalone) {
                 browserDistDirectory,
                 isStandalone,
             }),
-            (0, schematics_1.move)(project.root),
+            (0, schematics_1.move)(projectSourceRoot),
         ]));
     };
 }
@@ -275,6 +274,7 @@ function default_1(options) {
             throw (0, project_targets_1.targetBuildNotFoundError)();
         }
         const isUsingApplicationBuilder = usingApplicationBuilder(clientProject);
+        const sourceRoot = clientProject.sourceRoot ?? node_path_1.posix.join(clientProject.root, 'src');
         return (0, schematics_1.chain)([
             (0, schematics_1.schematic)('server', {
                 ...options,
@@ -282,14 +282,14 @@ function default_1(options) {
             }),
             ...(isUsingApplicationBuilder
                 ? [
-                    updateApplicationBuilderWorkspaceConfigRule(clientProject.root, options, context),
+                    updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
                     updateApplicationBuilderTsConfigRule(options),
                 ]
                 : [
                     updateWebpackBuilderServerTsConfigRule(options),
-                    updateWebpackBuilderWorkspaceConfigRule(options),
+                    updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
                 ]),
-            addServerFile(options, isStandalone),
+            addServerFile(sourceRoot, options, isStandalone),
             addScriptsRule(options, isUsingApplicationBuilder),
             addDependencies(options, isUsingApplicationBuilder),
         ]);

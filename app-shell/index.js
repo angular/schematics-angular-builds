@@ -19,7 +19,6 @@ const change_1 = require("../utility/change");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const util_1 = require("../utility/standalone/util");
 const workspace_1 = require("../utility/workspace");
-const workspace_models_1 = require("../utility/workspace-models");
 const APP_SHELL_ROUTE = 'shell';
 function getSourceFile(host, path) {
     const content = host.readText(path);
@@ -106,59 +105,6 @@ function validateProject(mainPath) {
         }
     };
 }
-function addAppShellConfigToWorkspace(options) {
-    return (host, context) => {
-        return (0, workspace_1.updateWorkspace)((workspace) => {
-            const project = workspace.projects.get(options.project);
-            if (!project) {
-                return;
-            }
-            const buildTarget = project.targets.get('build');
-            if (buildTarget?.builder === workspace_models_1.Builders.Application) {
-                // Application builder configuration.
-                const prodConfig = buildTarget.configurations?.production;
-                if (!prodConfig) {
-                    throw new schematics_1.SchematicsException(`A "production" configuration is not defined for the "build" builder.`);
-                }
-                prodConfig.appShell = true;
-                return;
-            }
-            // Webpack based builders configuration.
-            // Validation of targets is handled already in the main function.
-            // Duplicate keys means that we have configurations in both server and build builders.
-            const serverConfigKeys = project.targets.get('server')?.configurations ?? {};
-            const buildConfigKeys = project.targets.get('build')?.configurations ?? {};
-            const configurationNames = Object.keys({
-                ...serverConfigKeys,
-                ...buildConfigKeys,
-            });
-            const configurations = {};
-            for (const key of configurationNames) {
-                if (!serverConfigKeys[key]) {
-                    context.logger.warn(`Skipped adding "${key}" configuration to "app-shell" target as it's missing from "server" target.`);
-                    continue;
-                }
-                if (!buildConfigKeys[key]) {
-                    context.logger.warn(`Skipped adding "${key}" configuration to "app-shell" target as it's missing from "build" target.`);
-                    continue;
-                }
-                configurations[key] = {
-                    browserTarget: `${options.project}:build:${key}`,
-                    serverTarget: `${options.project}:server:${key}`,
-                };
-            }
-            project.targets.add({
-                name: 'app-shell',
-                builder: workspace_models_1.Builders.AppShell,
-                defaultConfiguration: configurations['production'] ? 'production' : undefined,
-                options: {
-                    route: APP_SHELL_ROUTE,
-                },
-                configurations,
-            });
-        });
-    };
-}
 function addRouterModule(mainPath) {
     return (host) => {
         const modulePath = (0, ng_ast_utils_1.getAppModulePath)(host, mainPath);
@@ -237,13 +183,12 @@ function addStandaloneServerRoute(options) {
         if (!host.exists(configFilePath)) {
             throw new schematics_1.SchematicsException(`Cannot find "${configFilePath}".`);
         }
+        const recorder = host.beginUpdate(configFilePath);
         let configSourceFile = getSourceFile(host, configFilePath);
         if (!(0, ast_utils_1.isImported)(configSourceFile, 'ROUTES', '@angular/router')) {
             const routesChange = (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'ROUTES', '@angular/router');
-            const recorder = host.beginUpdate(configFilePath);
             if (routesChange) {
                 (0, change_1.applyToUpdateRecorder)(recorder, [routesChange]);
-                host.commitUpdate(recorder);
             }
         }
         configSourceFile = getSourceFile(host, configFilePath);
@@ -252,26 +197,56 @@ function addStandaloneServerRoute(options) {
             throw new schematics_1.SchematicsException(`Cannot find the "providers" configuration in "${configFilePath}".`);
         }
         // Add route to providers literal.
-        const newProvidersLiteral = typescript_1.default.factory.updateArrayLiteralExpression(providersLiteral, [
-            ...providersLiteral.elements,
-            typescript_1.default.factory.createObjectLiteralExpression([
-                typescript_1.default.factory.createPropertyAssignment('provide', typescript_1.default.factory.createIdentifier('ROUTES')),
-                typescript_1.default.factory.createPropertyAssignment('multi', typescript_1.default.factory.createIdentifier('true')),
-                typescript_1.default.factory.createPropertyAssignment('useValue', typescript_1.default.factory.createArrayLiteralExpression([
-                    typescript_1.default.factory.createObjectLiteralExpression([
-                        typescript_1.default.factory.createPropertyAssignment('path', typescript_1.default.factory.createIdentifier(`'${APP_SHELL_ROUTE}'`)),
-                        typescript_1.default.factory.createPropertyAssignment('component', typescript_1.default.factory.createIdentifier('AppShellComponent')),
-                    ], true),
-                ], true)),
-            ], true),
-        ]);
-        const recorder = host.beginUpdate(configFilePath);
         recorder.remove(providersLiteral.getStart(), providersLiteral.getWidth());
-        const printer = typescript_1.default.createPrinter();
-        recorder.insertRight(providersLiteral.getStart(), printer.printNode(typescript_1.default.EmitHint.Unspecified, newProvidersLiteral, configSourceFile));
+        const updatedProvidersString = [
+            ...providersLiteral.elements.map((element) => '    ' + element.getText()),
+            `    {
+      provide: ROUTES,
+      multi: true,
+      useValue: [{
+        path: '${APP_SHELL_ROUTE}',
+        component: AppShellComponent
+      }]
+    }\n  `,
+        ];
+        recorder.insertRight(providersLiteral.getStart(), `[\n${updatedProvidersString.join(',\n')}]`);
         // Add AppShellComponent import
         const appShellImportChange = (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'AppShellComponent', './app-shell/app-shell.component');
         (0, change_1.applyToUpdateRecorder)(recorder, [appShellImportChange]);
+        host.commitUpdate(recorder);
+    };
+}
+function addServerRoutingConfig(options) {
+    return async (host) => {
+        const workspace = await (0, workspace_1.getWorkspace)(host);
+        const project = workspace.projects.get(options.project);
+        if (!project) {
+            throw new schematics_1.SchematicsException(`Project name "${options.project}" doesn't not exist.`);
+        }
+        const configFilePath = (0, posix_1.join)(project.sourceRoot ?? 'src', 'app/app.routes.server.ts');
+        if (!host.exists(configFilePath)) {
+            throw new schematics_1.SchematicsException(`Cannot find "${configFilePath}".`);
+        }
+        const sourceFile = getSourceFile(host, configFilePath);
+        const nodes = (0, ast_utils_1.getSourceNodes)(sourceFile);
+        // Find the serverRoutes variable declaration
+        const serverRoutesNode = nodes.find((node) => typescript_1.default.isVariableDeclaration(node) &&
+            node.initializer &&
+            typescript_1.default.isArrayLiteralExpression(node.initializer) &&
+            node.type &&
+            typescript_1.default.isArrayTypeNode(node.type) &&
+            node.type.getText().includes('ServerRoute'));
+        if (!serverRoutesNode) {
+            throw new schematics_1.SchematicsException(`Cannot find the "ServerRoute" configuration in "${configFilePath}".`);
+        }
+        const recorder = host.beginUpdate(configFilePath);
+        const arrayLiteral = serverRoutesNode.initializer;
+        const firstElementPosition = arrayLiteral.elements[0]?.getStart() ?? arrayLiteral.getStart() + 1;
+        const newRouteString = `{
+    path: '${APP_SHELL_ROUTE}',
+    renderMode: RenderMode.AppShell
+  },\n`;
+        recorder.insertLeft(firstElementPosition, newRouteString);
         host.commitUpdate(recorder);
     };
 }
@@ -282,9 +257,9 @@ function default_1(options) {
         return (0, schematics_1.chain)([
             validateProject(browserEntryPoint),
             (0, schematics_1.schematic)('server', options),
-            addAppShellConfigToWorkspace(options),
             isStandalone ? (0, schematics_1.noop)() : addRouterModule(browserEntryPoint),
             isStandalone ? addStandaloneServerRoute(options) : addServerRoutes(options),
+            addServerRoutingConfig(options),
             (0, schematics_1.schematic)('component', {
                 name: 'app-shell',
                 module: 'app.module.server.ts',
