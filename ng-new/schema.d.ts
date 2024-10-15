@@ -17,6 +17,10 @@ export interface Schema {
      */
     directory?: string;
     /**
+     * Create an application that does not utilize zone.js.
+     */
+    experimentalZoneless?: boolean;
+    /**
      * Include styles inline in the component TS file. By default, an external styles file is
      * created and referenced in the component TypeScript file.
      */
