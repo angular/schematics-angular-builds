@@ -33,6 +33,6 @@ var Builders;
     Builders["NgPackagr"] = "@angular-devkit/build-angular:ng-packagr";
     Builders["DevServer"] = "@angular-devkit/build-angular:dev-server";
     Builders["ExtractI18n"] = "@angular-devkit/build-angular:extract-i18n";
-    Builders["Protractor"] = "@angular-devkit/build-angular:protractor";
+    Builders["Protractor"] = "@angular-devkit/build-angular:private-protractor";
     Builders["BuildApplication"] = "@angular/build:application";
 })(Builders || (exports.Builders = Builders = {}));
