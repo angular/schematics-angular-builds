@@ -6,4 +6,8 @@ export interface Schema {
      * The name of the related client app.
      */
     project: string;
+    /**
+     * Creates a server application using the Server Routing API (Developer Preview).
+     */
+    serverRouting?: boolean;
 }
