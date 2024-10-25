@@ -88,7 +88,9 @@ function updateConfigFileApplicationBuilder(options) {
         }
         buildTarget.options ??= {};
         buildTarget.options['server'] = node_path_1.posix.join(project.sourceRoot ?? node_path_1.posix.join(project.root, 'src'), serverMainEntryName);
-        buildTarget.options['outputMode'] = 'static';
+        if (options.serverRouting) {
+            buildTarget.options['outputMode'] = 'static';
+        }
     });
 }
 function updateTsConfigFile(tsConfigPath) {
@@ -152,6 +154,9 @@ function default_1(options) {
         let filesUrl = `./files/${isUsingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
         filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)(filesUrl), [
+            options.serverRouting
+                ? (0, schematics_1.noop)()
+                : (0, schematics_1.filter)((path) => !path.endsWith('app.routes.server.ts.template')),
             (0, schematics_1.applyTemplates)({
                 ...schematics_1.strings,
                 ...options,

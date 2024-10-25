@@ -19,6 +19,7 @@ const change_1 = require("../utility/change");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const util_1 = require("../utility/standalone/util");
 const workspace_1 = require("../utility/workspace");
+const workspace_models_1 = require("../utility/workspace-models");
 const APP_SHELL_ROUTE = 'shell';
 function getSourceFile(host, path) {
     const content = host.readText(path);
@@ -129,6 +130,24 @@ function getMetadataProperty(metadata, propertyName) {
         return false;
     })[0];
     return property;
+}
+function addAppShellConfigToWorkspace(options) {
+    return (0, workspace_1.updateWorkspace)((workspace) => {
+        const project = workspace.projects.get(options.project);
+        if (!project) {
+            return;
+        }
+        const buildTarget = project.targets.get('build');
+        if (buildTarget?.builder === workspace_models_1.Builders.Application ||
+            buildTarget?.builder === workspace_models_1.Builders.BuildApplication) {
+            // Application builder configuration.
+            const prodConfig = buildTarget.configurations?.production;
+            if (!prodConfig) {
+                throw new schematics_1.SchematicsException(`A "production" configuration is not defined for the "build" builder.`);
+            }
+            prodConfig.appShell = true;
+        }
+    });
 }
 function addServerRoutes(options) {
     return async (host) => {
@@ -257,9 +276,12 @@ function default_1(options) {
         return (0, schematics_1.chain)([
             validateProject(browserEntryPoint),
             (0, schematics_1.schematic)('server', options),
-            isStandalone ? (0, schematics_1.noop)() : addRouterModule(browserEntryPoint),
-            isStandalone ? addStandaloneServerRoute(options) : addServerRoutes(options),
-            addServerRoutingConfig(options),
+            ...(isStandalone
+                ? [addStandaloneServerRoute(options)]
+                : [addRouterModule(browserEntryPoint), addServerRoutes(options)]),
+            options.serverRouting
+                ? addServerRoutingConfig(options)
+                : addAppShellConfigToWorkspace(options),
             (0, schematics_1.schematic)('component', {
                 name: 'app-shell',
                 module: 'app.module.server.ts',

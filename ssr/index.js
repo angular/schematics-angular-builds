@@ -139,7 +139,8 @@ function updateApplicationBuilderWorkspaceConfigRule(projectSourceRoot, options,
         buildTarget.options = {
             ...buildTarget.options,
             outputPath,
-            outputMode: 'server',
+            outputMode: options.serverRouting ? 'server' : undefined,
+            prerender: options.serverRouting ? undefined : true,
             ssr: {
                 entry: (0, core_1.join)((0, core_1.normalize)(projectSourceRoot), 'server.ts'),
             },
@@ -253,7 +254,8 @@ function addServerFile(projectSourceRoot, options, isStandalone) {
         const browserDistDirectory = isUsingApplicationBuilder
             ? (await getApplicationBuilderOutputPaths(host, projectName)).browser
             : await getLegacyOutputPaths(host, projectName, 'build');
-        return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)(`./files/${isUsingApplicationBuilder ? 'application-builder' : 'server-builder'}`), [
+        const applicationBuilderFiles = 'application-builder' + (options.serverRouting ? '' : '-common-engine');
+        return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)(`./files/${isUsingApplicationBuilder ? applicationBuilderFiles : 'server-builder'}`), [
             (0, schematics_1.applyTemplates)({
                 ...core_1.strings,
                 ...options,
