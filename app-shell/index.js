@@ -202,7 +202,7 @@ function addStandaloneServerRoute(options) {
         if (!host.exists(configFilePath)) {
             throw new schematics_1.SchematicsException(`Cannot find "${configFilePath}".`);
         }
-        const recorder = host.beginUpdate(configFilePath);
+        let recorder = host.beginUpdate(configFilePath);
         let configSourceFile = getSourceFile(host, configFilePath);
         if (!(0, ast_utils_1.isImported)(configSourceFile, 'ROUTES', '@angular/router')) {
             const routesChange = (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'ROUTES', '@angular/router');
@@ -229,6 +229,16 @@ function addStandaloneServerRoute(options) {
     }\n  `,
         ];
         recorder.insertRight(providersLiteral.getStart(), `[\n${updatedProvidersString.join(',\n')}]`);
+        if (options.serverRouting) {
+            host.commitUpdate(recorder);
+            configSourceFile = getSourceFile(host, configFilePath);
+            const functionCall = (0, ast_utils_1.findNodes)(configSourceFile, typescript_1.default.isCallExpression).find((n) => typescript_1.default.isIdentifier(n.expression) && n.expression.getText() === 'provideServerRoutesConfig');
+            if (!functionCall) {
+                throw new schematics_1.SchematicsException(`Cannot find the "provideServerRoutesConfig" function call in "${configFilePath}".`);
+            }
+            recorder = host.beginUpdate(configFilePath);
+            recorder.insertLeft(functionCall.end - 1, `, { appShellRoute: '${APP_SHELL_ROUTE}' }`);
+        }
         // Add AppShellComponent import
         const appShellImportChange = (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'AppShellComponent', './app-shell/app-shell.component');
         (0, change_1.applyToUpdateRecorder)(recorder, [appShellImportChange]);
@@ -279,9 +289,7 @@ function default_1(options) {
             ...(isStandalone
                 ? [addStandaloneServerRoute(options)]
                 : [addRouterModule(browserEntryPoint), addServerRoutes(options)]),
-            options.serverRouting
-                ? addServerRoutingConfig(options)
-                : addAppShellConfigToWorkspace(options),
+            options.serverRouting ? (0, schematics_1.noop)() : addAppShellConfigToWorkspace(options),
             (0, schematics_1.schematic)('component', {
                 name: 'app-shell',
                 module: 'app.module.server.ts',
