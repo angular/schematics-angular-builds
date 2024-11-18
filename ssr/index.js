@@ -6,8 +6,32 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
+exports.setPrompterForTestOnly = setPrompterForTestOnly;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const node_path_1 = require("node:path");
@@ -19,6 +43,7 @@ const project_targets_1 = require("../utility/project-targets");
 const util_1 = require("../utility/standalone/util");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
+const tty_1 = require("./tty");
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 const PRERENDER_TARGET_NAME = 'prerender';
 const DEFAULT_BROWSER_DIR = 'browser';
@@ -49,7 +74,7 @@ async function getApplicationBuilderOutputPaths(host, projectName) {
     }
     const { outputPath } = architectTarget.options;
     if (outputPath === null || outputPath === undefined) {
-        throw new schematics_1.SchematicsException(`outputPath for ${projectName} ${target} target is undeined or null.`);
+        throw new schematics_1.SchematicsException(`outputPath for ${projectName} ${target} target is undefined or null.`);
     }
     const defaultDirs = {
         server: DEFAULT_SERVER_DIR,
@@ -266,16 +291,18 @@ function addServerFile(projectSourceRoot, options, isStandalone) {
         ]));
     };
 }
-function default_1(options) {
+function default_1(inputOptions) {
     return async (host, context) => {
-        const browserEntryPoint = await (0, util_1.getMainFilePath)(host, options.project);
+        const browserEntryPoint = await (0, util_1.getMainFilePath)(host, inputOptions.project);
         const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(host, browserEntryPoint);
         const workspace = await (0, workspace_1.getWorkspace)(host);
-        const clientProject = workspace.projects.get(options.project);
+        const clientProject = workspace.projects.get(inputOptions.project);
         if (!clientProject) {
             throw (0, project_targets_1.targetBuildNotFoundError)();
         }
         const isUsingApplicationBuilder = usingApplicationBuilder(clientProject);
+        const serverRouting = await isServerRoutingEnabled(isUsingApplicationBuilder, inputOptions);
+        const options = { ...inputOptions, serverRouting };
         const sourceRoot = clientProject.sourceRoot ?? node_path_1.posix.join(clientProject.root, 'src');
         return (0, schematics_1.chain)([
             (0, schematics_1.schematic)('server', {
@@ -301,4 +328,39 @@ function usingApplicationBuilder(project) {
     const buildBuilder = project.targets.get('build')?.builder;
     const isUsingApplicationBuilder = buildBuilder === workspace_models_1.Builders.Application || buildBuilder === workspace_models_1.Builders.BuildApplication;
     return isUsingApplicationBuilder;
+}
+const defaultPrompter = async (message, defaultValue) => {
+    const { confirm } = await Promise.resolve().then(() => __importStar(require('@inquirer/prompts')));
+    return await confirm({
+        message,
+        default: defaultValue,
+    });
+};
+// Allow the prompt functionality to be overridden to facilitate testing.
+let prompt = defaultPrompter;
+function setPrompterForTestOnly(prompter) {
+    prompt = prompter ?? defaultPrompter;
+}
+/** Returns whether or not server routing is enabled, potentially prompting the user if necessary. */
+async function isServerRoutingEnabled(isUsingApplicationBuilder, options) {
+    if (!isUsingApplicationBuilder) {
+        if (options.serverRouting) {
+            throw new schematics_1.SchematicsException('Server routing APIs can only be added to a project using `application` builder.');
+        }
+        else {
+            return false;
+        }
+    }
+    // Use explicit option if provided.
+    if (options.serverRouting !== undefined) {
+        return options.serverRouting;
+    }
+    const serverRoutingDefault = false;
+    // Use the default if not in an interactive terminal.
+    if (!(0, tty_1.isTTY)()) {
+        return serverRoutingDefault;
+    }
+    // Prompt the user if in an interactive terminal and no option was provided.
+    return await prompt('Would you like to use the Server Routing and App Engine APIs (Developer Preview) for this server application?', 
+    /* defaultValue */ serverRoutingDefault);
 }

@@ -7,4 +7,6 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { Schema as SSROptions } from './schema';
-export default function (options: SSROptions): Rule;
+export default function (inputOptions: SSROptions): Rule;
+export type Prompt = (message: string, defaultValue: boolean) => Promise<boolean>;
+export declare function setPrompterForTestOnly(prompter?: Prompt): void;
