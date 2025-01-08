@@ -8,5 +8,6 @@
 export declare const latestVersions: Record<string, string> & {
     Angular: string;
     DevkitBuildAngular: string;
+    AngularBuild: string;
     AngularSSR: string;
 };

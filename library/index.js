@@ -38,8 +38,8 @@ function addDependenciesToPackageJson() {
             },
             {
                 type: dependencies_1.NodeDependencyType.Dev,
-                name: '@angular-devkit/build-angular',
-                version: latest_versions_1.latestVersions.DevkitBuildAngular,
+                name: '@angular/build',
+                version: latest_versions_1.latestVersions.AngularBuild,
             },
             {
                 type: dependencies_1.NodeDependencyType.Dev,
@@ -70,7 +70,7 @@ function addLibToWorkspaceFile(options, projectRoot, projectName) {
             prefix: options.prefix,
             targets: {
                 build: {
-                    builder: workspace_models_1.Builders.NgPackagr,
+                    builder: workspace_models_1.Builders.BuildNgPackagr,
                     defaultConfiguration: 'production',
                     options: {
                         project: `${projectRoot}/ng-package.json`,

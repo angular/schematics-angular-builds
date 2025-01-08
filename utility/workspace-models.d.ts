@@ -26,6 +26,7 @@ export declare enum Builders {
     Karma = "@angular-devkit/build-angular:karma",
     TsLint = "@angular-devkit/build-angular:tslint",
     NgPackagr = "@angular-devkit/build-angular:ng-packagr",
+    BuildNgPackagr = "@angular/build:ng-packagr",
     DevServer = "@angular-devkit/build-angular:dev-server",
     ExtractI18n = "@angular-devkit/build-angular:extract-i18n",
     Protractor = "@angular-devkit/build-angular:private-protractor",

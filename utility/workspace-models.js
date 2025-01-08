@@ -31,6 +31,7 @@ var Builders;
     Builders["Karma"] = "@angular-devkit/build-angular:karma";
     Builders["TsLint"] = "@angular-devkit/build-angular:tslint";
     Builders["NgPackagr"] = "@angular-devkit/build-angular:ng-packagr";
+    Builders["BuildNgPackagr"] = "@angular/build:ng-packagr";
     Builders["DevServer"] = "@angular-devkit/build-angular:dev-server";
     Builders["ExtractI18n"] = "@angular-devkit/build-angular:extract-i18n";
     Builders["Protractor"] = "@angular-devkit/build-angular:private-protractor";
