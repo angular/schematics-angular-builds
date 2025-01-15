@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Type = void 0;
 /**
- * Specifies which type of configuration file to create.
+ * Specifies the type of configuration file to generate.
  */
 var Type;
 (function (Type) {

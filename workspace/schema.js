@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PackageManager = void 0;
 /**
- * The package manager used to install dependencies.
+ * The package manager to use for installing dependencies.
  */
 var PackageManager;
 (function (PackageManager) {

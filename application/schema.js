@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ViewEncapsulation = exports.Style = void 0;
 /**
- * The file extension or preprocessor to use for style files.
+ * The type of stylesheet files to be created for components in the application.
  */
 var Style;
 (function (Style) {
@@ -14,7 +14,8 @@ var Style;
     Style["Scss"] = "scss";
 })(Style || (exports.Style = Style = {}));
 /**
- * The view encapsulation strategy to use in the new application.
+ * Sets the view encapsulation mode for the application's components. This determines how
+ * component styles are scoped and applied.
  */
 var ViewEncapsulation;
 (function (ViewEncapsulation) {

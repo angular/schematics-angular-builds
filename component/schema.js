@@ -4,7 +4,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ViewEncapsulation = exports.Style = exports.ChangeDetection = void 0;
 /**
- * The change detection strategy to use in the new component.
+ * Configures the change detection strategy for the component.
  */
 var ChangeDetection;
 (function (ChangeDetection) {
@@ -12,8 +12,8 @@ var ChangeDetection;
     ChangeDetection["OnPush"] = "OnPush";
 })(ChangeDetection || (exports.ChangeDetection = ChangeDetection = {}));
 /**
- * The file extension or preprocessor to use for style files, or 'none' to skip generating
- * the style file.
+ * Specify the type of stylesheet to be created for the component, or `none` to skip
+ * creating a stylesheet.
  */
 var Style;
 (function (Style) {
@@ -24,7 +24,8 @@ var Style;
     Style["Scss"] = "scss";
 })(Style || (exports.Style = Style = {}));
 /**
- * The view encapsulation strategy to use in the new component.
+ * Sets the view encapsulation mode for the component. This determines how the component's
+ * styles are scoped and applied.
  */
 var ViewEncapsulation;
 (function (ViewEncapsulation) {

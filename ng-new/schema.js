@@ -15,7 +15,7 @@ var PackageManager;
     PackageManager["Yarn"] = "yarn";
 })(PackageManager || (exports.PackageManager = PackageManager = {}));
 /**
- * The file extension or preprocessor to use for style files.
+ * The type of stylesheet files to be created for components in the initial project.
  */
 var Style;
 (function (Style) {
@@ -25,7 +25,10 @@ var Style;
     Style["Scss"] = "scss";
 })(Style || (exports.Style = Style = {}));
 /**
- * The view encapsulation strategy to use in the initial project.
+ * Sets the view encapsulation mode for components in the initial project. This determines
+ * how component styles are scoped and applied. Options include: `Emulated` (default, styles
+ * are scoped to the component), `None` (styles are global), and `ShadowDom` (styles are
+ * encapsulated using Shadow DOM).
  */
 var ViewEncapsulation;
 (function (ViewEncapsulation) {
