@@ -1,18 +1,20 @@
 /**
- * Generates a configuration file in the given project.
+ * Generates configuration files for your project. These files control various aspects of
+ * your project's build process, testing, and browser compatibility. This schematic helps
+ * you create or update essential configuration files with ease.
  */
 export interface Schema {
     /**
-     * The name of the project.
+     * The name of the project where the configuration file should be created or updated.
      */
     project: string;
     /**
-     * Specifies which type of configuration file to create.
+     * Specifies the type of configuration file to generate.
      */
     type: Type;
 }
 /**
- * Specifies which type of configuration file to create.
+ * Specifies the type of configuration file to generate.
  */
 export declare enum Type {
     Browserslist = "browserslist",

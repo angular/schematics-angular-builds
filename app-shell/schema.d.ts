@@ -1,13 +1,14 @@
 /**
- * Generates an application shell for running a server-side version of an app.
+ * Configures your project to generate an app-shell during build time.
  */
 export interface Schema {
     /**
-     * The name of the related client app.
+     * The name of the project where the app-shell should be generated.
      */
     project: string;
     /**
-     * Creates a server application using the Server Routing API (Developer Preview).
+     * Set up a server application using the Server Routing and App Engine APIs (Developer
+     * Preview).
      */
     serverRouting?: boolean;
 }

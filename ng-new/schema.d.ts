@@ -1,45 +1,54 @@
 /**
- * Creates a new project by combining the workspace and application schematics.
+ * Creates a new Angular workspace and an initial project. This schematic sets up the
+ * foundation for your Angular development, generating the workspace configuration files and
+ * an optional starter application. You can customize various aspects of the workspace and
+ * the initial project, such as routing, styling, and testing.
  */
 export interface Schema {
     /**
-     * Initial git repository commit information.
+     * Configure the initial Git commit for the new repository.
      */
     commit?: CommitUnion;
     /**
-     * Create a new initial application project in the 'src' folder of the new workspace. When
-     * false, creates an empty workspace with no initial application. You can then use the
-     * generate application command so that all applications are created in the projects folder.
+     * Create a new initial application project in the new workspace. When false, creates an
+     * empty workspace with no initial application. You can then use the `ng generate
+     * application` command to create applications in the `projects` directory.
      */
     createApplication?: boolean;
     /**
-     * The directory name to create the workspace in.
+     * The directory where the new workspace and project should be created. If not specified,
+     * the workspace will be created in the current directory.
      */
     directory?: string;
     /**
-     * Create an application that does not utilize zone.js.
+     * Create an initial application that does not utilize `zone.js`.
      */
     experimentalZoneless?: boolean;
     /**
-     * Include styles inline in the component TS file. By default, an external styles file is
-     * created and referenced in the component TypeScript file.
+     * Include the styles for the initial application's root component directly within the
+     * `app.component.ts` file. By default, a separate stylesheet file (e.g.,
+     * `app.component.css`) is created.
      */
     inlineStyle?: boolean;
     /**
-     * Include template inline in the component TS file. By default, an external template file
-     * is created and referenced in the component TypeScript file.
+     * Include the HTML template for the initial application's root component directly within
+     * the `app.component.ts` file. By default, a separate template file (e.g.,
+     * `app.component.html`) is created.
      */
     inlineTemplate?: boolean;
     /**
-     * Create a workspace without any testing frameworks. (Use for learning purposes only.)
+     * Generate a minimal Angular workspace without any testing frameworks. This is intended for
+     * learning purposes and simple experimentation, not for production applications.
      */
     minimal?: boolean;
     /**
-     * The name of the new workspace and initial project.
+     * The name for the new workspace and the initial project. This name will be used for the
+     * root directory and various identifiers throughout the project.
      */
     name: string;
     /**
-     * The path where new projects will be created, relative to the new workspace root.
+     * The path where new projects will be created within the workspace, relative to the
+     * workspace root. By default, new projects are created in the `projects` directory.
      */
     newProjectRoot?: string;
     /**
@@ -47,33 +56,38 @@ export interface Schema {
      */
     packageManager?: PackageManager;
     /**
-     * The prefix to apply to generated selectors for the initial project.
+     * The prefix to apply to generated selectors for the initial project. For example, if the
+     * prefix is `my-app` and you generate a component named `my-component`, the selector will
+     * be `my-app-my-component`.
      */
     prefix?: string;
     /**
-     * Enable routing in the initial project.
+     * Enable routing in the initial application project. This sets up the necessary files and
+     * modules for managing navigation between different views in your application.
      */
     routing?: boolean;
     /**
-     * Creates a server application using the Server Routing and App Engine APIs (Developer
-     * Preview).
+     * Create a server application in the initial project using the Server Routing and App
+     * Engine APIs (Developer Preview).
      */
     serverRouting?: boolean;
     /**
-     * Do not initialize a git repository.
+     * Do not initialize a Git repository in the new workspace. By default, a Git repository is
+     * initialized to help you track changes to your project.
      */
     skipGit?: boolean;
     /**
-     * Do not install dependency packages.
+     * Skip the automatic installation of packages. You will need to manually install the
+     * dependencies later.
      */
     skipInstall?: boolean;
     /**
-     * Do not generate "spec.ts" test files for the new project.
+     * Skip the generation of unit test files `spec.ts`.
      */
     skipTests?: boolean;
     /**
-     * Creates an application with Server-Side Rendering (SSR) and Static Site Generation
-     * (SSG/Prerendering) enabled.
+     * Configure the initial application for Server-Side Rendering (SSR) and Static Site
+     * Generation (SSG/Prerendering).
      */
     ssr?: boolean;
     /**
@@ -81,13 +95,13 @@ export interface Schema {
      */
     standalone?: boolean;
     /**
-     * Creates a workspace with stricter type checking and stricter bundle budgets settings.
-     * This setting helps improve maintainability and catch bugs ahead of time. For more
-     * information, see https://angular.dev/tools/cli/template-typecheck#strict-mode
+     * Enable stricter type checking and stricter bundle budgets settings. This setting helps
+     * improve maintainability and catch bugs ahead of time. For more information, see
+     * https://angular.dev/tools/cli/template-typecheck#strict-mode
      */
     strict?: boolean;
     /**
-     * The file extension or preprocessor to use for style files.
+     * The type of stylesheet files to be created for components in the initial project.
      */
     style?: Style;
     /**
@@ -95,12 +109,15 @@ export interface Schema {
      */
     version: string;
     /**
-     * The view encapsulation strategy to use in the initial project.
+     * Sets the view encapsulation mode for components in the initial project. This determines
+     * how component styles are scoped and applied. Options include: `Emulated` (default, styles
+     * are scoped to the component), `None` (styles are global), and `ShadowDom` (styles are
+     * encapsulated using Shadow DOM).
      */
     viewEncapsulation?: ViewEncapsulation;
 }
 /**
- * Initial git repository commit information.
+ * Configure the initial Git commit for the new repository.
  */
 export type CommitUnion = boolean | CommitObject;
 export interface CommitObject {
@@ -120,7 +137,7 @@ export declare enum PackageManager {
     Yarn = "yarn"
 }
 /**
- * The file extension or preprocessor to use for style files.
+ * The type of stylesheet files to be created for components in the initial project.
  */
 export declare enum Style {
     Css = "css",
@@ -129,7 +146,10 @@ export declare enum Style {
     Scss = "scss"
 }
 /**
- * The view encapsulation strategy to use in the initial project.
+ * Sets the view encapsulation mode for components in the initial project. This determines
+ * how component styles are scoped and applied. Options include: `Emulated` (default, styles
+ * are scoped to the component), `None` (styles are global), and `ShadowDom` (styles are
+ * encapsulated using Shadow DOM).
  */
 export declare enum ViewEncapsulation {
     Emulated = "Emulated",

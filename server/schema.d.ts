@@ -1,18 +1,21 @@
 /**
- * Pass this schematic to the "run" command to set up server-side rendering for an app.
+ * Sets up server-side rendering (SSR) for your Angular application. SSR allows your app to
+ * be rendered on the server, improving initial load performance and SEO. This schematic
+ * configures your project for SSR and generates the necessary files.
  */
 export interface Schema {
     /**
-     * The name of the project.
+     * The name of the project to enable server-side rendering for.
      */
     project: string;
     /**
-     * Creates a server application using the Server Routing and App Engine APIs (Developer
+     * Configure the server application to use the Server Routing and App Engine APIs (Developer
      * Preview).
      */
     serverRouting?: boolean;
     /**
-     * Do not install packages for dependencies.
+     * Skip the automatic installation of packages. You will need to manually install the
+     * dependencies later.
      */
     skipInstall?: boolean;
 }
