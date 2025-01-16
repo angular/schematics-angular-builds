@@ -44,7 +44,7 @@ function addDependenciesToPackageJson() {
             {
                 type: dependencies_1.NodeDependencyType.Dev,
                 name: 'ng-packagr',
-                version: latest_versions_1.latestVersions['ng-packagr'],
+                version: latest_versions_1.latestVersions.NgPackagr,
             },
             {
                 type: dependencies_1.NodeDependencyType.Default,
