@@ -3,7 +3,7 @@
  * parts of your application by checking certain conditions before a route is activated.
  * This schematic generates a new guard with the specified name, type, and options.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Creates the new guard files at the top level of the current project. If set to false, a
      * new folder with the guard's name will be created to contain the files.
@@ -40,7 +40,7 @@ export interface Schema {
      * Skip the generation of a unit test file `spec.ts` for the new guard.
      */
     skipTests?: boolean;
-}
+};
 export declare enum Implement {
     CanActivate = "CanActivate",
     CanActivateChild = "CanActivateChild",

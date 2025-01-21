@@ -1,7 +1,7 @@
 /**
  * Configures your project to generate an app-shell during build time.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name of the project where the app-shell should be generated.
      */
@@ -11,4 +11,4 @@ export interface Schema {
      * Preview).
      */
     serverRouting?: boolean;
-}
+};

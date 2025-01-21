@@ -4,7 +4,7 @@
  * displayed. This can improve the user experience by preventing delays and loading states.
  * This schematic generates a new resolver with the specified name and options.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Creates the new resolver files at the top level of the current project. If set to false,
      * a new folder with the resolver's name will be created to contain the files.
@@ -34,4 +34,4 @@ export interface Schema {
      * Skip the generation of a unit test file `spec.ts` for the new resolver.
      */
     skipTests?: boolean;
-}
+};

@@ -3,7 +3,7 @@
  * offline or on low-quality networks by caching assets and intercepting network requests.
  * This schematic configures your project to use a service worker.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name of the project to add the service worker to. If not specified, the CLI will
      * determine the project from the current directory.
@@ -14,4 +14,4 @@ export interface Schema {
      * that the service worker should be generated during the standard build process.
      */
     target?: string;
-}
+};

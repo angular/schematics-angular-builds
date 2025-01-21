@@ -4,9 +4,9 @@
  * development, testing, and production. This schematic helps you create and manage these
  * files, making it easier to customize your application's behavior for each environment.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name of the project where the environment files should be created or updated.
      */
     project: string;
-}
+};

@@ -4,7 +4,7 @@
  * across multiple applications. This schematic simplifies the process of generating a new
  * library with the necessary files and configurations.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The path to the library's public API file, relative to the workspace root. This file
      * defines what parts of the library are accessible to applications that import it.
@@ -47,4 +47,4 @@ export interface Schema {
      * This can simplify the structure of your library and its usage in applications.
      */
     standalone?: boolean;
-}
+};

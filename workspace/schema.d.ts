@@ -4,7 +4,7 @@
  * build processes for a collection of applications and libraries. This schematic sets up
  * the basic structure of the workspace and installs the necessary Angular dependencies.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Create a workspace without any testing frameworks. This is intended for learning purposes
      * and simple experimentation, not for production applications.
@@ -34,7 +34,7 @@ export interface Schema {
      * The version of the Angular CLI to use.
      */
     version: string;
-}
+};
 /**
  * The package manager to use for installing dependencies.
  */

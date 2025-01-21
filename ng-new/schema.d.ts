@@ -4,7 +4,7 @@
  * an optional starter application. You can customize various aspects of the workspace and
  * the initial project, such as routing, styling, and testing.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Configure the initial Git commit for the new repository.
      */
@@ -115,17 +115,17 @@ export interface Schema {
      * encapsulated using Shadow DOM).
      */
     viewEncapsulation?: ViewEncapsulation;
-}
+};
 /**
  * Configure the initial Git commit for the new repository.
  */
 export type CommitUnion = boolean | CommitObject;
-export interface CommitObject {
+export type CommitObject = {
     email: string;
     message?: string;
     name: string;
     [property: string]: any;
-}
+};
 /**
  * The package manager used to install dependencies.
  */

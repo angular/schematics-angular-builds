@@ -1,7 +1,7 @@
 /**
  * Generates a new, generic end-to-end test definition in the given project.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name of the application being tested.
      */
@@ -10,4 +10,4 @@ export interface Schema {
      * The HTML selector for the root component of the test app.
      */
     rootSelector?: string;
-}
+};

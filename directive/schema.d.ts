@@ -4,7 +4,7 @@
  * custom attributes, and respond to events. This schematic generates the necessary files
  * and boilerplate code for a new directive.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Automatically export the directive from the specified NgModule, making it accessible to
      * other modules in the application.
@@ -59,4 +59,4 @@ export interface Schema {
      * other standalone components or directives.
      */
     standalone?: boolean;
-}
+};

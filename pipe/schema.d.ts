@@ -4,7 +4,7 @@
  * dates, currency, or filtering arrays. This schematic generates the necessary files and
  * boilerplate code for a new pipe.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Automatically export the pipe from the specified NgModule, making it accessible to other
      * modules in the application.
@@ -49,4 +49,4 @@ export interface Schema {
      * standalone components, directives, or pipes.
      */
     standalone?: boolean;
-}
+};

@@ -3,7 +3,7 @@
  * named constants, making your code more readable and maintainable. This schematic
  * generates a new enum with the specified name and type.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name for the new enum. This will be used to create the enum file (e.g.,
      * `my-enum.enum.ts`).
@@ -24,4 +24,4 @@ export interface Schema {
      * For example, if you set the type to `status`, the filename will be `my-enum.status.ts`.
      */
     type?: string;
-}
+};

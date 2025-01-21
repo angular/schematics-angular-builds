@@ -3,7 +3,7 @@
  * be rendered on the server, improving initial load performance and SEO. This schematic
  * configures your project for SSR and generates the necessary files.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name of the project to enable server-side rendering for.
      */
@@ -18,4 +18,4 @@ export interface Schema {
      * dependencies later.
      */
     skipInstall?: boolean;
-}
+};

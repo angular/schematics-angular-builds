@@ -4,7 +4,7 @@
  * offloading computationally intensive tasks. This schematic generates the necessary files
  * for a new web worker and provides an optional code snippet to demonstrate its usage.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name for the new web worker. This will be used to create the worker file (e.g.,
      * `my-worker.worker.ts`).
@@ -24,4 +24,4 @@ export interface Schema {
      * Generate a code snippet that demonstrates how to create and use the new web worker.
      */
     snippet?: boolean;
-}
+};
