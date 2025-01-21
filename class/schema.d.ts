@@ -4,7 +4,7 @@
  * with properties and methods. This schematic helps you generate a new class with the basic
  * structure and optional test files.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name for the new class. This will be used to create the class file (e.g.,
      * `my-class.ts`) and, if enabled, the corresponding test file `my-class.spec.ts`.
@@ -29,4 +29,4 @@ export interface Schema {
      * For example, if you set the type to `helper`, the filename will be `my-class.helper.ts`.
      */
     type?: string;
-}
+};

@@ -3,7 +3,7 @@
  * applications. Each component consists of a TypeScript class, an HTML template, and an
  * optional CSS stylesheet. Use this schematic to generate a new component in your project.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Configures the change detection strategy for the component.
      */
@@ -103,7 +103,7 @@ export interface Schema {
      * styles are scoped and applied.
      */
     viewEncapsulation?: ViewEncapsulation;
-}
+};
 /**
  * Configures the change detection strategy for the component.
  */

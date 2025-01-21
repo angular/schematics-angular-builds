@@ -5,7 +5,7 @@
  * generating the necessary files and making the required modifications to your project's
  * structure.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name of the project you want to enable SSR for.
      */
@@ -20,4 +20,4 @@ export interface Schema {
      * dependencies later.
      */
     skipInstall?: boolean;
-}
+};

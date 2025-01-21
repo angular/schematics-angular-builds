@@ -3,7 +3,7 @@
  * your project's build process, testing, and browser compatibility. This schematic helps
  * you create or update essential configuration files with ease.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name of the project where the configuration file should be created or updated.
      */
@@ -12,7 +12,7 @@ export interface Schema {
      * Specifies the type of configuration file to generate.
      */
     type: Type;
-}
+};
 /**
  * Specifies the type of configuration file to generate.
  */

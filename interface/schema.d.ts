@@ -3,7 +3,7 @@
  * TypeScript, ensuring type safety and code clarity. This schematic generates a new
  * interface with the specified name and type.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The name for the new interface. This will be used to create the interface file (e.g.,
      * `my-interface.interface.ts`).
@@ -30,4 +30,4 @@ export interface Schema {
      * `my-interface.data.ts`.
      */
     type?: string;
-}
+};

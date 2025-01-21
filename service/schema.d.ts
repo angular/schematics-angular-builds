@@ -3,7 +3,7 @@
  * such as data access, API calls, or utility functions. This schematic simplifies the
  * process of generating a new service with the necessary files and boilerplate code.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Creates files at the top level of the project or the given path. If set to false, a new
      * folder with the service's name will be created to contain the files.
@@ -28,4 +28,4 @@ export interface Schema {
      * Skip the generation of a unit test file `spec.ts` for the service.
      */
     skipTests?: boolean;
-}
+};

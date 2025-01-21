@@ -4,7 +4,7 @@
  * configuration files. You can customize various aspects of the application, such as
  * routing, styling, and testing.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Generate an application that does not use `zone.js`.
      */
@@ -90,7 +90,7 @@ export interface Schema {
      * component styles are scoped and applied.
      */
     viewEncapsulation?: ViewEncapsulation;
-}
+};
 /**
  * The type of stylesheet files to be created for components in the application.
  */

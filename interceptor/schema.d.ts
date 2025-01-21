@@ -4,7 +4,7 @@
  * perform tasks like adding authentication headers, handling errors, or logging requests.
  * This schematic generates the necessary files and boilerplate code for a new interceptor.
  */
-export interface Schema {
+export type Schema = {
     /**
      * Creates the new interceptor files at the top level of the current project. If set to
      * false, a new folder with the interceptor's name will be created to contain the files.
@@ -35,4 +35,4 @@ export interface Schema {
      * Skip the generation of a unit test file `spec.ts` for the new interceptor.
      */
     skipTests?: boolean;
-}
+};

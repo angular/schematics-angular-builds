@@ -1,7 +1,7 @@
 /**
  * Creates a new, generic NgModule definition in the given project.
  */
-export interface Schema {
+export type Schema = {
     /**
      * The new NgModule imports "CommonModule".
      */
@@ -40,7 +40,7 @@ export interface Schema {
      * The scope for the new routing module.
      */
     routingScope?: RoutingScope;
-}
+};
 /**
  * The scope for the new routing module.
  */
