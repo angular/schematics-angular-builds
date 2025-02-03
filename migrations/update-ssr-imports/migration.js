@@ -42,6 +42,7 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const ts = __importStar(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const dependencies_1 = require("../../utility/dependencies");
 function* visit(directory) {
     for (const path of directory.subfiles) {
         if (path.endsWith('.ts') && !path.endsWith('.d.ts')) {
@@ -70,6 +71,9 @@ function* visit(directory) {
  */
 function default_1() {
     return (tree) => {
+        if (!(0, dependencies_1.getPackageJsonDependency)(tree, '@angular/ssr')) {
+            return;
+        }
         for (const sourceFile of visit(tree.root)) {
             let recorder;
             const allImportDeclarations = sourceFile.statements.filter((n) => ts.isImportDeclaration(n));
