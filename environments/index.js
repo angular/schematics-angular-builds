@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const utility_1 = require("@schematics/angular/utility");
-const path_1 = require("path");
+const node_path_1 = require("node:path");
 const ENVIRONMENTS_DIRECTORY = 'environments';
 const ENVIRONMENT_FILE_CONTENT = 'export const environment = {};\n';
 function default_1(options) {
@@ -31,7 +31,7 @@ function default_1(options) {
                 ' A "build" target is required to generate environment files.');
         }
         const serverTarget = project.targets.get('server');
-        const sourceRoot = project.sourceRoot ?? path_1.posix.join(project.root, 'src');
+        const sourceRoot = project.sourceRoot ?? node_path_1.posix.join(project.root, 'src');
         // The generator needs to be iterated prior to returning to ensure all workspace changes that occur
         // within the generator are present for `updateWorkspace` when it writes the workspace file.
         return (0, schematics_1.chain)([
@@ -64,7 +64,7 @@ function* generateConfigurationEnvironments(buildTarget, serverTarget, sourceRoo
             ' The generated project options may not be compatible with this builder.');
     }
     // Create default environment file
-    const defaultFilePath = path_1.posix.join(sourceRoot, ENVIRONMENTS_DIRECTORY, 'environment.ts');
+    const defaultFilePath = node_path_1.posix.join(sourceRoot, ENVIRONMENTS_DIRECTORY, 'environment.ts');
     yield createIfMissing(defaultFilePath);
     const configurationEntries = [
         ...Object.entries(buildTarget.configurations ?? {}),
@@ -80,7 +80,7 @@ function* generateConfigurationEnvironments(buildTarget, serverTarget, sourceRoo
         if (name === buildTarget.defaultConfiguration) {
             continue;
         }
-        const configurationFilePath = path_1.posix.join(sourceRoot, ENVIRONMENTS_DIRECTORY, `environment.${name}.ts`);
+        const configurationFilePath = node_path_1.posix.join(sourceRoot, ENVIRONMENTS_DIRECTORY, `environment.${name}.ts`);
         // Add file replacement option entry for the configuration environment file
         const replacements = (configurationOptions['fileReplacements'] ??= []);
         const existing = replacements.find((value) => value.replace === defaultFilePath);

@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const utility_1 = require("@schematics/angular/utility");
-const path_1 = require("path");
+const node_path_1 = require("node:path");
 const paths_1 = require("../utility/paths");
 const schema_1 = require("./schema");
 function default_1(options) {
@@ -52,7 +52,7 @@ function addKarmaConfig(options) {
             throw new schematics_1.SchematicsException(`Cannot add a karma configuration as builder for "test" target in project does not use "${utility_1.AngularBuilder.Karma}".`);
         }
         testTarget.options ??= {};
-        testTarget.options.karmaConfig = path_1.posix.join(project.root, 'karma.conf.js');
+        testTarget.options.karmaConfig = node_path_1.posix.join(project.root, 'karma.conf.js');
         // If scoped project (i.e. "@foo/bar"), convert dir to "foo/bar".
         let folderName = options.project.startsWith('@') ? options.project.slice(1) : options.project;
         if (/[A-Z]/.test(folderName)) {
