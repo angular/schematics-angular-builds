@@ -9,12 +9,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
-const utility_1 = require("@schematics/angular/utility");
 const node_path_1 = require("node:path");
+const workspace_1 = require("../utility/workspace");
+const workspace_models_1 = require("../utility/workspace-models");
 const ENVIRONMENTS_DIRECTORY = 'environments';
 const ENVIRONMENT_FILE_CONTENT = 'export const environment = {};\n';
 function default_1(options) {
-    return (0, utility_1.updateWorkspace)((workspace) => {
+    return (0, workspace_1.updateWorkspace)((workspace) => {
         const project = workspace.projects.get(options.project);
         if (!project) {
             throw new schematics_1.SchematicsException(`Project name "${options.project}" doesn't not exist.`);
@@ -53,13 +54,13 @@ function log(type, text) {
     return (_, context) => context.logger[type](text);
 }
 function* generateConfigurationEnvironments(buildTarget, serverTarget, sourceRoot, projectName) {
-    if (buildTarget.builder !== utility_1.AngularBuilder.Browser &&
-        buildTarget.builder !== utility_1.AngularBuilder.BrowserEsbuild &&
-        buildTarget.builder !== utility_1.AngularBuilder.Application) {
+    if (buildTarget.builder !== workspace_models_1.Builders.Browser &&
+        buildTarget.builder !== workspace_models_1.Builders.BrowserEsbuild &&
+        buildTarget.builder !== workspace_models_1.Builders.Application) {
         yield log('warn', `"build" target found for project "${projectName}" has a third-party builder "${buildTarget.builder}".` +
             ' The generated project options may not be compatible with this builder.');
     }
-    if (serverTarget && serverTarget.builder !== utility_1.AngularBuilder.Server) {
+    if (serverTarget && serverTarget.builder !== workspace_models_1.Builders.Server) {
         yield log('warn', `"server" target found for project "${projectName}" has a third-party builder "${buildTarget.builder}".` +
             ' The generated project options may not be compatible with this builder.');
     }
