@@ -55,7 +55,8 @@ function log(type, text) {
 function* generateConfigurationEnvironments(buildTarget, serverTarget, sourceRoot, projectName) {
     if (buildTarget.builder !== utility_1.AngularBuilder.Browser &&
         buildTarget.builder !== utility_1.AngularBuilder.BrowserEsbuild &&
-        buildTarget.builder !== utility_1.AngularBuilder.Application) {
+        buildTarget.builder !== utility_1.AngularBuilder.Application &&
+        buildTarget.builder !== utility_1.AngularBuilder.BuildApplication) {
         yield log('warn', `"build" target found for project "${projectName}" has a third-party builder "${buildTarget.builder}".` +
             ' The generated project options may not be compatible with this builder.');
     }
