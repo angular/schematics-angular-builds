@@ -56,7 +56,8 @@ function log(type, text) {
 function* generateConfigurationEnvironments(buildTarget, serverTarget, sourceRoot, projectName) {
     if (buildTarget.builder !== workspace_models_1.Builders.Browser &&
         buildTarget.builder !== workspace_models_1.Builders.BrowserEsbuild &&
-        buildTarget.builder !== workspace_models_1.Builders.Application) {
+        buildTarget.builder !== workspace_models_1.Builders.Application &&
+        buildTarget.builder !== workspace_models_1.Builders.BuildApplication) {
         yield log('warn', `"build" target found for project "${projectName}" has a third-party builder "${buildTarget.builder}".` +
             ' The generated project options may not be compatible with this builder.');
     }

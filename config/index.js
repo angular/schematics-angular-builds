@@ -49,8 +49,10 @@ function addKarmaConfig(options) {
             throw new schematics_1.SchematicsException(`No "test" target found for project "${options.project}".` +
                 ' A "test" target is required to generate a karma configuration.');
         }
-        if (testTarget.builder !== workspace_models_1.Builders.Karma) {
-            throw new schematics_1.SchematicsException(`Cannot add a karma configuration as builder for "test" target in project does not use "${workspace_models_1.Builders.Karma}".`);
+        if (testTarget.builder !== workspace_models_1.Builders.Karma &&
+            testTarget.builder !== workspace_models_1.Builders.BuildKarma) {
+            throw new schematics_1.SchematicsException(`Cannot add a karma configuration as builder for "test" target in project does not` +
+                ` use "${workspace_models_1.Builders.Karma}" or "${workspace_models_1.Builders.BuildKarma}".`);
         }
         testTarget.options ??= {};
         testTarget.options.karmaConfig = node_path_1.posix.join(project.root, 'karma.conf.js');
@@ -64,6 +66,7 @@ function addKarmaConfig(options) {
             (0, schematics_1.applyTemplates)({
                 relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(project.root),
                 folderName,
+                needDevkitPlugin: testTarget.builder === workspace_models_1.Builders.Karma,
             }),
             (0, schematics_1.move)(project.root),
         ]));

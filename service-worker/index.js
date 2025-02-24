@@ -122,7 +122,8 @@ function default_1(options) {
         const buildOptions = buildTarget.options;
         let browserEntryPoint;
         const ngswConfigPath = (0, core_1.join)((0, core_1.normalize)(project.root), 'ngsw-config.json');
-        if (buildTarget.builder === workspace_models_1.Builders.Application) {
+        if (buildTarget.builder === workspace_models_1.Builders.Application ||
+            buildTarget.builder === workspace_models_1.Builders.BuildApplication) {
             browserEntryPoint = buildOptions.browser;
             const productionConf = buildTarget.configurations?.production;
             if (productionConf) {
