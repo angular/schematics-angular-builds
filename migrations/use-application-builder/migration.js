@@ -349,8 +349,13 @@ function deleteFile(path) {
     };
 }
 function updateJsonFile(path, updater) {
-    return (tree) => {
-        updater(new json_file_1.JSONFile(tree, path));
+    return (tree, ctx) => {
+        if (tree.exists(path)) {
+            updater(new json_file_1.JSONFile(tree, path));
+        }
+        else {
+            ctx.logger.info(`Skipping updating '${path}' as it does not exist.`);
+        }
     };
 }
 /**
