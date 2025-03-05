@@ -96,8 +96,8 @@ function addDependenciesToPackageJson(options) {
             },
             {
                 type: dependencies_1.NodeDependencyType.Dev,
-                name: '@angular-devkit/build-angular',
-                version: latest_versions_1.latestVersions.DevkitBuildAngular,
+                name: '@angular/build',
+                version: latest_versions_1.latestVersions.AngularBuild,
             },
             {
                 type: dependencies_1.NodeDependencyType.Dev,
@@ -193,7 +193,7 @@ function addAppToWorkspaceFile(options, appDir, folderName) {
         schematics,
         targets: {
             build: {
-                builder: workspace_models_1.Builders.Application,
+                builder: workspace_models_1.Builders.BuildApplication,
                 defaultConfiguration: 'production',
                 options: {
                     outputPath: `dist/${folderName}`,
@@ -219,7 +219,7 @@ function addAppToWorkspaceFile(options, appDir, folderName) {
                 },
             },
             serve: {
-                builder: workspace_models_1.Builders.DevServer,
+                builder: workspace_models_1.Builders.BuildDevServer,
                 defaultConfiguration: 'development',
                 options: {},
                 configurations: {
@@ -232,12 +232,12 @@ function addAppToWorkspaceFile(options, appDir, folderName) {
                 },
             },
             'extract-i18n': {
-                builder: workspace_models_1.Builders.ExtractI18n,
+                builder: workspace_models_1.Builders.BuildExtractI18n,
             },
             test: options.minimal
                 ? undefined
                 : {
-                    builder: workspace_models_1.Builders.Karma,
+                    builder: workspace_models_1.Builders.BuildKarma,
                     options: {
                         polyfills: options.experimentalZoneless ? [] : ['zone.js', 'zone.js/testing'],
                         tsConfig: `${projectRoot}tsconfig.spec.json`,
