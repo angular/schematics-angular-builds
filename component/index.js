@@ -51,6 +51,7 @@ function default_1(options) {
             (0, schematics_1.applyTemplates)({
                 ...schematics_1.strings,
                 'if-flat': (s) => (options.flat ? '' : s),
+                'ngext': options.ngHtml ? '.ng' : '',
                 ...options,
             }),
             !options.type

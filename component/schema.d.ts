@@ -50,6 +50,11 @@ export type Schema = {
      */
     name: string;
     /**
+     * Generate component template files with an '.ng.html' file extension instead of '.html'.
+     * The '.ng.html' file extension is recommended by the Angular style guide.
+     */
+    ngHtml?: boolean;
+    /**
      * The path where the component files should be created, relative to the current workspace.
      * If not provided, a folder with the same name as the component will be created in the
      * project's `src/app` directory.

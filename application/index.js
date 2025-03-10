@@ -63,7 +63,7 @@ function default_1(options) {
                     ? (0, schematics_1.filter)((path) => !path.endsWith('tsconfig.spec.json.template'))
                     : (0, schematics_1.noop)(),
                 componentOptions.inlineTemplate
-                    ? (0, schematics_1.filter)((path) => !path.endsWith('component.html.template'))
+                    ? (0, schematics_1.filter)((path) => !path.endsWith('.ng.html.template'))
                     : (0, schematics_1.noop)(),
                 (0, schematics_1.applyTemplates)({
                     utils: schematics_1.strings,
