@@ -67,11 +67,6 @@ export type Schema = {
      */
     routing?: boolean;
     /**
-     * Create a server application in the initial project using the Server Routing and App
-     * Engine APIs (Developer Preview).
-     */
-    serverRouting?: boolean;
-    /**
      * Do not initialize a Git repository in the new workspace. By default, a Git repository is
      * initialized to help you track changes to your project.
      */

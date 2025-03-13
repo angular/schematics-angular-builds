@@ -88,9 +88,7 @@ function updateConfigFileApplicationBuilder(options) {
         }
         buildTarget.options ??= {};
         buildTarget.options['server'] = node_path_1.posix.join(project.sourceRoot ?? node_path_1.posix.join(project.root, 'src'), serverMainEntryName);
-        if (options.serverRouting) {
-            buildTarget.options['outputMode'] = 'static';
-        }
+        buildTarget.options['outputMode'] = 'static';
     });
 }
 function updateTsConfigFile(tsConfigPath) {
@@ -140,10 +138,9 @@ function default_1(options) {
         if (!clientBuildTarget) {
             throw (0, project_targets_1.targetBuildNotFoundError)();
         }
-        const isUsingApplicationBuilder = clientBuildTarget.builder === workspace_models_1.Builders.Application ||
-            clientBuildTarget.builder === workspace_models_1.Builders.BuildApplication;
+        const usingApplicationBuilder = (0, project_targets_1.isUsingApplicationBuilder)(clientProject);
         if (clientProject.targets.has('server') ||
-            (isUsingApplicationBuilder && clientBuildTarget.options?.server !== undefined)) {
+            (usingApplicationBuilder && clientBuildTarget.options?.server !== undefined)) {
             // Server has already been added.
             return;
         }
@@ -151,12 +148,9 @@ function default_1(options) {
         const browserEntryPoint = await (0, util_1.getMainFilePath)(host, options.project);
         const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(host, browserEntryPoint);
         const sourceRoot = clientProject.sourceRoot ?? (0, core_1.join)((0, core_1.normalize)(clientProject.root), 'src');
-        let filesUrl = `./files/${isUsingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
+        let filesUrl = `./files/${usingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
         filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)(filesUrl), [
-            options.serverRouting
-                ? (0, schematics_1.noop)()
-                : (0, schematics_1.filter)((path) => !path.endsWith('app.routes.server.ts.template')),
             (0, schematics_1.applyTemplates)({
                 ...schematics_1.strings,
                 ...options,
@@ -168,7 +162,7 @@ function default_1(options) {
         const tsConfigDirectory = (0, core_1.dirname)(clientTsConfig);
         return (0, schematics_1.chain)([
             (0, schematics_1.mergeWith)(templateSource),
-            ...(isUsingApplicationBuilder
+            ...(usingApplicationBuilder
                 ? [
                     updateConfigFileApplicationBuilder(options),
                     updateTsConfigFile(clientBuildOptions.tsConfig),

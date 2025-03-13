@@ -48,11 +48,6 @@ export type Schema = {
      */
     routing?: boolean;
     /**
-     * Set up a server application using the Server Routing and App Engine APIs (Developer
-     * Preview).
-     */
-    serverRouting?: boolean;
-    /**
      * Skip the automatic installation of packages. You will need to manually install the
      * dependencies later.
      */

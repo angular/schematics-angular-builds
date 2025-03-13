@@ -17,9 +17,9 @@ const typescript_1 = __importDefault(require("../third_party/github.com/Microsof
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
+const project_targets_1 = require("../utility/project-targets");
 const util_1 = require("../utility/standalone/util");
 const workspace_1 = require("../utility/workspace");
-const workspace_models_1 = require("../utility/workspace-models");
 const APP_SHELL_ROUTE = 'shell';
 function getSourceFile(host, path) {
     const content = host.readText(path);
@@ -119,24 +119,6 @@ function getMetadataProperty(metadata, propertyName) {
         return false;
     })[0];
     return property;
-}
-function addAppShellConfigToWorkspace(options) {
-    return (0, workspace_1.updateWorkspace)((workspace) => {
-        const project = workspace.projects.get(options.project);
-        if (!project) {
-            return;
-        }
-        const buildTarget = project.targets.get('build');
-        if (buildTarget?.builder === workspace_models_1.Builders.Application ||
-            buildTarget?.builder === workspace_models_1.Builders.BuildApplication) {
-            // Application builder configuration.
-            const prodConfig = buildTarget.configurations?.production;
-            if (!prodConfig) {
-                throw new schematics_1.SchematicsException(`A "production" configuration is not defined for the "build" builder.`);
-            }
-            prodConfig.appShell = true;
-        }
-    });
 }
 function addServerRoutes(options) {
     return async (host) => {
@@ -258,17 +240,20 @@ function default_1(options) {
     return async (tree) => {
         const browserEntryPoint = await (0, util_1.getMainFilePath)(tree, options.project);
         const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(tree, browserEntryPoint);
+        const workspace = await (0, workspace_1.getWorkspace)(tree);
+        const project = workspace.projects.get(options.project);
+        if (!project) {
+            throw (0, project_targets_1.targetBuildNotFoundError)();
+        }
         return (0, schematics_1.chain)([
             validateProject(browserEntryPoint),
             (0, schematics_1.schematic)('server', options),
-            ...(options.serverRouting
+            ...((0, project_targets_1.isUsingApplicationBuilder)(project)
                 ? [(0, schematics_1.noop)()]
                 : isStandalone
                     ? [addStandaloneServerRoute(options)]
                     : [addServerRoutes(options)]),
-            options.serverRouting
-                ? addServerRoutingConfig(options, isStandalone)
-                : addAppShellConfigToWorkspace(options),
+            addServerRoutingConfig(options, isStandalone),
             (0, schematics_1.schematic)('component', {
                 name: 'app-shell',
                 module: 'app.module.server.ts',

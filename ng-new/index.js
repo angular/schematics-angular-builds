@@ -40,7 +40,6 @@ function default_1(options) {
         minimal: options.minimal,
         standalone: options.standalone,
         ssr: options.ssr,
-        serverRouting: options.serverRouting,
         experimentalZoneless: options.experimentalZoneless,
     };
     return (0, schematics_1.chain)([

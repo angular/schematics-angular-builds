@@ -78,7 +78,6 @@ function default_1(options) {
             options.ssr
                 ? (0, schematics_1.schematic)('ssr', {
                     project: options.name,
-                    serverRouting: options.serverRouting,
                     skipInstall: true,
                 })
                 : (0, schematics_1.noop)(),
