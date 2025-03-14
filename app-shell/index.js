@@ -143,7 +143,7 @@ function addServerRoutes(options) {
                 .filter((node) => node.kind === typescript_1.default.SyntaxKind.ImportDeclaration)
                 .sort((a, b) => a.getStart() - b.getStart());
             const insertPosition = imports[imports.length - 1].getEnd();
-            const routeText = `\n\nconst routes: Routes = [ { path: '${APP_SHELL_ROUTE}', component: AppShellComponent }];`;
+            const routeText = `\n\nconst routes: Routes = [ { path: '${APP_SHELL_ROUTE}', component: AppShell }];`;
             recorder.insertRight(insertPosition, routeText);
             host.commitUpdate(recorder);
         }
@@ -195,13 +195,13 @@ function addStandaloneServerRoute(options) {
         multi: true,
         useValue: [{
           path: '${APP_SHELL_ROUTE}',
-          component: AppShellComponent
+          component: AppShell
         }]
       }\n  `,
         ];
         recorder.insertRight(providersLiteral.getStart(), `[\n${updatedProvidersString.join(',\n')}]`);
         (0, change_1.applyToUpdateRecorder)(recorder, [
-            (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'AppShellComponent', './app-shell/app-shell.component'),
+            (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'AppShell', './app-shell/app-shell'),
         ]);
         host.commitUpdate(recorder);
     };
@@ -228,10 +228,10 @@ function addServerRoutingConfig(options, isStandalone) {
             throw new schematics_1.SchematicsException(`Cannot find the "provideServerRouting" function call in "${configFilePath}".`);
         }
         recorder = host.beginUpdate(configFilePath);
-        recorder.insertLeft(functionCall.end - 1, `, withAppShell(AppShellComponent)`);
+        recorder.insertLeft(functionCall.end - 1, `, withAppShell(AppShell)`);
         (0, change_1.applyToUpdateRecorder)(recorder, [
             (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'withAppShell', '@angular/ssr'),
-            (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'AppShellComponent', './app-shell/app-shell.component'),
+            (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'AppShell', './app-shell/app-shell'),
         ]);
         host.commitUpdate(recorder);
     };

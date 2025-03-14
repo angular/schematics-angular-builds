@@ -42,7 +42,7 @@ function findModuleFromOptions(host, options) {
         for (const c of candidatesDirs) {
             const candidateFiles = ['', `${moduleBaseName}.ts`, `${moduleBaseName}${moduleExt}`].map((x) => (0, core_1.join)(c, x));
             for (const sc of candidateFiles) {
-                if (host.exists(sc)) {
+                if (host.exists(sc) && host.readText(sc).includes('@NgModule')) {
                     return (0, core_1.normalize)(sc);
                 }
             }
