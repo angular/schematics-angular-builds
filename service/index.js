@@ -13,6 +13,8 @@ function default_1(options) {
     // This schematic uses an older method to implement the flat option
     const flat = options.flat;
     options.flat = true;
+    // Schematic templates require a defined type value
+    options.type ??= '';
     return (0, generate_from_files_1.generateFromFiles)(options, {
         'if-flat': (s) => (flat ? '' : s),
     });

@@ -155,12 +155,6 @@ function default_1(options) {
                 standalone: options.standalone,
                 project: packageName,
             }),
-            (0, schematics_1.schematic)('service', {
-                name: options.name,
-                flat: true,
-                path: sourceDir,
-                project: packageName,
-            }),
             (_tree, context) => {
                 if (!options.skipPackageJson && !options.skipInstall) {
                     context.addTask(new tasks_1.NodePackageInstallTask());

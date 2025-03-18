@@ -29,6 +29,16 @@ function generateFromFiles(options, extraTemplateValues = {}) {
                 ...options,
                 ...extraTemplateValues,
             }),
+            !options.type
+                ? (0, schematics_1.forEach)(((file) => {
+                    return file.path.includes('..')
+                        ? {
+                            content: file.content,
+                            path: file.path.replace('..', '.'),
+                        }
+                        : file;
+                }))
+                : (0, schematics_1.noop)(),
             (0, schematics_1.move)(parsedPath.path + (options.flat ? '' : '/' + schematics_1.strings.dasherize(options.name))),
         ]);
         return (0, schematics_1.chain)([(0, schematics_1.mergeWith)(templateSource)]);
