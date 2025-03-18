@@ -223,9 +223,9 @@ function addServerRoutingConfig(options, isStandalone) {
         const configSourceFile = getSourceFile(host, configFilePath);
         const functionCall = (0, ast_utils_1.findNodes)(configSourceFile, typescript_1.default.isCallExpression, 
         /** max */ undefined, 
-        /** recursive */ true).find((n) => typescript_1.default.isIdentifier(n.expression) && n.expression.getText() === 'provideServerRouting');
+        /** recursive */ true).find((n) => typescript_1.default.isIdentifier(n.expression) && n.expression.getText() === 'provideServerRendering');
         if (!functionCall) {
-            throw new schematics_1.SchematicsException(`Cannot find the "provideServerRouting" function call in "${configFilePath}".`);
+            throw new schematics_1.SchematicsException(`Cannot find the "provideServerRendering" function call in "${configFilePath}".`);
         }
         recorder = host.beginUpdate(configFilePath);
         recorder.insertLeft(functionCall.end - 1, `, withAppShell(AppShell)`);
