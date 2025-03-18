@@ -67,12 +67,7 @@ function* visit(directory) {
 }
 function default_1() {
     return async (tree) => {
-        (0, dependencies_1.addPackageJsonDependency)(tree, {
-            name: '@angular/ssr',
-            version: latest_versions_1.latestVersions.AngularSSR,
-            type: dependencies_1.NodeDependencyType.Default,
-            overwrite: false,
-        });
+        let angularSSRAdded = false;
         for (const [filePath, content] of visit(tree.root)) {
             let updatedContent = content;
             const ssrImports = new Set();
@@ -123,6 +118,15 @@ function default_1() {
             }
             if (content !== updatedContent) {
                 tree.overwrite(filePath, updatedContent);
+                if (!angularSSRAdded) {
+                    (0, dependencies_1.addPackageJsonDependency)(tree, {
+                        name: '@angular/ssr',
+                        version: latest_versions_1.latestVersions.AngularSSR,
+                        type: dependencies_1.NodeDependencyType.Default,
+                        overwrite: false,
+                    });
+                    angularSSRAdded = true;
+                }
             }
         }
     };
