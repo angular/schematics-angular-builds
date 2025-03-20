@@ -203,7 +203,6 @@ function addAppToWorkspaceFile(options, appDir, folderName) {
                     inlineStyleLanguage,
                     assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
                     styles: [`${sourceRoot}/styles.${options.style}`],
-                    scripts: [],
                 },
                 configurations: {
                     production: {
@@ -243,7 +242,6 @@ function addAppToWorkspaceFile(options, appDir, folderName) {
                         inlineStyleLanguage,
                         assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
                         styles: [`${sourceRoot}/styles.${options.style}`],
-                        scripts: [],
                     },
                 },
         },
