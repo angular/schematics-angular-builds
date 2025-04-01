@@ -105,7 +105,6 @@ function* updateBuildTarget(projectName, buildTarget, serverTarget, tree, contex
         }
         yield (0, schematics_1.externalSchematic)('@schematics/angular', 'ssr', {
             project: projectName,
-            skipInstall: true,
         });
     }
 }

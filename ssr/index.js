@@ -225,10 +225,12 @@ function addDependencies({ skipInstall }, isUsingApplicationBuilder) {
         (0, utility_1.addDependency)('express', latest_versions_1.latestVersions['express'], {
             type: utility_1.DependencyType.Default,
             install,
+            existing: utility_1.ExistingBehavior.Replace,
         }),
         (0, utility_1.addDependency)('@types/express', latest_versions_1.latestVersions['@types/express'], {
             type: utility_1.DependencyType.Dev,
             install,
+            existing: utility_1.ExistingBehavior.Replace,
         }),
     ];
     if (!isUsingApplicationBuilder) {
