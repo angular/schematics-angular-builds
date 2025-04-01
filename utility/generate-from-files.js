@@ -30,14 +30,16 @@ function generateFromFiles(options, extraTemplateValues = {}) {
                 ...extraTemplateValues,
             }),
             !options.type
-                ? (0, schematics_1.forEach)(((file) => {
-                    return file.path.includes('..')
-                        ? {
-                            content: file.content,
-                            path: file.path.replace('..', '.'),
-                        }
-                        : file;
-                }))
+                ? (0, schematics_1.forEach)((file) => {
+                    let filePath = file.path;
+                    while (filePath.includes('..')) {
+                        filePath = filePath.replaceAll('..', '.');
+                    }
+                    return {
+                        content: file.content,
+                        path: filePath,
+                    };
+                })
                 : (0, schematics_1.noop)(),
             (0, schematics_1.move)(parsedPath.path + (options.flat ? '' : '/' + schematics_1.strings.dasherize(options.name))),
         ]);
