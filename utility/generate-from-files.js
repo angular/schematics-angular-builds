@@ -17,6 +17,8 @@ function generateFromFiles(options, extraTemplateValues = {}) {
         options.path ??= await (0, workspace_1.createDefaultPath)(host, options.project);
         options.prefix ??= '';
         options.flat ??= true;
+        // Schematic templates require a defined type value
+        options.type ??= '';
         const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;

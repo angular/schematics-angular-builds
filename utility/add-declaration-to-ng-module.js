@@ -57,10 +57,9 @@ function addDeclarationToNgModule(options) {
         const filePath = `/${options.path}/` +
             (options.flat ? '' : schematics_1.strings.dasherize(options.name) + '/') +
             schematics_1.strings.dasherize(options.name) +
-            (options.type ? '.' : '') +
-            schematics_1.strings.dasherize(options.type);
+            (options.type ? '.' + schematics_1.strings.dasherize(options.type) : '');
         const importPath = (0, find_module_1.buildRelativePath)(modulePath, filePath);
-        const classifiedName = schematics_1.strings.classify(options.name) + schematics_1.strings.classify(options.type);
+        const classifiedName = schematics_1.strings.classify(options.name) + (options.type ? schematics_1.strings.classify(options.type) : '');
         const changes = (0, ast_utils_1.addDeclarationToModule)(source, modulePath, classifiedName, importPath);
         if (options.export) {
             changes.push(...(0, ast_utils_1.addSymbolToNgModuleMetadata)(source, modulePath, 'exports', classifiedName));
