@@ -40,6 +40,10 @@ export type Schema = {
      * Skip the generation of a unit test file `spec.ts` for the new guard.
      */
     skipTests?: boolean;
+    /**
+     * The separator character to use before the type within the generated file's name. For
+     * example, if you set the option to `.`, the file will be named `example.guard.ts`.
+     */
     typeSeparator?: TypeSeparator;
 };
 export declare enum Implement {
@@ -48,6 +52,10 @@ export declare enum Implement {
     CanDeactivate = "CanDeactivate",
     CanMatch = "CanMatch"
 }
+/**
+ * The separator character to use before the type within the generated file's name. For
+ * example, if you set the option to `.`, the file will be named `example.guard.ts`.
+ */
 export declare enum TypeSeparator {
     Empty = "-",
     TypeSeparator = "."

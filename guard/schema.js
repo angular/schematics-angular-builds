@@ -10,6 +10,10 @@ var Implement;
     Implement["CanDeactivate"] = "CanDeactivate";
     Implement["CanMatch"] = "CanMatch";
 })(Implement || (exports.Implement = Implement = {}));
+/**
+ * The separator character to use before the type within the generated file's name. For
+ * example, if you set the option to `.`, the file will be named `example.guard.ts`.
+ */
 var TypeSeparator;
 (function (TypeSeparator) {
     TypeSeparator["Empty"] = "-";
