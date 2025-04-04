@@ -49,4 +49,9 @@ export type Schema = {
      * standalone components, directives, or pipes.
      */
     standalone?: boolean;
+    typeSeparator?: TypeSeparator;
 };
+export declare enum TypeSeparator {
+    Empty = "-",
+    TypeSeparator = "."
+}
