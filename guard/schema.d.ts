@@ -40,10 +40,15 @@ export type Schema = {
      * Skip the generation of a unit test file `spec.ts` for the new guard.
      */
     skipTests?: boolean;
+    typeSeparator?: TypeSeparator;
 };
 export declare enum Implement {
     CanActivate = "CanActivate",
     CanActivateChild = "CanActivateChild",
     CanDeactivate = "CanDeactivate",
     CanMatch = "CanMatch"
+}
+export declare enum TypeSeparator {
+    Empty = "-",
+    TypeSeparator = "."
 }
