@@ -18,6 +18,7 @@ const latest_versions_1 = require("../utility/latest-versions");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const paths_1 = require("../utility/paths");
 const project_targets_1 = require("../utility/project-targets");
+const app_component_1 = require("../utility/standalone/app_component");
 const util_1 = require("../utility/standalone/util");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
@@ -150,10 +151,22 @@ function default_1(options) {
         const sourceRoot = clientProject.sourceRoot ?? (0, core_1.join)((0, core_1.normalize)(clientProject.root), 'src');
         let filesUrl = `./files/${usingApplicationBuilder ? 'application-builder/' : 'server-builder/'}`;
         filesUrl += isStandalone ? 'standalone-src' : 'ngmodule-src';
+        const { componentName, componentImportPathInSameFile, moduleName, moduleImportPathInSameFile } = (0, app_component_1.resolveBootstrappedComponentData)(host, browserEntryPoint) || {
+            componentName: 'App',
+            componentImportPathInSameFile: './app/app',
+            moduleName: 'AppModule',
+            moduleImportPathInSameFile: './app/app.module',
+        };
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)(filesUrl), [
             (0, schematics_1.applyTemplates)({
                 ...schematics_1.strings,
                 ...options,
+                appComponentName: componentName,
+                appComponentPath: componentImportPathInSameFile,
+                appModuleName: moduleName,
+                appModulePath: moduleImportPathInSameFile === null
+                    ? null
+                    : `./${node_path_1.posix.basename(moduleImportPathInSameFile)}`,
             }),
             (0, schematics_1.move)(sourceRoot),
         ]);
