@@ -151,6 +151,10 @@ function default_1(options) {
                 export: true,
                 standalone: options.standalone,
                 project: packageName,
+                // Explicitly set an empty `type` since it doesn't necessarily make sense in a library.
+                // This also ensures that the generated files are valid even if the `component` schematic
+                // inherits its `type` from the workspace.
+                type: '',
             }),
             (_tree, context) => {
                 if (!options.skipPackageJson && !options.skipInstall) {
