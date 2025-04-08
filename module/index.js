@@ -52,7 +52,7 @@ const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const schema_1 = require("./schema");
 function buildRelativeModulePath(options, modulePath) {
-    const importModulePath = (0, posix_1.join)(options.path ?? '', options.flat ? '' : schematics_1.strings.dasherize(options.name), schematics_1.strings.dasherize(options.name) + '.module');
+    const importModulePath = (0, posix_1.join)(options.path ?? '', options.flat ? '' : schematics_1.strings.dasherize(options.name), schematics_1.strings.dasherize(options.name) + options.typeSeparator + 'module');
     return (0, find_module_1.buildRelativePath)(modulePath, importModulePath);
 }
 function addImportToNgModule(options) {
@@ -99,9 +99,11 @@ function addRouteDeclarationToNgModule(options, routingModulePath) {
     };
 }
 function getRoutingModulePath(host, modulePath) {
-    const routingModulePath = modulePath.endsWith(find_module_1.ROUTING_MODULE_EXT)
+    const routingModulePath = modulePath.endsWith(find_module_1.ROUTING_MODULE_EXT) || modulePath.endsWith('-routing-module.ts')
         ? modulePath
-        : modulePath.replace(find_module_1.MODULE_EXT, find_module_1.ROUTING_MODULE_EXT);
+        : modulePath
+            .replace(find_module_1.MODULE_EXT, find_module_1.ROUTING_MODULE_EXT)
+            .replace('-module.ts', '-routing-module.ts');
     return host.exists(routingModulePath) ? routingModulePath : undefined;
 }
 function buildRoute(options, modulePath) {
@@ -116,7 +118,16 @@ function default_1(options) {
             options.path = await (0, workspace_1.createDefaultPath)(host, options.project);
         }
         if (options.module) {
-            options.module = (0, find_module_1.findModuleFromOptions)(host, options);
+            try {
+                options.module = (0, find_module_1.findModuleFromOptions)(host, options);
+            }
+            catch {
+                options.module = (0, find_module_1.findModuleFromOptions)(host, {
+                    ...options,
+                    moduleExt: '-module.ts',
+                    routingModuleExt: '-routing-module.ts',
+                });
+            }
         }
         let routingModulePath;
         const isLazyLoadedModuleGen = !!(options.route && options.module);
@@ -131,7 +142,7 @@ function default_1(options) {
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
             options.routing || (isLazyLoadedModuleGen && routingModulePath)
                 ? (0, schematics_1.noop)()
-                : (0, schematics_1.filter)((path) => !path.endsWith('-routing.module.ts.template')),
+                : (0, schematics_1.filter)((path) => !path.includes('-routing')),
             (0, schematics_1.applyTemplates)({
                 ...schematics_1.strings,
                 'if-flat': (s) => (options.flat ? '' : s),
@@ -143,7 +154,7 @@ function default_1(options) {
             (0, schematics_1.move)(parsedPath.path),
         ]);
         const moduleDasherized = schematics_1.strings.dasherize(options.name);
-        const modulePath = `${!options.flat ? moduleDasherized + '/' : ''}${moduleDasherized}.module.ts`;
+        const modulePath = `${!options.flat ? moduleDasherized + '/' : ''}${moduleDasherized}${options.typeSeparator}module.ts`;
         const componentOptions = {
             module: modulePath,
             flat: options.flat,

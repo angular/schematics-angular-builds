@@ -35,7 +35,16 @@ function default_1(options) {
         if (options.path === undefined) {
             options.path = (0, workspace_1.buildDefaultPath)(project);
         }
-        options.module = (0, find_module_1.findModuleFromOptions)(host, options);
+        try {
+            options.module = (0, find_module_1.findModuleFromOptions)(host, options);
+        }
+        catch {
+            options.module = (0, find_module_1.findModuleFromOptions)(host, {
+                ...options,
+                moduleExt: '-module.ts',
+                routingModuleExt: '-routing-module.ts',
+            });
+        }
         const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
         options.name = parsedPath.name;
         options.path = parsedPath.path;
