@@ -150,6 +150,7 @@ function updateProjects(tree, context) {
                 case workspace_models_1.Builders.Application:
                 case workspace_models_1.Builders.DevServer:
                 case workspace_models_1.Builders.ExtractI18n:
+                case workspace_models_1.Builders.Karma:
                 case workspace_models_1.Builders.NgPackagr:
                     // Ignore application, dev server, and i18n extraction for devkit usage check.
                     // Both will be replaced if no other usage is found.
@@ -172,6 +173,13 @@ function updateProjects(tree, context) {
                         break;
                     case workspace_models_1.Builders.ExtractI18n:
                         target.builder = '@angular/build:extract-i18n';
+                        break;
+                    case workspace_models_1.Builders.Karma:
+                        target.builder = '@angular/build:karma';
+                        // Remove "builderMode" option since the builder will always use "application"
+                        for (const [, karmaOptions] of (0, workspace_1.allTargetOptions)(target)) {
+                            delete karmaOptions['builderMode'];
+                        }
                         break;
                     case workspace_models_1.Builders.NgPackagr:
                         target.builder = '@angular/build:ng-packagr';
