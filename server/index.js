@@ -95,10 +95,6 @@ function updateConfigFileApplicationBuilder(options) {
 function updateTsConfigFile(tsConfigPath) {
     return (host) => {
         const json = new json_file_1.JSONFile(host, tsConfigPath);
-        const filesPath = ['files'];
-        const files = new Set(json.get(filesPath) ?? []);
-        files.add('src/' + serverMainEntryName);
-        json.modify(filesPath, [...files]);
         const typePath = ['compilerOptions', 'types'];
         const types = new Set(json.get(typePath) ?? []);
         types.add('node');

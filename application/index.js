@@ -12,16 +12,33 @@ const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
 const dependencies_1 = require("../utility/dependencies");
+const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 const schema_1 = require("./schema");
+function addTsProjectReference(...paths) {
+    return (host) => {
+        if (!host.exists('tsconfig.json')) {
+            return host;
+        }
+        const newReferences = paths.map((path) => ({ path }));
+        const file = new json_file_1.JSONFile(host, 'tsconfig.json');
+        const jsonPath = ['references'];
+        const value = file.get(jsonPath);
+        file.modify(jsonPath, Array.isArray(value) ? [...value, ...newReferences] : newReferences);
+    };
+}
 function default_1(options) {
     return async (host, context) => {
         const { appDir, appRootSelector, componentOptions, folderName, sourceDir } = await getAppOptions(host, options);
         return (0, schematics_1.chain)([
             addAppToWorkspaceFile(options, appDir, folderName),
+            addTsProjectReference((0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.app.json')),
+            options.skipTests
+                ? (0, schematics_1.noop)()
+                : addTsProjectReference((0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.spec.json')),
             options.standalone
                 ? (0, schematics_1.noop)()
                 : (0, schematics_1.schematic)('module', {
