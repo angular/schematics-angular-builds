@@ -35,10 +35,10 @@ function default_1(options) {
         const { appDir, appRootSelector, componentOptions, folderName, sourceDir } = await getAppOptions(host, options);
         return (0, schematics_1.chain)([
             addAppToWorkspaceFile(options, appDir, folderName),
-            addTsProjectReference((0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.app.json')),
+            addTsProjectReference('./' + (0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.app.json')),
             options.skipTests
                 ? (0, schematics_1.noop)()
-                : addTsProjectReference((0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.spec.json')),
+                : addTsProjectReference('./' + (0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.spec.json')),
             options.standalone
                 ? (0, schematics_1.noop)()
                 : (0, schematics_1.schematic)('module', {
