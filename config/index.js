@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
+const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
 const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
@@ -31,9 +32,11 @@ function addBrowserslistConfig(options) {
         if (!project) {
             throw new schematics_1.SchematicsException(`Project name "${options.project}" doesn't not exist.`);
         }
+        // Read Angular's default vendored `.browserslistrc` file.
+        const config = await (0, promises_1.readFile)(node_path_1.posix.join(__dirname, '.browserslistrc'), 'utf8');
         return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
             (0, schematics_1.filter)((p) => p.endsWith('.browserslistrc.template')),
-            (0, schematics_1.applyTemplates)({}),
+            (0, schematics_1.applyTemplates)({ config }),
             (0, schematics_1.move)(project.root),
         ]));
     };
