@@ -35,7 +35,7 @@ function addSnippet(options) {
         const logMessage = 'console.log(`page got message: ${data}`);';
         const workerCreationSnippet = core_1.tags.stripIndent `
       if (typeof Worker !== 'undefined') {
-        // Create a new
+        // Create a new Web Worker
         const worker = new Worker(new URL('./${options.name}.worker', import.meta.url));
         worker.onmessage = ({ data }) => {
           ${logMessage}
