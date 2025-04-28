@@ -36,7 +36,7 @@ function default_1(options) {
         return (0, schematics_1.chain)([
             addAppToWorkspaceFile(options, appDir, folderName),
             addTsProjectReference('./' + (0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.app.json')),
-            options.skipTests
+            options.skipTests || options.minimal
                 ? (0, schematics_1.noop)()
                 : addTsProjectReference('./' + (0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.spec.json')),
             options.standalone
