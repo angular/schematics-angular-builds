@@ -6,10 +6,6 @@
  */
 export type Schema = {
     /**
-     * Generate an application that does not use `zone.js`.
-     */
-    experimentalZoneless?: boolean;
-    /**
      * Include the styles for the root component directly within the `app.component.ts` file.
      * Only CSS styles can be included inline. By default, a separate stylesheet file (e.g.,
      * `app.component.css`) is created.
@@ -85,6 +81,10 @@ export type Schema = {
      * component styles are scoped and applied.
      */
     viewEncapsulation?: ViewEncapsulation;
+    /**
+     * Generate an application that does not use `zone.js`.
+     */
+    zoneless?: boolean;
 };
 /**
  * The type of stylesheet files to be created for components in the application.

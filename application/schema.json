@@ -118,8 +118,9 @@
       "default": false,
       "x-user-analytics": "ep.ng_ssr"
     },
-    "experimentalZoneless": {
+    "zoneless": {
       "description": "Generate an application that does not use `zone.js`.",
+      "x-prompt": "Do you want to create a 'zoneless' application without zone.js (Developer Preview)?",
       "type": "boolean",
       "default": false
     }
