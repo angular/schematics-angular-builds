@@ -1,6 +1,6 @@
-Chrome >= 105
-ChromeAndroid >= 105
-Edge >= 105
+Chrome >= 107
+ChromeAndroid >= 107
+Edge >= 107
 Firefox >= 104
 FirefoxAndroid >= 104
 Safari >= 16
