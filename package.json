@@ -1,6 +1,6 @@
 {
   "name": "@schematics/angular",
-  "version": "19.2.11+sha-7720741",
+  "version": "19.2.11+sha-cf1ab3e",
   "description": "Schematics specific to Angular",
   "homepage": "https://github.com/angular/angular-cli",
   "keywords": [
