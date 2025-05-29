@@ -163,6 +163,7 @@ function updateProjects(tree, context) {
         }
         // Use @angular/build directly if there is no devkit package usage
         if (!hasAngularDevkitUsage) {
+            const karmaConfigFiles = new Set();
             for (const [, target] of (0, workspace_1.allWorkspaceTargets)(workspace)) {
                 switch (target.builder) {
                     case workspace_models_1.Builders.Application:
@@ -176,9 +177,14 @@ function updateProjects(tree, context) {
                         break;
                     case workspace_models_1.Builders.Karma:
                         target.builder = '@angular/build:karma';
-                        // Remove "builderMode" option since the builder will always use "application"
                         for (const [, karmaOptions] of (0, workspace_1.allTargetOptions)(target)) {
+                            // Remove "builderMode" option since the builder will always use "application"
                             delete karmaOptions['builderMode'];
+                            // Collect custom karma configurations for @angular-devkit/build-angular plugin removal
+                            const karmaConfig = karmaOptions['karmaConfig'];
+                            if (karmaConfig && typeof karmaConfig === 'string') {
+                                karmaConfigFiles.add(karmaConfig);
+                            }
                         }
                         break;
                     case workspace_models_1.Builders.NgPackagr:
@@ -213,6 +219,29 @@ function updateProjects(tree, context) {
                     type: dependency_1.DependencyType.Dev,
                     existing: dependency_1.ExistingBehavior.Replace,
                 }));
+            }
+            for (const karmaConfigFile of karmaConfigFiles) {
+                if (!tree.exists(karmaConfigFile)) {
+                    continue;
+                }
+                try {
+                    const originalKarmaConfigText = tree.readText(karmaConfigFile);
+                    const updatedKarmaConfigText = originalKarmaConfigText
+                        .replaceAll(`require('@angular-devkit/build-angular/plugins/karma'),`, '')
+                        .replaceAll(`require('@angular-devkit/build-angular/plugins/karma')`, '');
+                    if (updatedKarmaConfigText.includes('@angular-devkit/build-angular/plugins')) {
+                        throw new Error('Migration does not support found usage of "@angular-devkit/build-angular".');
+                    }
+                    else {
+                        tree.overwrite(karmaConfigFile, updatedKarmaConfigText);
+                    }
+                }
+                catch (error) {
+                    const reason = error instanceof Error ? `Reason: ${error.message}` : '';
+                    context.logger.warn(`Unable to update custom karma configuration file ("${karmaConfigFile}"). ` +
+                        reason +
+                        '\nReferences to the "@angular-devkit/build-angular" package within the file may need to be removed manually.');
+                }
             }
         }
         return (0, schematics_1.chain)(rules);
