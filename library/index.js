@@ -72,7 +72,7 @@ function addDependenciesToPackageJson() {
         return host;
     };
 }
-function addLibToWorkspaceFile(options, projectRoot, projectName) {
+function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDependency) {
     return (0, workspace_1.updateWorkspace)((workspace) => {
         workspace.projects.add({
             name: projectName,
@@ -97,7 +97,7 @@ function addLibToWorkspaceFile(options, projectRoot, projectName) {
                     builder: workspace_models_1.Builders.BuildKarma,
                     options: {
                         tsConfig: `${projectRoot}/tsconfig.spec.json`,
-                        polyfills: ['zone.js', 'zone.js/testing'],
+                        polyfills: hasZoneDependency ? ['zone.js', 'zone.js/testing'] : undefined,
                     },
                 },
             },
@@ -139,9 +139,10 @@ function default_1(options) {
             }),
             (0, schematics_1.move)(libDir),
         ]);
+        const hasZoneDependency = (0, dependencies_1.getPackageJsonDependency)(host, 'zone.js') !== null;
         return (0, schematics_1.chain)([
             (0, schematics_1.mergeWith)(templateSource),
-            addLibToWorkspaceFile(options, libDir, packageName),
+            addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
             options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(),
             options.skipTsConfig ? (0, schematics_1.noop)() : updateTsConfig(packageName, './' + distRoot),
             options.skipTsConfig
