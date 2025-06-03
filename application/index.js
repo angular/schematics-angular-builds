@@ -121,6 +121,13 @@ function addDependenciesToPackageJson(options) {
                 version: latest_versions_1.latestVersions['typescript'],
             },
         ].forEach((dependency) => (0, dependencies_1.addPackageJsonDependency)(host, dependency));
+        if (!options.zoneless) {
+            (0, dependencies_1.addPackageJsonDependency)(host, {
+                type: dependencies_1.NodeDependencyType.Default,
+                name: 'zone.js',
+                version: latest_versions_1.latestVersions['zone.js'],
+            });
+        }
         if (!options.skipInstall) {
             context.addTask(new tasks_1.NodePackageInstallTask());
         }
