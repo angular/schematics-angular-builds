@@ -99,11 +99,11 @@ function addRouteDeclarationToNgModule(options, routingModulePath) {
     };
 }
 function getRoutingModulePath(host, modulePath) {
-    const routingModulePath = modulePath.endsWith(find_module_1.ROUTING_MODULE_EXT) || modulePath.endsWith('-routing-module.ts')
+    const routingModulePath = modulePath.endsWith(find_module_1.ROUTING_MODULE_EXT_LEGACY) || modulePath.endsWith(find_module_1.ROUTING_MODULE_EXT)
         ? modulePath
         : modulePath
-            .replace(find_module_1.MODULE_EXT, find_module_1.ROUTING_MODULE_EXT)
-            .replace('-module.ts', '-routing-module.ts');
+            .replace(find_module_1.MODULE_EXT_LEGACY, find_module_1.ROUTING_MODULE_EXT_LEGACY)
+            .replace(find_module_1.MODULE_EXT, find_module_1.ROUTING_MODULE_EXT);
     return host.exists(routingModulePath) ? routingModulePath : undefined;
 }
 function buildRoute(options, modulePath) {
@@ -118,16 +118,7 @@ function default_1(options) {
             options.path = await (0, workspace_1.createDefaultPath)(host, options.project);
         }
         if (options.module) {
-            try {
-                options.module = (0, find_module_1.findModuleFromOptions)(host, options);
-            }
-            catch {
-                options.module = (0, find_module_1.findModuleFromOptions)(host, {
-                    ...options,
-                    moduleExt: '-module.ts',
-                    routingModuleExt: '-routing-module.ts',
-                });
-            }
+            options.module = (0, find_module_1.findModuleFromOptions)(host, options);
         }
         let routingModulePath;
         const isLazyLoadedModuleGen = !!(options.route && options.module);
