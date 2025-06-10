@@ -31,10 +31,10 @@ function addTsProjectReference(...paths) {
     };
 }
 function default_1(options) {
-    return async (host, context) => {
+    return async (host) => {
         const { appDir, appRootSelector, componentOptions, folderName, sourceDir } = await getAppOptions(host, options);
         return (0, schematics_1.chain)([
-            addAppToWorkspaceFile(options, appDir, folderName),
+            addAppToWorkspaceFile(options, appDir),
             addTsProjectReference('./' + (0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.app.json')),
             options.skipTests || options.minimal
                 ? (0, schematics_1.noop)()
@@ -128,13 +128,20 @@ function addDependenciesToPackageJson(options) {
                 version: latest_versions_1.latestVersions['zone.js'],
             });
         }
+        if (options.style === schema_1.Style.Less) {
+            (0, dependencies_1.addPackageJsonDependency)(host, {
+                type: dependencies_1.NodeDependencyType.Dev,
+                name: 'less',
+                version: latest_versions_1.latestVersions['less'],
+            });
+        }
         if (!options.skipInstall) {
             context.addTask(new tasks_1.NodePackageInstallTask());
         }
         return host;
     };
 }
-function addAppToWorkspaceFile(options, appDir, folderName) {
+function addAppToWorkspaceFile(options, appDir) {
     let projectRoot = appDir;
     if (projectRoot) {
         projectRoot += '/';
