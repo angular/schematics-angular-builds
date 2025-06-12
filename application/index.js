@@ -49,6 +49,7 @@ function default_1(options) {
                     routingScope: 'Root',
                     path: sourceDir,
                     project: options.name,
+                    typeSeparator: undefined,
                 }),
             (0, schematics_1.schematic)('component', {
                 name: 'app',

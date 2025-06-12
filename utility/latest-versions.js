@@ -16,7 +16,7 @@ exports.latestVersions = {
     // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
     Angular: '^20.0.0',
     NgPackagr: '^20.0.0',
-    DevkitBuildAngular: '^20.0.2+sha-0371f9a',
-    AngularBuild: '^20.0.2+sha-0371f9a',
-    AngularSSR: '^20.0.2+sha-0371f9a',
+    DevkitBuildAngular: '^20.0.2+sha-5c48b8e',
+    AngularBuild: '^20.0.2+sha-5c48b8e',
+    AngularSSR: '^20.0.2+sha-5c48b8e',
 };
