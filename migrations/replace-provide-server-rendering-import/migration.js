@@ -6,43 +6,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
-const ts = __importStar(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
-const dependencies_1 = require("../../utility/dependencies");
+const typescript_1 = __importDefault(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const dependency_1 = require("../../utility/dependency");
 const latest_versions_1 = require("../../utility/latest-versions");
 function* visit(directory) {
     for (const path of directory.subfiles) {
@@ -67,20 +37,20 @@ function* visit(directory) {
 }
 function default_1() {
     return async (tree) => {
-        let angularSSRAdded = false;
+        let rule;
         for (const [filePath, content] of visit(tree.root)) {
             let updatedContent = content;
             const ssrImports = new Set();
             const platformServerImports = new Set();
-            const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
+            const sourceFile = typescript_1.default.createSourceFile(filePath, content, typescript_1.default.ScriptTarget.Latest, true);
             sourceFile.forEachChild((node) => {
-                if (ts.isImportDeclaration(node)) {
+                if (typescript_1.default.isImportDeclaration(node)) {
                     const moduleSpecifier = node.moduleSpecifier.getText(sourceFile);
                     if (moduleSpecifier.includes('@angular/platform-server')) {
                         const importClause = node.importClause;
                         if (importClause &&
                             importClause.namedBindings &&
-                            ts.isNamedImports(importClause.namedBindings)) {
+                            typescript_1.default.isNamedImports(importClause.namedBindings)) {
                             const namedImports = importClause.namedBindings.elements.map((e) => e.getText(sourceFile));
                             namedImports.forEach((importName) => {
                                 if (importName === 'provideServerRendering') {
@@ -97,7 +67,7 @@ function default_1() {
                         const importClause = node.importClause;
                         if (importClause &&
                             importClause.namedBindings &&
-                            ts.isNamedImports(importClause.namedBindings)) {
+                            typescript_1.default.isNamedImports(importClause.namedBindings)) {
                             importClause.namedBindings.elements.forEach((e) => {
                                 ssrImports.add(e.getText(sourceFile));
                             });
@@ -118,16 +88,11 @@ function default_1() {
             }
             if (content !== updatedContent) {
                 tree.overwrite(filePath, updatedContent);
-                if (!angularSSRAdded) {
-                    (0, dependencies_1.addPackageJsonDependency)(tree, {
-                        name: '@angular/ssr',
-                        version: latest_versions_1.latestVersions.AngularSSR,
-                        type: dependencies_1.NodeDependencyType.Default,
-                        overwrite: false,
-                    });
-                    angularSSRAdded = true;
+                if (rule === undefined) {
+                    rule = (0, dependency_1.addDependency)('@angular/ssr', latest_versions_1.latestVersions.AngularSSR);
                 }
             }
         }
+        return rule;
     };
 }

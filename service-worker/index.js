@@ -47,7 +47,7 @@ const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/
 const utility_1 = require("../utility");
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
-const dependencies_1 = require("../utility/dependencies");
+const dependency_1 = require("../utility/dependency");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const paths_1 = require("../utility/paths");
 const project_targets_1 = require("../utility/project-targets");
@@ -56,7 +56,7 @@ const util_1 = require("../utility/standalone/util");
 const workspace_models_1 = require("../utility/workspace-models");
 function addDependencies() {
     return (host) => {
-        const coreDep = (0, dependencies_1.getPackageJsonDependency)(host, '@angular/core');
+        const coreDep = (0, dependency_1.getDependency)(host, '@angular/core');
         if (!coreDep) {
             throw new schematics_1.SchematicsException('Could not find "@angular/core" version.');
         }

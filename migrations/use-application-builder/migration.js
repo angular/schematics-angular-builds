@@ -10,7 +10,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
-const dependencies_1 = require("../../utility/dependencies");
 const dependency_1 = require("../../utility/dependency");
 const json_file_1 = require("../../utility/json-file");
 const latest_versions_1 = require("../../utility/latest-versions");
@@ -195,12 +194,8 @@ function updateProjects(tree, context) {
             // Add direct @angular/build dependencies and remove @angular-devkit/build-angular
             rules.push((0, dependency_1.addDependency)('@angular/build', latest_versions_1.latestVersions.DevkitBuildAngular, {
                 type: dependency_1.DependencyType.Dev,
-                // Always is set here since removePackageJsonDependency below does not automatically
-                // trigger the package manager execution.
-                install: dependency_1.InstallBehavior.Always,
                 existing: dependency_1.ExistingBehavior.Replace,
-            }));
-            (0, dependencies_1.removePackageJsonDependency)(tree, '@angular-devkit/build-angular');
+            }), (0, dependency_1.removeDependency)('@angular-devkit/build-angular'));
             // Add less dependency if any projects contain a Less stylesheet file.
             // This check does not consider Node.js packages due to the performance
             // cost of searching such a large directory structure. A build time error

@@ -9,14 +9,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
-const tasks_1 = require("@angular-devkit/schematics/tasks");
 const posix_1 = require("node:path/posix");
-const dependencies_1 = require("../utility/dependencies");
+const dependency_1 = require("../utility/dependency");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
+const LIBRARY_DEV_DEPENDENCIES = [
+    { name: '@angular/compiler-cli', version: latest_versions_1.latestVersions.Angular },
+    { name: '@angular/build', version: latest_versions_1.latestVersions.AngularBuild },
+    { name: 'ng-packagr', version: latest_versions_1.latestVersions.NgPackagr },
+    { name: 'typescript', version: latest_versions_1.latestVersions['typescript'] },
+];
 function updateTsConfig(packageName, ...paths) {
     return (host) => {
         if (!host.exists('tsconfig.json')) {
@@ -40,37 +45,19 @@ function addTsProjectReference(...paths) {
         file.modify(jsonPath, Array.isArray(value) ? [...value, ...newReferences] : newReferences);
     };
 }
-function addDependenciesToPackageJson() {
-    return (host) => {
-        [
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: '@angular/compiler-cli',
-                version: latest_versions_1.latestVersions.Angular,
-            },
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: '@angular/build',
-                version: latest_versions_1.latestVersions.AngularBuild,
-            },
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: 'ng-packagr',
-                version: latest_versions_1.latestVersions.NgPackagr,
-            },
-            {
-                type: dependencies_1.NodeDependencyType.Default,
-                name: 'tslib',
-                version: latest_versions_1.latestVersions['tslib'],
-            },
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: 'typescript',
-                version: latest_versions_1.latestVersions['typescript'],
-            },
-        ].forEach((dependency) => (0, dependencies_1.addPackageJsonDependency)(host, dependency));
-        return host;
-    };
+function addDependenciesToPackageJson(skipInstall) {
+    return (0, schematics_1.chain)([
+        ...LIBRARY_DEV_DEPENDENCIES.map((dependency) => (0, dependency_1.addDependency)(dependency.name, dependency.version, {
+            type: dependency_1.DependencyType.Dev,
+            existing: dependency_1.ExistingBehavior.Skip,
+            install: skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+        })),
+        (0, dependency_1.addDependency)('tslib', latest_versions_1.latestVersions['tslib'], {
+            type: dependency_1.DependencyType.Default,
+            existing: dependency_1.ExistingBehavior.Skip,
+            install: skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+        }),
+    ]);
 }
 function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDependency) {
     return (0, workspace_1.updateWorkspace)((workspace) => {
@@ -139,11 +126,11 @@ function default_1(options) {
             }),
             (0, schematics_1.move)(libDir),
         ]);
-        const hasZoneDependency = (0, dependencies_1.getPackageJsonDependency)(host, 'zone.js') !== null;
+        const hasZoneDependency = (0, dependency_1.getDependency)(host, 'zone.js') !== null;
         return (0, schematics_1.chain)([
             (0, schematics_1.mergeWith)(templateSource),
             addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
-            options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(),
+            options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(!!options.skipInstall),
             options.skipTsConfig ? (0, schematics_1.noop)() : updateTsConfig(packageName, './' + distRoot),
             options.skipTsConfig
                 ? (0, schematics_1.noop)()
@@ -172,11 +159,6 @@ function default_1(options) {
                 // inherits its `type` from the workspace.
                 type: '',
             }),
-            (_tree, context) => {
-                if (!options.skipPackageJson && !options.skipInstall) {
-                    context.addTask(new tasks_1.NodePackageInstallTask());
-                }
-            },
         ]);
     };
 }

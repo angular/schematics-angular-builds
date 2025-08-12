@@ -10,14 +10,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const tasks_1 = require("@angular-devkit/schematics/tasks");
-const dependencies_1 = require("../utility/dependencies");
+const dependency_1 = require("../utility/dependency");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 const schema_1 = require("./schema");
+const APPLICATION_DEV_DEPENDENCIES = [
+    { name: '@angular/compiler-cli', version: latest_versions_1.latestVersions.Angular },
+    { name: '@angular/build', version: latest_versions_1.latestVersions.AngularBuild },
+    { name: 'typescript', version: latest_versions_1.latestVersions['typescript'] },
+];
 function addTsProjectReference(...paths) {
     return (host) => {
         if (!host.exists('tsconfig.json')) {
@@ -104,43 +108,26 @@ function default_1(options) {
     };
 }
 function addDependenciesToPackageJson(options) {
-    return (host, context) => {
-        [
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: '@angular/compiler-cli',
-                version: latest_versions_1.latestVersions.Angular,
-            },
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: '@angular/build',
-                version: latest_versions_1.latestVersions.AngularBuild,
-            },
-            {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: 'typescript',
-                version: latest_versions_1.latestVersions['typescript'],
-            },
-        ].forEach((dependency) => (0, dependencies_1.addPackageJsonDependency)(host, dependency));
-        if (!options.zoneless) {
-            (0, dependencies_1.addPackageJsonDependency)(host, {
-                type: dependencies_1.NodeDependencyType.Default,
-                name: 'zone.js',
-                version: latest_versions_1.latestVersions['zone.js'],
-            });
-        }
-        if (options.style === schema_1.Style.Less) {
-            (0, dependencies_1.addPackageJsonDependency)(host, {
-                type: dependencies_1.NodeDependencyType.Dev,
-                name: 'less',
-                version: latest_versions_1.latestVersions['less'],
-            });
-        }
-        if (!options.skipInstall) {
-            context.addTask(new tasks_1.NodePackageInstallTask());
-        }
-        return host;
-    };
+    const rules = APPLICATION_DEV_DEPENDENCIES.map((dependency) => (0, dependency_1.addDependency)(dependency.name, dependency.version, {
+        type: dependency_1.DependencyType.Dev,
+        existing: dependency_1.ExistingBehavior.Skip,
+        install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+    }));
+    if (!options.zoneless) {
+        rules.push((0, dependency_1.addDependency)('zone.js', latest_versions_1.latestVersions['zone.js'], {
+            type: dependency_1.DependencyType.Default,
+            existing: dependency_1.ExistingBehavior.Skip,
+            install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+        }));
+    }
+    if (options.style === schema_1.Style.Less) {
+        rules.push((0, dependency_1.addDependency)('less', latest_versions_1.latestVersions['less'], {
+            type: dependency_1.DependencyType.Dev,
+            existing: dependency_1.ExistingBehavior.Skip,
+            install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+        }));
+    }
+    return (0, schematics_1.chain)(rules);
 }
 function addAppToWorkspaceFile(options, appDir) {
     let projectRoot = appDir;
