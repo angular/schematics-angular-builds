@@ -21,18 +21,18 @@ const paths_1 = require("../../utility/paths");
 const karma_config_analyzer_1 = require("./karma-config-analyzer");
 /**
  * Generates the default Karma configuration file content as a string.
- * @param relativePathToWorkspaceRoot The relative path from the project root to the workspace root.
- * @param folderName The name of the project folder.
+ * @param relativePathToWorkspaceRoot The relative path from the Karma config file to the workspace root.
+ * @param projectName The name of the project.
  * @param needDevkitPlugin A boolean indicating if the devkit plugin is needed.
  * @returns The content of the default `karma.conf.js` file.
  */
-async function generateDefaultKarmaConfig(relativePathToWorkspaceRoot, folderName, needDevkitPlugin) {
+async function generateDefaultKarmaConfig(relativePathToWorkspaceRoot, projectName, needDevkitPlugin) {
     const templatePath = posix_1.default.join(__dirname, '../../config/files/karma.conf.js.template');
     let template = await (0, promises_1.readFile)(templatePath, 'utf-8');
     // TODO: Replace this with the actual schematic templating logic.
     template = template
         .replace(/<%= relativePathToWorkspaceRoot %>/g, posix_1.default.normalize(relativePathToWorkspaceRoot).replace(/\\/g, '/'))
-        .replace(/<%= folderName %>/g, folderName);
+        .replace(/<%= folderName %>/g, projectName);
     const devkitPluginRegex = /<% if \(needDevkitPlugin\) { %>(.*?)<% } %>/gs;
     const replacement = needDevkitPlugin ? '$1' : '';
     template = template.replace(devkitPluginRegex, replacement);
@@ -41,8 +41,8 @@ async function generateDefaultKarmaConfig(relativePathToWorkspaceRoot, folderNam
 /**
  * Compares two Karma configuration analyses and returns the difference.
  * @param projectAnalysis The analysis of the project's configuration.
- * @param defaultAnalysis The analysis of the default configuration.
- * @returns A diff object representing the changes.
+ * @param defaultAnalysis The analysis of the default configuration to compare against.
+ * @returns A diff object representing the changes between the two configurations.
  */
 function compareKarmaConfigs(projectAnalysis, defaultAnalysis) {
     const added = new Map();
@@ -73,17 +73,17 @@ function compareKarmaConfigs(projectAnalysis, defaultAnalysis) {
 }
 /**
  * Checks if there are any differences in the provided Karma configuration diff.
- * @param diff The Karma configuration diff object.
- * @returns True if there are any differences, false otherwise.
+ * @param diff The Karma configuration diff object to check.
+ * @returns True if there are any differences; false otherwise.
  */
 function hasDifferences(diff) {
     return diff.added.size > 0 || diff.removed.size > 0 || diff.modified.size > 0;
 }
-async function compareKarmaConfigToDefault(projectConfigOrAnalysis, projectRoot, needDevkitPlugin) {
+async function compareKarmaConfigToDefault(projectConfigOrAnalysis, projectRoot, needDevkitPlugin, karmaConfigPath) {
     const projectAnalysis = typeof projectConfigOrAnalysis === 'string'
         ? (0, karma_config_analyzer_1.analyzeKarmaConfig)(projectConfigOrAnalysis)
         : projectConfigOrAnalysis;
-    const defaultContent = await generateDefaultKarmaConfig((0, paths_1.relativePathToWorkspaceRoot)(projectRoot), posix_1.default.basename(projectRoot), needDevkitPlugin);
+    const defaultContent = await generateDefaultKarmaConfig((0, paths_1.relativePathToWorkspaceRoot)(karmaConfigPath ? posix_1.default.dirname(karmaConfigPath) : projectRoot), posix_1.default.basename(projectRoot), needDevkitPlugin);
     const defaultAnalysis = (0, karma_config_analyzer_1.analyzeKarmaConfig)(defaultContent);
     return compareKarmaConfigs(projectAnalysis, defaultAnalysis);
 }
