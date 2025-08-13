@@ -6,6 +6,11 @@
  */
 export type Schema = {
     /**
+     * Specifies which AI tools to generate configuration files for. These file are used to
+     * improve the outputs of AI tools by following the best practices.
+     */
+    aiConfig?: AiConfig[];
+    /**
      * Configure the initial Git commit for the new repository.
      */
     commit?: CommitUnion;
@@ -111,6 +116,15 @@ export type Schema = {
      */
     zoneless?: boolean;
 };
+export declare enum AiConfig {
+    Claude = "claude",
+    Copilot = "copilot",
+    Cursor = "cursor",
+    Gemini = "gemini",
+    Jetbrains = "jetbrains",
+    None = "none",
+    Windsurf = "windsurf"
+}
 /**
  * Configure the initial Git commit for the new repository.
  */

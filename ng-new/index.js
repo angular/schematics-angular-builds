@@ -46,6 +46,9 @@ function default_1(options) {
         (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.empty)(), [
             (0, schematics_1.schematic)('workspace', workspaceOptions),
             options.createApplication ? (0, schematics_1.schematic)('application', applicationOptions) : schematics_1.noop,
+            (0, schematics_1.schematic)('ai-config', {
+                tool: options.aiConfig?.length ? options.aiConfig : undefined,
+            }),
             (0, schematics_1.move)(options.directory),
         ])),
         (_host, context) => {

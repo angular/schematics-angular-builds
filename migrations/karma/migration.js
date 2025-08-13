@@ -15,7 +15,7 @@ const karma_config_comparer_1 = require("./karma-config-comparer");
 function updateProjects(tree) {
     return (0, workspace_1.updateWorkspace)(async (workspace) => {
         const removableKarmaConfigs = new Map();
-        for (const [, project] of workspace.projects) {
+        for (const [projectName, project] of workspace.projects) {
             for (const [, target] of project.targets) {
                 let needDevkitPlugin = false;
                 switch (target.builder) {
@@ -41,7 +41,7 @@ function updateProjects(tree) {
                             isRemovable = false;
                         }
                         else {
-                            const diff = await (0, karma_config_comparer_1.compareKarmaConfigToDefault)(analysis, project.root, needDevkitPlugin, karmaConfig);
+                            const diff = await (0, karma_config_comparer_1.compareKarmaConfigToDefault)(analysis, projectName, karmaConfig, needDevkitPlugin);
                             isRemovable = !(0, karma_config_comparer_1.hasDifferences)(diff) && diff.isReliable;
                         }
                         removableKarmaConfigs.set(karmaConfig, isRemovable);

@@ -79,11 +79,11 @@ function compareKarmaConfigs(projectAnalysis, defaultAnalysis) {
 function hasDifferences(diff) {
     return diff.added.size > 0 || diff.removed.size > 0 || diff.modified.size > 0;
 }
-async function compareKarmaConfigToDefault(projectConfigOrAnalysis, projectRoot, needDevkitPlugin, karmaConfigPath) {
+async function compareKarmaConfigToDefault(projectConfigOrAnalysis, projectName, karmaConfigPath, needDevkitPlugin) {
     const projectAnalysis = typeof projectConfigOrAnalysis === 'string'
         ? (0, karma_config_analyzer_1.analyzeKarmaConfig)(projectConfigOrAnalysis)
         : projectConfigOrAnalysis;
-    const defaultContent = await generateDefaultKarmaConfig((0, paths_1.relativePathToWorkspaceRoot)(karmaConfigPath ? posix_1.default.dirname(karmaConfigPath) : projectRoot), posix_1.default.basename(projectRoot), needDevkitPlugin);
+    const defaultContent = await generateDefaultKarmaConfig((0, paths_1.relativePathToWorkspaceRoot)(posix_1.default.dirname(karmaConfigPath)), projectName, needDevkitPlugin);
     const defaultAnalysis = (0, karma_config_analyzer_1.analyzeKarmaConfig)(defaultContent);
     return compareKarmaConfigs(projectAnalysis, defaultAnalysis);
 }

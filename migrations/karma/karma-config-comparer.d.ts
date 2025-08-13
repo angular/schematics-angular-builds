@@ -51,7 +51,7 @@ export declare function hasDifferences(diff: KarmaConfigDiff): boolean;
  * @param karmaConfigPath The path to the Karma configuration file, used to resolve relative paths.
  * @returns A diff object representing the changes.
  */
-export declare function compareKarmaConfigToDefault(projectConfigContent: string, projectRoot: string, needDevkitPlugin: boolean, karmaConfigPath?: string): Promise<KarmaConfigDiff>;
+export declare function compareKarmaConfigToDefault(projectConfigContent: string, projectName: string, karmaConfigPath: string, needDevkitPlugin: boolean): Promise<KarmaConfigDiff>;
 /**
  * Compares a project's Karma configuration with the default configuration.
  * @param projectAnalysis The analysis of the project's configuration.
@@ -60,4 +60,4 @@ export declare function compareKarmaConfigToDefault(projectConfigContent: string
  * @param karmaConfigPath The path to the Karma configuration file, used to resolve relative paths.
  * @returns A diff object representing the changes.
  */
-export declare function compareKarmaConfigToDefault(projectAnalysis: KarmaConfigAnalysis, projectRoot: string, needDevkitPlugin: boolean, karmaConfigPath?: string): Promise<KarmaConfigDiff>;
+export declare function compareKarmaConfigToDefault(projectAnalysis: KarmaConfigAnalysis, projectName: string, karmaConfigPath: string, needDevkitPlugin: boolean): Promise<KarmaConfigDiff>;
