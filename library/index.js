@@ -156,6 +156,9 @@ function default_1(options) {
                     flat: true,
                     path: sourceDir,
                     project: packageName,
+                    // Explicitly set the `typeSeparator` this also ensures that the generated files are valid even if the `module` schematic
+                    // inherits its `typeSeparator` from the workspace.
+                    typeSeparator: '-',
                 }),
             (0, schematics_1.schematic)('component', {
                 name: options.name,
