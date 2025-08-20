@@ -140,7 +140,6 @@ export type CommitObject = {
  */
 export declare enum PackageManager {
     Bun = "bun",
-    Cnpm = "cnpm",
     Npm = "npm",
     Pnpm = "pnpm",
     Yarn = "yarn"
