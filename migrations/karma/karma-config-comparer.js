@@ -27,7 +27,7 @@ const karma_config_analyzer_1 = require("./karma-config-analyzer");
  * @returns The content of the default `karma.conf.js` file.
  */
 async function generateDefaultKarmaConfig(relativePathToWorkspaceRoot, projectName, needDevkitPlugin) {
-    const templatePath = posix_1.default.join(__dirname, '../../config/files/karma.conf.js.template');
+    const templatePath = require.resolve('../../config/files/karma.conf.js.template');
     let template = await (0, promises_1.readFile)(templatePath, 'utf-8');
     // TODO: Replace this with the actual schematic templating logic.
     template = template
