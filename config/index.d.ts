@@ -7,4 +7,5 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { Schema as ConfigOptions } from './schema';
-export default function (options: ConfigOptions): Rule;
+declare const _default: (options: ConfigOptions) => Rule;
+export default _default;

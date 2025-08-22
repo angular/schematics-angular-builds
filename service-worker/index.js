@@ -40,7 +40,6 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = default_1;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
@@ -50,6 +49,7 @@ const change_1 = require("../utility/change");
 const dependency_1 = require("../utility/dependency");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const paths_1 = require("../utility/paths");
+const project_1 = require("../utility/project");
 const project_targets_1 = require("../utility/project-targets");
 const app_config_1 = require("../utility/standalone/app_config");
 const util_1 = require("../utility/standalone/util");
@@ -105,50 +105,43 @@ function getTsSourceFile(host, path) {
     const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
     return source;
 }
-function default_1(options) {
-    return async (host) => {
-        const workspace = await (0, utility_1.readWorkspace)(host);
-        const project = workspace.projects.get(options.project);
-        if (!project) {
-            throw new schematics_1.SchematicsException(`Invalid project name (${options.project})`);
+exports.default = (0, project_1.createProjectSchematic)(async (options, { project, workspace, tree }) => {
+    if (project.extensions.projectType !== 'application') {
+        throw new schematics_1.SchematicsException(`Service worker requires a project type of "application".`);
+    }
+    const buildTarget = project.targets.get('build');
+    if (!buildTarget) {
+        throw (0, project_targets_1.targetBuildNotFoundError)();
+    }
+    const buildOptions = buildTarget.options;
+    const browserEntryPoint = await (0, util_1.getMainFilePath)(tree, options.project);
+    const ngswConfigPath = (0, core_1.join)((0, core_1.normalize)(project.root), 'ngsw-config.json');
+    if (buildTarget.builder === workspace_models_1.Builders.Application ||
+        buildTarget.builder === workspace_models_1.Builders.BuildApplication) {
+        const productionConf = buildTarget.configurations?.production;
+        if (productionConf) {
+            productionConf.serviceWorker = ngswConfigPath;
         }
-        if (project.extensions.projectType !== 'application') {
-            throw new schematics_1.SchematicsException(`Service worker requires a project type of "application".`);
-        }
-        const buildTarget = project.targets.get('build');
-        if (!buildTarget) {
-            throw (0, project_targets_1.targetBuildNotFoundError)();
-        }
-        const buildOptions = buildTarget.options;
-        const browserEntryPoint = await (0, util_1.getMainFilePath)(host, options.project);
-        const ngswConfigPath = (0, core_1.join)((0, core_1.normalize)(project.root), 'ngsw-config.json');
-        if (buildTarget.builder === workspace_models_1.Builders.Application ||
-            buildTarget.builder === workspace_models_1.Builders.BuildApplication) {
-            const productionConf = buildTarget.configurations?.production;
-            if (productionConf) {
-                productionConf.serviceWorker = ngswConfigPath;
-            }
-        }
-        else {
-            buildOptions.serviceWorker = true;
-            buildOptions.ngswConfigPath = ngswConfigPath;
-        }
-        await (0, utility_1.writeWorkspace)(host, workspace);
-        return (0, schematics_1.chain)([
-            addDependencies(),
-            (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
-                (0, schematics_1.applyTemplates)({
-                    ...options,
-                    relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(project.root),
-                }),
-                (0, schematics_1.move)(project.root),
-            ])),
-            (0, ng_ast_utils_1.isStandaloneApp)(host, browserEntryPoint)
-                ? addProvideServiceWorker(options.project, browserEntryPoint)
-                : updateAppModule(browserEntryPoint),
-        ]);
-    };
-}
+    }
+    else {
+        buildOptions.serviceWorker = true;
+        buildOptions.ngswConfigPath = ngswConfigPath;
+    }
+    await (0, utility_1.writeWorkspace)(tree, workspace);
+    return (0, schematics_1.chain)([
+        addDependencies(),
+        (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+            (0, schematics_1.applyTemplates)({
+                ...options,
+                relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(project.root),
+            }),
+            (0, schematics_1.move)(project.root),
+        ])),
+        (0, ng_ast_utils_1.isStandaloneApp)(tree, browserEntryPoint)
+            ? addProvideServiceWorker(options.project, browserEntryPoint)
+            : updateAppModule(browserEntryPoint),
+    ]);
+});
 function addImport(host, filePath, symbolName, moduleName) {
     const moduleSource = getTsSourceFile(host, filePath);
     const change = (0, ast_utils_1.insertImport)(moduleSource, filePath, symbolName, moduleName);

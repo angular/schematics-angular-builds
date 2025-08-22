@@ -7,7 +7,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = default_1;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const node_path_1 = require("node:path");
@@ -15,9 +14,9 @@ const utility_1 = require("../utility");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
+const project_1 = require("../utility/project");
 const project_targets_1 = require("../utility/project-targets");
 const util_1 = require("../utility/standalone/util");
-const workspace_1 = require("../utility/workspace");
 const SERVE_SSR_TARGET_NAME = 'serve-ssr';
 const PRERENDER_TARGET_NAME = 'prerender';
 const DEFAULT_BROWSER_DIR = 'browser';
@@ -269,34 +268,27 @@ function addServerFile(projectSourceRoot, options, isStandalone) {
         ]));
     };
 }
-function default_1(options) {
-    return async (host, context) => {
-        const browserEntryPoint = await (0, util_1.getMainFilePath)(host, options.project);
-        const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(host, browserEntryPoint);
-        const workspace = await (0, workspace_1.getWorkspace)(host);
-        const clientProject = workspace.projects.get(options.project);
-        if (!clientProject) {
-            throw (0, project_targets_1.targetBuildNotFoundError)();
-        }
-        const usingApplicationBuilder = (0, project_targets_1.isUsingApplicationBuilder)(clientProject);
-        const sourceRoot = clientProject.sourceRoot ?? node_path_1.posix.join(clientProject.root, 'src');
-        return (0, schematics_1.chain)([
-            (0, schematics_1.schematic)('server', {
-                ...options,
-                skipInstall: true,
-            }),
-            ...(usingApplicationBuilder
-                ? [
-                    updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
-                    updateApplicationBuilderTsConfigRule(options),
-                ]
-                : [
-                    updateWebpackBuilderServerTsConfigRule(options),
-                    updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
-                ]),
-            addServerFile(sourceRoot, options, isStandalone),
-            addScriptsRule(options, usingApplicationBuilder),
-            addDependencies(options, usingApplicationBuilder),
-        ]);
-    };
-}
+exports.default = (0, project_1.createProjectSchematic)(async (options, { project, tree, context }) => {
+    const browserEntryPoint = await (0, util_1.getMainFilePath)(tree, options.project);
+    const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(tree, browserEntryPoint);
+    const usingApplicationBuilder = (0, project_targets_1.isUsingApplicationBuilder)(project);
+    const sourceRoot = project.sourceRoot ?? node_path_1.posix.join(project.root, 'src');
+    return (0, schematics_1.chain)([
+        (0, schematics_1.schematic)('server', {
+            ...options,
+            skipInstall: true,
+        }),
+        ...(usingApplicationBuilder
+            ? [
+                updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
+                updateApplicationBuilderTsConfigRule(options),
+            ]
+            : [
+                updateWebpackBuilderServerTsConfigRule(options),
+                updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
+            ]),
+        addServerFile(sourceRoot, options, isStandalone),
+        addScriptsRule(options, usingApplicationBuilder),
+        addDependencies(options, usingApplicationBuilder),
+    ]);
+});

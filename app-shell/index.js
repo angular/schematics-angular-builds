@@ -10,14 +10,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
 const typescript_1 = __importDefault(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
-const project_targets_1 = require("../utility/project-targets");
+const project_1 = require("../utility/project");
 const util_1 = require("../utility/standalone/util");
 const workspace_1 = require("../utility/workspace");
 function getSourceFile(host, path) {
@@ -149,25 +148,18 @@ function addServerRoutingConfig(options, isStandalone) {
         host.commitUpdate(recorder);
     };
 }
-function default_1(options) {
-    return async (tree) => {
-        const browserEntryPoint = await (0, util_1.getMainFilePath)(tree, options.project);
-        const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(tree, browserEntryPoint);
-        const workspace = await (0, workspace_1.getWorkspace)(tree);
-        const project = workspace.projects.get(options.project);
-        if (!project) {
-            throw (0, project_targets_1.targetBuildNotFoundError)();
-        }
-        return (0, schematics_1.chain)([
-            validateProject(browserEntryPoint),
-            (0, schematics_1.schematic)('server', options),
-            addServerRoutingConfig(options, isStandalone),
-            (0, schematics_1.schematic)('component', {
-                name: 'app-shell',
-                module: 'app.module.server.ts',
-                project: options.project,
-                standalone: isStandalone,
-            }),
-        ]);
-    };
-}
+exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }) => {
+    const browserEntryPoint = await (0, util_1.getMainFilePath)(tree, options.project);
+    const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(tree, browserEntryPoint);
+    return (0, schematics_1.chain)([
+        validateProject(browserEntryPoint),
+        (0, schematics_1.schematic)('server', options),
+        addServerRoutingConfig(options, isStandalone),
+        (0, schematics_1.schematic)('component', {
+            name: 'app-shell',
+            module: 'app.module.server.ts',
+            project: options.project,
+            standalone: isStandalone,
+        }),
+    ]);
+});
