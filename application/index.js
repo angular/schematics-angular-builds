@@ -36,6 +36,10 @@ function addTsProjectReference(...paths) {
 }
 function default_1(options) {
     return async (host) => {
+        const isTailwind = options.style === schema_1.Style.Tailwind;
+        if (isTailwind) {
+            options.style = schema_1.Style.Css;
+        }
         const { appDir, appRootSelector, componentOptions, folderName, sourceDir } = await getAppOptions(host, options);
         return (0, schematics_1.chain)([
             addAppToWorkspaceFile(options, appDir),
@@ -104,6 +108,11 @@ function default_1(options) {
                 })
                 : (0, schematics_1.noop)(),
             options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(options),
+            isTailwind
+                ? (0, schematics_1.schematic)('tailwind', {
+                    project: options.name,
+                })
+                : (0, schematics_1.noop)(),
         ]);
     };
 }

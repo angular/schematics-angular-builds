@@ -151,7 +151,8 @@ export declare enum Style {
     Css = "css",
     Less = "less",
     Sass = "sass",
-    Scss = "scss"
+    Scss = "scss",
+    Tailwind = "tailwind"
 }
 /**
  * Sets the view encapsulation mode for components in the initial project. This determines

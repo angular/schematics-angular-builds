@@ -12,6 +12,7 @@ var Style;
     Style["Less"] = "less";
     Style["Sass"] = "sass";
     Style["Scss"] = "scss";
+    Style["Tailwind"] = "tailwind";
 })(Style || (exports.Style = Style = {}));
 /**
  * Sets the view encapsulation mode for the application's components. This determines how
