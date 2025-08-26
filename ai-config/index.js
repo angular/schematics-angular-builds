@@ -39,11 +39,13 @@ const AI_TOOLS = {
     },
 };
 function default_1({ tool }) {
-    if (!tool || tool.includes(schema_1.Tool.None)) {
+    if (!tool) {
         return (0, schematics_1.noop)();
     }
-    const files = tool.map((selectedTool) => AI_TOOLS[selectedTool]);
-    const rules = files.map(({ rulesName, directory, frontmatter }) => (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+    const rules = tool
+        .filter((tool) => tool !== schema_1.Tool.None)
+        .map((selectedTool) => AI_TOOLS[selectedTool])
+        .map(({ rulesName, directory, frontmatter }) => (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
         (0, schematics_1.applyTemplates)({
             ...schematics_1.strings,
             rulesName,
