@@ -57,7 +57,6 @@ exports.isImported = isImported;
 exports.getRouterModuleDeclaration = getRouterModuleDeclaration;
 exports.addRouteDeclarationToModule = addRouteDeclarationToModule;
 exports.hasTopLevelIdentifier = hasTopLevelIdentifier;
-const core_1 = require("@angular-devkit/core");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const change_1 = require("./change");
 const eol_1 = require("./eol");
@@ -312,7 +311,11 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
         let toInsert;
         if (node.properties.length == 0) {
             position = node.getEnd() - 1;
-            toInsert = `\n  ${metadataField}: [\n${core_1.tags.indentBy(4) `${symbolName}`}\n  ]\n`;
+            toInsert = `
+  ${metadataField}: [
+${' '.repeat(4)}${symbolName}
+  ]
+`;
         }
         else {
             const childNode = node.properties[node.properties.length - 1];
@@ -323,7 +326,7 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
             if (matches) {
                 toInsert =
                     `,${matches[0]}${metadataField}: [${matches[1]}` +
-                        `${core_1.tags.indentBy(matches[2].length + 2) `${symbolName}`}${matches[0]}]`;
+                        `${' '.repeat(matches[2].length + 2)}${symbolName}${matches[0]}]`;
             }
             else {
                 toInsert = `, ${metadataField}: [${symbolName}]`;
@@ -349,8 +352,8 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
     const assignmentInit = assignment.initializer;
     const elements = assignmentInit.elements;
     if (elements.length) {
-        const symbolsArray = elements.map((node) => core_1.tags.oneLine `${node.getText()}`);
-        if (symbolsArray.includes(core_1.tags.oneLine `${symbolName}`)) {
+        const symbolsArray = elements.map((node) => node.getText());
+        if (symbolsArray.includes(symbolName)) {
             return [];
         }
         expression = elements[elements.length - 1];
@@ -363,14 +366,14 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
     if (ts.isArrayLiteralExpression(expression)) {
         // We found the field but it's empty. Insert it just before the `]`.
         position--;
-        toInsert = `\n${core_1.tags.indentBy(4) `${symbolName}`}\n  `;
+        toInsert = `\n${' '.repeat(4)}${symbolName}\n  `;
     }
     else {
         // Get the indentation of the last element, if any.
         const text = expression.getFullText(source);
         const matches = text.match(/^(\r?\n)(\s*)/);
         if (matches) {
-            toInsert = `,${matches[1]}${core_1.tags.indentBy(matches[2].length) `${symbolName}`}`;
+            toInsert = `,${matches[1]}${' '.repeat(matches[2].length)}${symbolName}`;
         }
         else {
             toInsert = `, ${symbolName}`;

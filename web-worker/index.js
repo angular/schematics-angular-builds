@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
+const posix_1 = require("node:path/posix");
 const parse_name_1 = require("../utility/parse-name");
 const paths_1 = require("../utility/paths");
 const project_1 = require("../utility/project");
@@ -33,18 +33,18 @@ function addSnippet(options) {
         }
         const siblingModulePath = `${options.path}/${siblingModules[0]}`;
         const logMessage = 'console.log(`page got message: ${data}`);';
-        const workerCreationSnippet = core_1.tags.stripIndent `
-      if (typeof Worker !== 'undefined') {
-        // Create a new
-        const worker = new Worker(new URL('./${options.name}.worker', import.meta.url));
-        worker.onmessage = ({ data }) => {
-          ${logMessage}
-        };
-        worker.postMessage('hello');
-      } else {
-        // Web Workers are not supported in this environment.
-        // You should add a fallback so that your program still executes correctly.
-      }
+        const workerCreationSnippet = `
+if (typeof Worker !== 'undefined') {
+  // Create a new
+  const worker = new Worker(new URL('./${options.name}.worker', import.meta.url));
+  worker.onmessage = ({ data }) => {
+    ${logMessage}
+  };
+  worker.postMessage('hello');
+} else {
+  // Web Workers are not supported in this environment.
+  // You should add a fallback so that your program still executes correctly.
+}
     `;
         // Append the worker creation snippet.
         const originalContent = host.readText(siblingModulePath);
@@ -85,7 +85,7 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project }) =
             if (!buildTarget) {
                 throw new Error(`Build target is not defined for this project.`);
             }
-            const workerConfigPath = (0, core_1.join)((0, core_1.normalize)(root), 'tsconfig.worker.json');
+            const workerConfigPath = (0, posix_1.join)(root, 'tsconfig.worker.json');
             (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
             if (testTarget) {
                 (testTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
