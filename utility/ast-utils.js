@@ -115,6 +115,7 @@ function insertImport(source, fileToEdit, symbolName, fileName, isDefault = fals
         ` from '${fileName}'${insertAtBeginning ? `;${eol}` : ''}`;
     return insertAfterLastOccurrence(allImports, toInsert, fileToEdit, fallbackPos, ts.SyntaxKind.StringLiteral);
 }
+const findNodesCache = new WeakMap();
 function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
     if (!node || max == 0) {
         return [];
@@ -122,6 +123,13 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
     const test = typeof kindOrGuard === 'function'
         ? kindOrGuard
         : (node) => node.kind === kindOrGuard;
+    // Caching is only supported for the entire file
+    if (ts.isSourceFile(node)) {
+        const sourceFileCache = findNodesCache.get(node);
+        if (sourceFileCache?.has(kindOrGuard)) {
+            return sourceFileCache.get(kindOrGuard);
+        }
+    }
     const arr = [];
     if (test(node)) {
         arr.push(node);
@@ -140,6 +148,14 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
             }
         }
     }
+    if (ts.isSourceFile(node)) {
+        let sourceFileCache = findNodesCache.get(node);
+        if (!sourceFileCache) {
+            sourceFileCache = new Map();
+            findNodesCache.set(node, sourceFileCache);
+        }
+        sourceFileCache.set(kindOrGuard, arr);
+    }
     return arr;
 }
 /**
@@ -149,17 +165,12 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
  */
 function getSourceNodes(sourceFile) {
     const nodes = [sourceFile];
-    const result = [];
-    while (nodes.length > 0) {
-        const node = nodes.shift();
-        if (node) {
-            result.push(node);
-            if (node.getChildCount(sourceFile) >= 0) {
-                nodes.unshift(...node.getChildren());
-            }
-        }
+    // NOTE: nodes.length changes inside of the loop but we only append to the end
+    for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        nodes.push(...node.getChildren(sourceFile));
     }
-    return result;
+    return nodes;
 }
 function findNode(node, kind, text) {
     if (node.kind === kind && node.getText() === text) {
