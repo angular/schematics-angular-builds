@@ -5,6 +5,11 @@
  */
 export type Schema = {
     /**
+     * When true, the 'type' option will be appended to the generated class name. When false,
+     * only the file name will include the type.
+     */
+    addTypeToClassName?: boolean;
+    /**
      * Creates files at the top level of the project or the given path. If set to false, a new
      * folder with the service's name will be created to contain the files.
      */

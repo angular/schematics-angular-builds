@@ -5,6 +5,11 @@
  */
 export type Schema = {
     /**
+     * When true, the 'type' option will be appended to the generated class name. When false,
+     * only the file name will include the type.
+     */
+    addTypeToClassName?: boolean;
+    /**
      * Configures the change detection strategy for the component.
      */
     changeDetection?: ChangeDetection;

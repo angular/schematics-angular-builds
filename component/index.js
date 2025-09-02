@@ -37,7 +37,9 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
     options.path = parsedPath.path;
     options.selector = options.selector || buildSelector(options, (project && project.prefix) || '');
     (0, validation_1.validateHtmlSelector)(options.selector);
-    (0, validation_1.validateClassName)(schematics_1.strings.classify(options.name));
+    const classifiedName = schematics_1.strings.classify(options.name) +
+        (options.addTypeToClassName && options.type ? schematics_1.strings.classify(options.type) : '');
+    (0, validation_1.validateClassName)(classifiedName);
     const skipStyleFile = options.inlineStyle || options.style === schema_1.Style.None;
     const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
         options.skipTests ? (0, schematics_1.filter)((path) => !path.endsWith('.spec.ts.template')) : (0, schematics_1.noop)(),
@@ -48,6 +50,8 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
             'if-flat': (s) => (options.flat ? '' : s),
             'ngext': options.ngHtml ? '.ng' : '',
             ...options,
+            // Add a new variable for the classified name, conditionally including the type
+            classifiedName,
         }),
         !options.type
             ? (0, schematics_1.forEach)(((file) => {

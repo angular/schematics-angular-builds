@@ -26,6 +26,13 @@ export type Schema = {
      */
     directory?: string;
     /**
+     * The file naming convention to use for generated files. The '2025' style guide (default)
+     * uses a concise format (e.g., `app.ts` for the root component), while the '2016' style
+     * guide includes the type in the file name (e.g., `app.component.ts`). For more
+     * information, see the Angular Style Guide (https://angular.dev/style-guide).
+     */
+    fileNameStyleGuide?: FileNameStyleGuide;
+    /**
      * Include the styles for the initial application's root component directly within the
      * `app.component.ts` file. By default, a separate stylesheet file (e.g.,
      * `app.component.css`) is created.
@@ -135,6 +142,16 @@ export type CommitObject = {
     name: string;
     [property: string]: any;
 };
+/**
+ * The file naming convention to use for generated files. The '2025' style guide (default)
+ * uses a concise format (e.g., `app.ts` for the root component), while the '2016' style
+ * guide includes the type in the file name (e.g., `app.component.ts`). For more
+ * information, see the Angular Style Guide (https://angular.dev/style-guide).
+ */
+export declare enum FileNameStyleGuide {
+    The2016 = "2016",
+    The2025 = "2025"
+}
 /**
  * The package manager used to install dependencies.
  */

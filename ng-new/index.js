@@ -41,6 +41,7 @@ function default_1(options) {
         standalone: options.standalone,
         ssr: options.ssr,
         zoneless: options.zoneless,
+        fileNameStyleGuide: options.fileNameStyleGuide,
     };
     return (0, schematics_1.chain)([
         (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.empty)(), [

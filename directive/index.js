@@ -35,12 +35,17 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
     options.path = parsedPath.path;
     options.selector = options.selector || buildSelector(options, project.prefix || '');
     (0, validation_1.validateHtmlSelector)(options.selector);
-    (0, validation_1.validateClassName)(schematics_1.strings.classify(options.name));
+    const classifiedName = schematics_1.strings.classify(options.name) +
+        (options.addTypeToClassName && options.type ? schematics_1.strings.classify(options.type) : '');
+    (0, validation_1.validateClassName)(classifiedName);
     return (0, schematics_1.chain)([
         (0, add_declaration_to_ng_module_1.addDeclarationToNgModule)({
             type: 'directive',
             ...options,
         }),
-        (0, generate_from_files_1.generateFromFiles)(options),
+        (0, generate_from_files_1.generateFromFiles)({
+            ...options,
+            classifiedName,
+        }),
     ]);
 });
