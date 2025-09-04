@@ -114,6 +114,7 @@ function default_1(options) {
             isTailwind
                 ? (0, schematics_1.schematic)('tailwind', {
                     project: options.name,
+                    skipInstall: options.skipInstall,
                 })
                 : (0, schematics_1.noop)(),
         ]);

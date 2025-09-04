@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { type Rule } from '@angular-devkit/schematics';
-declare const _default: (options: {
-    project: string;
-}) => Rule;
+import { Schema as TailwindOptions } from './schema';
+declare const _default: (options: TailwindOptions) => Rule;
 export default _default;

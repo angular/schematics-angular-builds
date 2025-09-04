@@ -100,6 +100,7 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project }) =
         ...TAILWIND_DEPENDENCIES.map((name) => (0, utility_1.addDependency)(name, latest_versions_1.latestVersions[name], {
             type: utility_1.DependencyType.Dev,
             existing: utility_1.ExistingBehavior.Skip,
+            install: options.skipInstall ? utility_1.InstallBehavior.None : utility_1.InstallBehavior.Auto,
         })),
     ]);
 });
