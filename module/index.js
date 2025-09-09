@@ -40,6 +40,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
@@ -47,7 +48,6 @@ const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
 const find_module_1 = require("../utility/find-module");
 const parse_name_1 = require("../utility/parse-name");
-const project_1 = require("../utility/project");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const schema_1 = require("./schema");
@@ -112,51 +112,53 @@ function buildRoute(options, modulePath) {
     const loadChildren = `() => import('${relativeModulePath}').then(m => m.${moduleName})`;
     return `{ path: '${options.route}', loadChildren: ${loadChildren} }`;
 }
-exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }) => {
-    if (options.path === undefined) {
-        options.path = await (0, workspace_1.createDefaultPath)(tree, options.project);
-    }
-    if (options.module) {
-        options.module = (0, find_module_1.findModuleFromOptions)(tree, options);
-    }
-    let routingModulePath;
-    const isLazyLoadedModuleGen = !!(options.route && options.module);
-    if (isLazyLoadedModuleGen) {
-        options.routingScope = schema_1.RoutingScope.Child;
-        routingModulePath = getRoutingModulePath(tree, options.module);
-    }
-    const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
-    options.name = parsedPath.name;
-    options.path = parsedPath.path;
-    (0, validation_1.validateClassName)(schematics_1.strings.classify(options.name));
-    const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
-        options.routing || (isLazyLoadedModuleGen && routingModulePath)
-            ? (0, schematics_1.noop)()
-            : (0, schematics_1.filter)((path) => !path.includes('-routing')),
-        (0, schematics_1.applyTemplates)({
-            ...schematics_1.strings,
-            'if-flat': (s) => (options.flat ? '' : s),
-            lazyRoute: isLazyLoadedModuleGen,
-            lazyRouteWithoutRouteModule: isLazyLoadedModuleGen && !routingModulePath,
-            lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
-            ...options,
-        }),
-        (0, schematics_1.move)(parsedPath.path),
-    ]);
-    const moduleDasherized = schematics_1.strings.dasherize(options.name);
-    const modulePath = `${!options.flat ? moduleDasherized + '/' : ''}${moduleDasherized}${options.typeSeparator}module.ts`;
-    const componentOptions = {
-        module: modulePath,
-        flat: options.flat,
-        name: options.name,
-        path: options.path,
-        project: options.project,
-        standalone: false,
+function default_1(options) {
+    return async (host) => {
+        if (options.path === undefined) {
+            options.path = await (0, workspace_1.createDefaultPath)(host, options.project);
+        }
+        if (options.module) {
+            options.module = (0, find_module_1.findModuleFromOptions)(host, options);
+        }
+        let routingModulePath;
+        const isLazyLoadedModuleGen = !!(options.route && options.module);
+        if (isLazyLoadedModuleGen) {
+            options.routingScope = schema_1.RoutingScope.Child;
+            routingModulePath = getRoutingModulePath(host, options.module);
+        }
+        const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
+        options.name = parsedPath.name;
+        options.path = parsedPath.path;
+        (0, validation_1.validateClassName)(schematics_1.strings.classify(options.name));
+        const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+            options.routing || (isLazyLoadedModuleGen && routingModulePath)
+                ? (0, schematics_1.noop)()
+                : (0, schematics_1.filter)((path) => !path.includes('-routing')),
+            (0, schematics_1.applyTemplates)({
+                ...schematics_1.strings,
+                'if-flat': (s) => (options.flat ? '' : s),
+                lazyRoute: isLazyLoadedModuleGen,
+                lazyRouteWithoutRouteModule: isLazyLoadedModuleGen && !routingModulePath,
+                lazyRouteWithRouteModule: isLazyLoadedModuleGen && !!routingModulePath,
+                ...options,
+            }),
+            (0, schematics_1.move)(parsedPath.path),
+        ]);
+        const moduleDasherized = schematics_1.strings.dasherize(options.name);
+        const modulePath = `${!options.flat ? moduleDasherized + '/' : ''}${moduleDasherized}${options.typeSeparator}module.ts`;
+        const componentOptions = {
+            module: modulePath,
+            flat: options.flat,
+            name: options.name,
+            path: options.path,
+            project: options.project,
+            standalone: false,
+        };
+        return (0, schematics_1.chain)([
+            !isLazyLoadedModuleGen ? addImportToNgModule(options) : (0, schematics_1.noop)(),
+            addRouteDeclarationToNgModule(options, routingModulePath),
+            (0, schematics_1.mergeWith)(templateSource),
+            isLazyLoadedModuleGen ? (0, schematics_1.schematic)('component', componentOptions) : (0, schematics_1.noop)(),
+        ]);
     };
-    return (0, schematics_1.chain)([
-        !isLazyLoadedModuleGen ? addImportToNgModule(options) : (0, schematics_1.noop)(),
-        addRouteDeclarationToNgModule(options, routingModulePath),
-        (0, schematics_1.mergeWith)(templateSource),
-        isLazyLoadedModuleGen ? (0, schematics_1.schematic)('component', componentOptions) : (0, schematics_1.noop)(),
-    ]);
-});
+}

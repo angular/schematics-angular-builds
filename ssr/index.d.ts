@@ -7,5 +7,4 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { Schema as SSROptions } from './schema';
-declare const _default: (options: SSROptions) => Rule;
-export default _default;
+export default function (options: SSROptions): Rule;

@@ -7,5 +7,4 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { Schema as WebWorkerOptions } from './schema';
-declare const _default: (options: WebWorkerOptions) => Rule;
-export default _default;
+export default function (options: WebWorkerOptions): Rule;

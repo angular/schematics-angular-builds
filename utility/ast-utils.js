@@ -57,6 +57,7 @@ exports.isImported = isImported;
 exports.getRouterModuleDeclaration = getRouterModuleDeclaration;
 exports.addRouteDeclarationToModule = addRouteDeclarationToModule;
 exports.hasTopLevelIdentifier = hasTopLevelIdentifier;
+const core_1 = require("@angular-devkit/core");
 const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const change_1 = require("./change");
 const eol_1 = require("./eol");
@@ -115,7 +116,6 @@ function insertImport(source, fileToEdit, symbolName, fileName, isDefault = fals
         ` from '${fileName}'${insertAtBeginning ? `;${eol}` : ''}`;
     return insertAfterLastOccurrence(allImports, toInsert, fileToEdit, fallbackPos, ts.SyntaxKind.StringLiteral);
 }
-const findNodesCache = new WeakMap();
 function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
     if (!node || max == 0) {
         return [];
@@ -123,13 +123,6 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
     const test = typeof kindOrGuard === 'function'
         ? kindOrGuard
         : (node) => node.kind === kindOrGuard;
-    // Caching is only supported for the entire file
-    if (ts.isSourceFile(node)) {
-        const sourceFileCache = findNodesCache.get(node);
-        if (sourceFileCache?.has(kindOrGuard)) {
-            return sourceFileCache.get(kindOrGuard);
-        }
-    }
     const arr = [];
     if (test(node)) {
         arr.push(node);
@@ -148,14 +141,6 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
             }
         }
     }
-    if (ts.isSourceFile(node)) {
-        let sourceFileCache = findNodesCache.get(node);
-        if (!sourceFileCache) {
-            sourceFileCache = new Map();
-            findNodesCache.set(node, sourceFileCache);
-        }
-        sourceFileCache.set(kindOrGuard, arr);
-    }
     return arr;
 }
 /**
@@ -165,12 +150,17 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
  */
 function getSourceNodes(sourceFile) {
     const nodes = [sourceFile];
-    // NOTE: nodes.length changes inside of the loop but we only append to the end
-    for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        nodes.push(...node.getChildren(sourceFile));
+    const result = [];
+    while (nodes.length > 0) {
+        const node = nodes.shift();
+        if (node) {
+            result.push(node);
+            if (node.getChildCount(sourceFile) >= 0) {
+                nodes.unshift(...node.getChildren());
+            }
+        }
     }
-    return nodes;
+    return result;
 }
 function findNode(node, kind, text) {
     if (node.kind === kind && node.getText() === text) {
@@ -322,11 +312,7 @@ function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbol
         let toInsert;
         if (node.properties.length == 0) {
             position = node.getEnd() - 1;
-            toInsert = `
-  ${metadataField}: [
-${' '.repeat(4)}${symbolName}
-  ]
-`;
+            toInsert = `\n  ${metadataField}: [\n${core_1.tags.indentBy(4) `${symbolName}`}\n  ]\n`;
         }
         else {
             const childNode = node.properties[node.properties.length - 1];
@@ -337,7 +323,7 @@ ${' '.repeat(4)}${symbolName}
             if (matches) {
                 toInsert =
                     `,${matches[0]}${metadataField}: [${matches[1]}` +
-                        `${' '.repeat(matches[2].length + 2)}${symbolName}${matches[0]}]`;
+                        `${core_1.tags.indentBy(matches[2].length + 2) `${symbolName}`}${matches[0]}]`;
             }
             else {
                 toInsert = `, ${metadataField}: [${symbolName}]`;
@@ -363,8 +349,8 @@ ${' '.repeat(4)}${symbolName}
     const assignmentInit = assignment.initializer;
     const elements = assignmentInit.elements;
     if (elements.length) {
-        const symbolsArray = elements.map((node) => node.getText());
-        if (symbolsArray.includes(symbolName)) {
+        const symbolsArray = elements.map((node) => core_1.tags.oneLine `${node.getText()}`);
+        if (symbolsArray.includes(core_1.tags.oneLine `${symbolName}`)) {
             return [];
         }
         expression = elements[elements.length - 1];
@@ -377,14 +363,14 @@ ${' '.repeat(4)}${symbolName}
     if (ts.isArrayLiteralExpression(expression)) {
         // We found the field but it's empty. Insert it just before the `]`.
         position--;
-        toInsert = `\n${' '.repeat(4)}${symbolName}\n  `;
+        toInsert = `\n${core_1.tags.indentBy(4) `${symbolName}`}\n  `;
     }
     else {
         // Get the indentation of the last element, if any.
         const text = expression.getFullText(source);
         const matches = text.match(/^(\r?\n)(\s*)/);
         if (matches) {
-            toInsert = `,${matches[1]}${' '.repeat(matches[2].length)}${symbolName}`;
+            toInsert = `,${matches[1]}${core_1.tags.indentBy(matches[2].length) `${symbolName}`}`;
         }
         else {
             toInsert = `, ${symbolName}`;

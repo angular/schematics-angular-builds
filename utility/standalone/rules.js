@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addRootImport = addRootImport;
 exports.addRootProvider = addRootProvider;
+const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
 const ast_utils_1 = require("../ast-utils");
 const change_1 = require("../change");
@@ -136,7 +137,7 @@ function insertStandaloneRootProvider(tree, mainFilePath, expression) {
         addProvidersExpressionToAppConfig(tree, appConfig, expression);
         return;
     }
-    const newAppConfig = `, {\n${' '.repeat(2)}providers: [${expression}]\n}`;
+    const newAppConfig = `, {\n${core_1.tags.indentBy(2) `providers: [${expression}]`}\n}`;
     let targetCall;
     if (bootstrapCall.arguments.length === 1) {
         targetCall = bootstrapCall;
@@ -169,7 +170,7 @@ function addProvidersExpressionToAppConfig(tree, appConfig, expression) {
         ]);
     }
     else {
-        const prop = `${' '.repeat(2)}providers: [${expression}]`;
+        const prop = core_1.tags.indentBy(2) `providers: [${expression}]`;
         let toInsert;
         let insertPosition;
         if (configProps.length === 0) {

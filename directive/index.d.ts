@@ -7,5 +7,4 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { Schema as DirectiveOptions } from './schema';
-declare const _default: (options: DirectiveOptions) => Rule;
-export default _default;
+export default function (options: DirectiveOptions): Rule;

@@ -36,12 +36,7 @@ function addTsProjectReference(...paths) {
 }
 function default_1(options) {
     return async (host) => {
-        const isTailwind = options.style === schema_1.Style.Tailwind;
-        if (isTailwind) {
-            options.style = schema_1.Style.Css;
-        }
         const { appDir, appRootSelector, componentOptions, folderName, sourceDir } = await getAppOptions(host, options);
-        const suffix = options.fileNameStyleGuide === '2016' ? '.component' : '';
         return (0, schematics_1.chain)([
             addAppToWorkspaceFile(options, appDir),
             addTsProjectReference('./' + (0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.app.json')),
@@ -82,7 +77,6 @@ function default_1(options) {
                     relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(appDir),
                     appName: options.name,
                     folderName,
-                    suffix,
                 }),
                 (0, schematics_1.move)(appDir),
             ]), schematics_1.MergeStrategy.Overwrite),
@@ -91,7 +85,7 @@ function default_1(options) {
                     ? (0, schematics_1.filter)((path) => !path.endsWith('tsconfig.spec.json.template'))
                     : (0, schematics_1.noop)(),
                 componentOptions.inlineTemplate
-                    ? (0, schematics_1.filter)((path) => !path.endsWith('app__suffix__.html.template'))
+                    ? (0, schematics_1.filter)((path) => !path.endsWith('app.html.template'))
                     : (0, schematics_1.noop)(),
                 (0, schematics_1.applyTemplates)({
                     utils: schematics_1.strings,
@@ -100,7 +94,6 @@ function default_1(options) {
                     relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(appDir),
                     appName: options.name,
                     folderName,
-                    suffix,
                 }),
                 (0, schematics_1.move)(appDir),
             ]), schematics_1.MergeStrategy.Overwrite),
@@ -111,12 +104,6 @@ function default_1(options) {
                 })
                 : (0, schematics_1.noop)(),
             options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(options),
-            isTailwind
-                ? (0, schematics_1.schematic)('tailwind', {
-                    project: options.name,
-                    skipInstall: options.skipInstall,
-                })
-                : (0, schematics_1.noop)(),
         ]);
     };
 }
@@ -183,18 +170,6 @@ function addAppToWorkspaceFile(options, appDir) {
         const schematicsWithStandalone = ['component', 'directive', 'pipe'];
         schematicsWithStandalone.forEach((type) => {
             (schematics[`@schematics/angular:${type}`] ??= {}).standalone = false;
-        });
-    }
-    if (options.fileNameStyleGuide === '2016') {
-        const schematicsWithTypeSymbols = ['component', 'directive', 'service'];
-        schematicsWithTypeSymbols.forEach((type) => {
-            const schematicDefaults = (schematics[`@schematics/angular:${type}`] ??= {});
-            schematicDefaults.type = type;
-            schematicDefaults.addTypeToClassName = false;
-        });
-        const schematicsWithTypeSeparator = ['guard', 'interceptor', 'module', 'pipe', 'resolver'];
-        schematicsWithTypeSeparator.forEach((type) => {
-            (schematics[`@schematics/angular:${type}`] ??= {}).typeSeparator = '.';
         });
     }
     const sourceRoot = (0, core_1.join)((0, core_1.normalize)(projectRoot), 'src');
@@ -333,9 +308,5 @@ function getComponentOptions(options) {
             style: options.style,
             viewEncapsulation: options.viewEncapsulation,
         };
-    if (options.fileNameStyleGuide === '2016') {
-        componentOptions.type = 'component';
-        componentOptions.addTypeToClassName = false;
-    }
     return componentOptions;
 }

@@ -6,20 +6,50 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
+const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
-const posix_1 = require("node:path/posix");
-const typescript_1 = __importDefault(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const utility_1 = require("../utility");
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
 const dependency_1 = require("../utility/dependency");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");
 const paths_1 = require("../utility/paths");
-const project_1 = require("../utility/project");
 const project_targets_1 = require("../utility/project-targets");
 const app_config_1 = require("../utility/standalone/app_config");
 const util_1 = require("../utility/standalone/util");
@@ -41,7 +71,7 @@ function updateAppModule(mainPath) {
         addImport(host, modulePath, 'ServiceWorkerModule', '@angular/service-worker');
         addImport(host, modulePath, 'isDevMode', '@angular/core');
         // register SW in application module
-        const importText = `
+        const importText = core_1.tags.stripIndent `
       ServiceWorkerModule.register('ngsw-worker.js', {
         enabled: !isDevMode(),
         // Register the ServiceWorker as soon as the application is stable
@@ -72,46 +102,53 @@ function addProvideServiceWorker(projectName, mainPath) {
 }
 function getTsSourceFile(host, path) {
     const content = host.readText(path);
-    const source = typescript_1.default.createSourceFile(path, content, typescript_1.default.ScriptTarget.Latest, true);
+    const source = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
     return source;
 }
-exports.default = (0, project_1.createProjectSchematic)(async (options, { project, workspace, tree }) => {
-    if (project.extensions.projectType !== 'application') {
-        throw new schematics_1.SchematicsException(`Service worker requires a project type of "application".`);
-    }
-    const buildTarget = project.targets.get('build');
-    if (!buildTarget) {
-        throw (0, project_targets_1.targetBuildNotFoundError)();
-    }
-    const buildOptions = buildTarget.options;
-    const browserEntryPoint = await (0, util_1.getMainFilePath)(tree, options.project);
-    const ngswConfigPath = (0, posix_1.join)(project.root, 'ngsw-config.json');
-    if (buildTarget.builder === workspace_models_1.Builders.Application ||
-        buildTarget.builder === workspace_models_1.Builders.BuildApplication) {
-        const productionConf = buildTarget.configurations?.production;
-        if (productionConf) {
-            productionConf.serviceWorker = ngswConfigPath;
+function default_1(options) {
+    return async (host) => {
+        const workspace = await (0, utility_1.readWorkspace)(host);
+        const project = workspace.projects.get(options.project);
+        if (!project) {
+            throw new schematics_1.SchematicsException(`Invalid project name (${options.project})`);
         }
-    }
-    else {
-        buildOptions.serviceWorker = true;
-        buildOptions.ngswConfigPath = ngswConfigPath;
-    }
-    await (0, utility_1.writeWorkspace)(tree, workspace);
-    return (0, schematics_1.chain)([
-        addDependencies(),
-        (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
-            (0, schematics_1.applyTemplates)({
-                ...options,
-                relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(project.root),
-            }),
-            (0, schematics_1.move)(project.root),
-        ])),
-        (0, ng_ast_utils_1.isStandaloneApp)(tree, browserEntryPoint)
-            ? addProvideServiceWorker(options.project, browserEntryPoint)
-            : updateAppModule(browserEntryPoint),
-    ]);
-});
+        if (project.extensions.projectType !== 'application') {
+            throw new schematics_1.SchematicsException(`Service worker requires a project type of "application".`);
+        }
+        const buildTarget = project.targets.get('build');
+        if (!buildTarget) {
+            throw (0, project_targets_1.targetBuildNotFoundError)();
+        }
+        const buildOptions = buildTarget.options;
+        const browserEntryPoint = await (0, util_1.getMainFilePath)(host, options.project);
+        const ngswConfigPath = (0, core_1.join)((0, core_1.normalize)(project.root), 'ngsw-config.json');
+        if (buildTarget.builder === workspace_models_1.Builders.Application ||
+            buildTarget.builder === workspace_models_1.Builders.BuildApplication) {
+            const productionConf = buildTarget.configurations?.production;
+            if (productionConf) {
+                productionConf.serviceWorker = ngswConfigPath;
+            }
+        }
+        else {
+            buildOptions.serviceWorker = true;
+            buildOptions.ngswConfigPath = ngswConfigPath;
+        }
+        await (0, utility_1.writeWorkspace)(host, workspace);
+        return (0, schematics_1.chain)([
+            addDependencies(),
+            (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+                (0, schematics_1.applyTemplates)({
+                    ...options,
+                    relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(project.root),
+                }),
+                (0, schematics_1.move)(project.root),
+            ])),
+            (0, ng_ast_utils_1.isStandaloneApp)(host, browserEntryPoint)
+                ? addProvideServiceWorker(options.project, browserEntryPoint)
+                : updateAppModule(browserEntryPoint),
+        ]);
+    };
+}
 function addImport(host, filePath, symbolName, moduleName) {
     const moduleSource = getTsSourceFile(host, filePath);
     const change = (0, ast_utils_1.insertImport)(moduleSource, filePath, symbolName, moduleName);

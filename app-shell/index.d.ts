@@ -7,5 +7,4 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { Schema as AppShellOptions } from './schema';
-declare const _default: (options: AppShellOptions) => Rule;
-export default _default;
+export default function (options: AppShellOptions): Rule;

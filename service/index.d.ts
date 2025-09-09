@@ -7,5 +7,4 @@
  */
 import { Rule } from '@angular-devkit/schematics';
 import { Schema as ServiceOptions } from './schema';
-declare const _default: (options: ServiceOptions) => Rule;
-export default _default;
+export default function (options: ServiceOptions): Rule;
