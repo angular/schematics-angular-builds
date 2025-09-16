@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const schematics_1 = require("@angular-devkit/schematics");
-const promises_1 = require("node:fs/promises");
 const node_path_1 = require("node:path");
 const paths_1 = require("../utility/paths");
 const project_1 = require("../utility/project");
@@ -26,11 +25,10 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project }) =
     }
 });
 async function addBrowserslistConfig(projectRoot) {
-    // Read Angular's default vendored `.browserslistrc` file.
-    const config = await (0, promises_1.readFile)(node_path_1.posix.join(__dirname, '.browserslistrc'), 'utf8');
     return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
         (0, schematics_1.filter)((p) => p.endsWith('.browserslistrc.template')),
-        (0, schematics_1.applyTemplates)({ config }),
+        // The below is replaced by bazel `npm_package`.
+        (0, schematics_1.applyTemplates)({ baselineDate: '2025-08-20' }),
         (0, schematics_1.move)(projectRoot),
     ]));
 }
