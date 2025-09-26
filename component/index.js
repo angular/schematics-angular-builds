@@ -12,6 +12,7 @@ const add_declaration_to_ng_module_1 = require("../utility/add-declaration-to-ng
 const find_module_1 = require("../utility/find-module");
 const parse_name_1 = require("../utility/parse-name");
 const project_1 = require("../utility/project");
+const project_targets_1 = require("../utility/project-targets");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
 const schema_1 = require("./schema");
@@ -40,6 +41,7 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
     const classifiedName = schematics_1.strings.classify(options.name) +
         (options.addTypeToClassName && options.type ? schematics_1.strings.classify(options.type) : '');
     (0, validation_1.validateClassName)(classifiedName);
+    const zoneless = (0, project_targets_1.isZonelessApp)(project);
     const skipStyleFile = options.inlineStyle || options.style === schema_1.Style.None;
     const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
         options.skipTests ? (0, schematics_1.filter)((path) => !path.endsWith('.spec.ts.template')) : (0, schematics_1.noop)(),
@@ -52,6 +54,7 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
             ...options,
             // Add a new variable for the classified name, conditionally including the type
             classifiedName,
+            zoneless,
         }),
         !options.type
             ? (0, schematics_1.forEach)(((file) => {
