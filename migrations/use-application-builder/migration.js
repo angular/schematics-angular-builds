@@ -270,6 +270,7 @@ function default_1() {
             rootJson.modify(['compilerOptions', 'esModuleInterop'], true);
             rootJson.modify(['compilerOptions', 'downlevelIteration'], undefined);
             rootJson.modify(['compilerOptions', 'allowSyntheticDefaultImports'], undefined);
+            rootJson.modify(['compilerOptions', 'moduleResolution'], 'bundler');
         }),
     ]);
 }
