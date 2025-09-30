@@ -39,19 +39,32 @@ const AI_TOOLS = {
     },
 };
 function default_1({ tool }) {
-    if (!tool) {
-        return (0, schematics_1.noop)();
-    }
-    const rules = tool
-        .filter((tool) => tool !== schema_1.Tool.None)
-        .map((selectedTool) => AI_TOOLS[selectedTool])
-        .map(({ rulesName, directory, frontmatter }) => (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
-        (0, schematics_1.applyTemplates)({
-            ...schematics_1.strings,
-            rulesName,
-            frontmatter,
-        }),
-        (0, schematics_1.move)(directory),
-    ])));
-    return (0, schematics_1.chain)(rules);
+    return (tree, context) => {
+        if (!tool) {
+            return (0, schematics_1.noop)();
+        }
+        const rules = tool
+            .filter((tool) => tool !== schema_1.Tool.None)
+            .map((selectedTool) => {
+            const { rulesName, directory, frontmatter } = AI_TOOLS[selectedTool];
+            const path = `${directory}/${rulesName}`;
+            if (tree.exists(path)) {
+                const toolName = schematics_1.strings.classify(selectedTool);
+                context.logger.warn(`Skipping configuration file for '${toolName}' at '${path}' because it already exists.\n` +
+                    'This is to prevent overwriting a potentially customized file. ' +
+                    'If you want to regenerate it with Angular recommended defaults, please delete the existing file and re-run the command.\n' +
+                    'You can review the latest recommendations at https://angular.dev/ai/develop-with-ai.');
+                return (0, schematics_1.noop)();
+            }
+            return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+                (0, schematics_1.applyTemplates)({
+                    ...schematics_1.strings,
+                    rulesName,
+                    frontmatter,
+                }),
+                (0, schematics_1.move)(directory),
+            ]));
+        });
+        return (0, schematics_1.chain)(rules);
+    };
 }
