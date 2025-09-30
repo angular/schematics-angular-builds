@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ViewEncapsulation = exports.Style = exports.PackageManager = exports.FileNameStyleGuide = exports.AiConfig = void 0;
 var AiConfig;
 (function (AiConfig) {
+    AiConfig["Agents"] = "agents";
     AiConfig["Claude"] = "claude";
     AiConfig["Copilot"] = "copilot";
     AiConfig["Cursor"] = "cursor";

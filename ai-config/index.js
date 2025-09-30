@@ -11,6 +11,10 @@ exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const schema_1 = require("./schema");
 const AI_TOOLS = {
+    agents: {
+        rulesName: 'AGENTS.md',
+        directory: '.',
+    },
     gemini: {
         rulesName: 'GEMINI.md',
         directory: '.gemini',

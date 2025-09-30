@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Tool = void 0;
 var Tool;
 (function (Tool) {
+    Tool["Agents"] = "agents";
     Tool["Claude"] = "claude";
     Tool["Copilot"] = "copilot";
     Tool["Cursor"] = "cursor";

@@ -11,6 +11,7 @@ export type Schema = {
     tool?: Tool[];
 };
 export declare enum Tool {
+    Agents = "agents",
     Claude = "claude",
     Copilot = "copilot",
     Cursor = "cursor",
