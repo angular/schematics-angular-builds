@@ -29,3 +29,4 @@ function isZonelessApp(project) {
     const polyfillsList = Array.isArray(polyfills) ? polyfills : [polyfills];
     return !polyfillsList.includes('zone.js');
 }
+//# sourceMappingURL=project-targets.js.map

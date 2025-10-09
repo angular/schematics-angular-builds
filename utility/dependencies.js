@@ -54,3 +54,4 @@ function getPackageJsonDependency(tree, name, pkgJsonPath = PKG_JSON_PATH) {
     }
     return null;
 }
+//# sourceMappingURL=dependencies.js.map

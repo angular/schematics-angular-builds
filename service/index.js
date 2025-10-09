@@ -28,3 +28,4 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
         classifiedName,
     });
 });
+//# sourceMappingURL=index.js.map

@@ -217,3 +217,4 @@ function* potentialSassImports(specifier, base, fromImport) {
     const extensionsToTry = hasStyleExtension ? [extension] : SASS_EXTENSIONS;
     yield* yieldSassImportCandidates(directory, filename, extensionsToTry, fromImport);
 }
+//# sourceMappingURL=stylesheet-updates.js.map

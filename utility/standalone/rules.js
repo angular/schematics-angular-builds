@@ -184,3 +184,4 @@ function addProvidersExpressionToAppConfig(tree, appConfig, expression) {
         (0, util_1.applyChangesToFile)(tree, filePath, [new change_1.InsertChange(filePath, insertPosition, toInsert)]);
     }
 }
+//# sourceMappingURL=rules.js.map

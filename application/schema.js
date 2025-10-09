@@ -35,3 +35,4 @@ var ViewEncapsulation;
     ViewEncapsulation["None"] = "None";
     ViewEncapsulation["ShadowDom"] = "ShadowDom";
 })(ViewEncapsulation || (exports.ViewEncapsulation = ViewEncapsulation = {}));
+//# sourceMappingURL=schema.js.map

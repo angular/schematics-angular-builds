@@ -121,3 +121,4 @@ function addImport(host, filePath, symbolName, moduleName) {
         host.commitUpdate(recorder);
     }
 }
+//# sourceMappingURL=index.js.map

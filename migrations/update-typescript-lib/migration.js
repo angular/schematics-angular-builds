@@ -77,3 +77,4 @@ function updateLib(host, tsConfigPath) {
         json.modify(jsonPath, newLibs);
     }
 }
+//# sourceMappingURL=migration.js.map

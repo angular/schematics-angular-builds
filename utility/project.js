@@ -28,3 +28,4 @@ function createProjectSchematic(factory) {
         return factory(options, { project, workspace, tree, context });
     };
 }
+//# sourceMappingURL=project.js.map

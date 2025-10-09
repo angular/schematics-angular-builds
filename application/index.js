@@ -339,3 +339,4 @@ function getComponentOptions(options) {
     }
     return componentOptions;
 }
+//# sourceMappingURL=index.js.map

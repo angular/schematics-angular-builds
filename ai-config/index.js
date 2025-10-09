@@ -72,3 +72,4 @@ function default_1({ tool }) {
         return (0, schematics_1.chain)(rules);
     };
 }
+//# sourceMappingURL=index.js.map

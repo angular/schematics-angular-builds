@@ -13,3 +13,4 @@ var PackageManager;
     PackageManager["Pnpm"] = "pnpm";
     PackageManager["Yarn"] = "yarn";
 })(PackageManager || (exports.PackageManager = PackageManager = {}));
+//# sourceMappingURL=schema.js.map

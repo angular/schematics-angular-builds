@@ -11,3 +11,4 @@ var Type;
     Type["Browserslist"] = "browserslist";
     Type["Karma"] = "karma";
 })(Type || (exports.Type = Type = {}));
+//# sourceMappingURL=schema.js.map

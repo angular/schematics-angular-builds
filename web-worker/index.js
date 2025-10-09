@@ -98,3 +98,4 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project }) =
         (0, schematics_1.mergeWith)(templateSourceWorkerConfig),
     ]);
 });
+//# sourceMappingURL=index.js.map

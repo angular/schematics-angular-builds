@@ -160,3 +160,4 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }
         isLazyLoadedModuleGen ? (0, schematics_1.schematic)('component', componentOptions) : (0, schematics_1.noop)(),
     ]);
 });
+//# sourceMappingURL=index.js.map

@@ -562,3 +562,4 @@ function hasTopLevelIdentifier(sourceFile, symbolName, skipModule = null) {
     }
     return false;
 }
+//# sourceMappingURL=ast-utils.js.map

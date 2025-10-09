@@ -163,3 +163,4 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }
         }),
     ]);
 });
+//# sourceMappingURL=index.js.map

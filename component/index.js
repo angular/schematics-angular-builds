@@ -76,3 +76,4 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
         (0, schematics_1.mergeWith)(templateSource),
     ]);
 });
+//# sourceMappingURL=index.js.map

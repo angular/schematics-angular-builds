@@ -292,3 +292,4 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { projec
         addDependencies(options, usingApplicationBuilder),
     ]);
 });
+//# sourceMappingURL=index.js.map

@@ -199,3 +199,4 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { projec
         (0, utility_1.addRootProvider)(options.project, ({ code, external }) => code `${external('provideClientHydration', '@angular/platform-browser')}(${external('withEventReplay', '@angular/platform-browser')}())`),
     ]);
 });
+//# sourceMappingURL=index.js.map

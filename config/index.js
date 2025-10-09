@@ -66,3 +66,4 @@ function addKarmaConfig(options) {
         ]));
     });
 }
+//# sourceMappingURL=index.js.map

@@ -75,3 +75,4 @@ function addDeclarationToNgModule(options) {
         return host;
     };
 }
+//# sourceMappingURL=add-declaration-to-ng-module.js.map

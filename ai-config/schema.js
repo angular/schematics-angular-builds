@@ -14,3 +14,4 @@ var Tool;
     Tool["None"] = "none";
     Tool["Windsurf"] = "windsurf";
 })(Tool || (exports.Tool = Tool = {}));
+//# sourceMappingURL=schema.js.map

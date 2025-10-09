@@ -30,3 +30,4 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }
         (0, generate_from_files_1.generateFromFiles)(options),
     ]);
 });
+//# sourceMappingURL=index.js.map
