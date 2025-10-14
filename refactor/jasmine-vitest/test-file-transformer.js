@@ -14,6 +14,7 @@ exports.transformJasmineToVitest = transformJasmineToVitest;
 const typescript_1 = __importDefault(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const jasmine_lifecycle_1 = require("./transformers/jasmine-lifecycle");
 const jasmine_matcher_1 = require("./transformers/jasmine-matcher");
+const jasmine_spy_1 = require("./transformers/jasmine-spy");
 /**
  * Transforms a string of Jasmine test code to Vitest test code.
  * This is the main entry point for the transformation.
@@ -39,6 +40,11 @@ function transformJasmineToVitest(filePath, content, reporter) {
                     jasmine_matcher_1.transformSyntacticSugarMatchers,
                     jasmine_lifecycle_1.transformFocusedAndSkippedTests,
                     jasmine_matcher_1.transformComplexMatchers,
+                    jasmine_spy_1.transformSpies,
+                    jasmine_spy_1.transformCreateSpyObj,
+                    jasmine_spy_1.transformSpyReset,
+                    jasmine_lifecycle_1.transformFocusedAndSkippedTests,
+                    jasmine_spy_1.transformSpyCallInspection,
                     jasmine_lifecycle_1.transformPending,
                     jasmine_lifecycle_1.transformDoneCallback,
                     jasmine_matcher_1.transformtoHaveBeenCalledBefore,
@@ -49,7 +55,7 @@ function transformJasmineToVitest(filePath, content, reporter) {
                 }
             }
             else if (typescript_1.default.isPropertyAccessExpression(transformedNode)) {
-                const transformations = [jasmine_matcher_1.transformAsymmetricMatchers];
+                const transformations = [jasmine_matcher_1.transformAsymmetricMatchers, jasmine_spy_1.transformSpyCallInspection];
                 for (const transformer of transformations) {
                     transformedNode = transformer(transformedNode, refactorCtx);
                 }
