@@ -13,6 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.transformJasmineToVitest = transformJasmineToVitest;
 const typescript_1 = __importDefault(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const jasmine_lifecycle_1 = require("./transformers/jasmine-lifecycle");
+const jasmine_matcher_1 = require("./transformers/jasmine-matcher");
 /**
  * Transforms a string of Jasmine test code to Vitest test code.
  * This is the main entry point for the transformation.
@@ -33,12 +34,38 @@ function transformJasmineToVitest(filePath, content, reporter) {
             // Transform the node itself based on its type
             if (typescript_1.default.isCallExpression(transformedNode)) {
                 const transformations = [
+                    jasmine_matcher_1.transformWithContext,
+                    jasmine_matcher_1.transformExpectAsync,
+                    jasmine_matcher_1.transformSyntacticSugarMatchers,
                     jasmine_lifecycle_1.transformFocusedAndSkippedTests,
+                    jasmine_matcher_1.transformComplexMatchers,
                     jasmine_lifecycle_1.transformPending,
                     jasmine_lifecycle_1.transformDoneCallback,
+                    jasmine_matcher_1.transformtoHaveBeenCalledBefore,
+                    jasmine_matcher_1.transformToHaveClass,
                 ];
                 for (const transformer of transformations) {
                     transformedNode = transformer(transformedNode, refactorCtx);
+                }
+            }
+            else if (typescript_1.default.isPropertyAccessExpression(transformedNode)) {
+                const transformations = [jasmine_matcher_1.transformAsymmetricMatchers];
+                for (const transformer of transformations) {
+                    transformedNode = transformer(transformedNode, refactorCtx);
+                }
+            }
+            else if (typescript_1.default.isExpressionStatement(transformedNode)) {
+                const statementTransformers = [
+                    jasmine_matcher_1.transformCalledOnceWith,
+                    jasmine_matcher_1.transformArrayWithExactContents,
+                    jasmine_matcher_1.transformExpectNothing,
+                ];
+                for (const transformer of statementTransformers) {
+                    const result = transformer(transformedNode, refactorCtx);
+                    if (result !== transformedNode) {
+                        transformedNode = result;
+                        break;
+                    }
                 }
             }
             // Visit the children of the node to ensure they are transformed
@@ -52,7 +79,7 @@ function transformJasmineToVitest(filePath, content, reporter) {
         return (node) => typescript_1.default.visitNode(node, visitor);
     };
     const result = typescript_1.default.transform(sourceFile, [transformer]);
-    if (result.transformed[0] === sourceFile) {
+    if (result.transformed[0] === sourceFile && !reporter.hasTodos) {
         return content;
     }
     const printer = typescript_1.default.createPrinter();

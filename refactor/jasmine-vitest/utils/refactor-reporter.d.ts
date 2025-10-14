@@ -14,6 +14,7 @@ export declare class RefactorReporter {
     private readonly todos;
     private readonly verboseLogs;
     constructor(logger: logging.LoggerApi);
+    get hasTodos(): boolean;
     incrementScannedFiles(): void;
     incrementTransformedFiles(): void;
     recordTodo(category: string): void;

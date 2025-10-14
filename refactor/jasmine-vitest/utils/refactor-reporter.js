@@ -21,6 +21,9 @@ class RefactorReporter {
     constructor(logger) {
         this.logger = logger;
     }
+    get hasTodos() {
+        return this.todos.size > 0;
+    }
     incrementScannedFiles() {
         this.filesScanned++;
     }
