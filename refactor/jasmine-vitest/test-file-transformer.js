@@ -14,6 +14,7 @@ exports.transformJasmineToVitest = transformJasmineToVitest;
 const typescript_1 = __importDefault(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const jasmine_lifecycle_1 = require("./transformers/jasmine-lifecycle");
 const jasmine_matcher_1 = require("./transformers/jasmine-matcher");
+const jasmine_misc_1 = require("./transformers/jasmine-misc");
 const jasmine_spy_1 = require("./transformers/jasmine-spy");
 /**
  * Transforms a string of Jasmine test code to Vitest test code.
@@ -49,13 +50,23 @@ function transformJasmineToVitest(filePath, content, reporter) {
                     jasmine_lifecycle_1.transformDoneCallback,
                     jasmine_matcher_1.transformtoHaveBeenCalledBefore,
                     jasmine_matcher_1.transformToHaveClass,
+                    jasmine_misc_1.transformTimerMocks,
+                    jasmine_lifecycle_1.transformFocusedAndSkippedTests,
+                    jasmine_lifecycle_1.transformPending,
+                    jasmine_lifecycle_1.transformDoneCallback,
+                    jasmine_misc_1.transformGlobalFunctions,
+                    jasmine_misc_1.transformUnsupportedJasmineCalls,
                 ];
                 for (const transformer of transformations) {
                     transformedNode = transformer(transformedNode, refactorCtx);
                 }
             }
             else if (typescript_1.default.isPropertyAccessExpression(transformedNode)) {
-                const transformations = [jasmine_matcher_1.transformAsymmetricMatchers, jasmine_spy_1.transformSpyCallInspection];
+                const transformations = [
+                    jasmine_matcher_1.transformAsymmetricMatchers,
+                    jasmine_spy_1.transformSpyCallInspection,
+                    jasmine_misc_1.transformUnknownJasmineProperties,
+                ];
                 for (const transformer of transformations) {
                     transformedNode = transformer(transformedNode, refactorCtx);
                 }
@@ -65,6 +76,8 @@ function transformJasmineToVitest(filePath, content, reporter) {
                     jasmine_matcher_1.transformCalledOnceWith,
                     jasmine_matcher_1.transformArrayWithExactContents,
                     jasmine_matcher_1.transformExpectNothing,
+                    jasmine_misc_1.transformFail,
+                    jasmine_misc_1.transformDefaultTimeoutInterval,
                 ];
                 for (const transformer of statementTransformers) {
                     const result = transformer(transformedNode, refactorCtx);
