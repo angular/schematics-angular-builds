@@ -7,6 +7,11 @@ export type Schema = {
      */
     fileSuffix?: string;
     /**
+     * A path to a specific file or directory to refactor. If not provided, all test files in
+     * the project will be refactored.
+     */
+    include?: string;
+    /**
      * The name of the project where the tests should be refactored. If not specified, the CLI
      * will determine the project from the current directory.
      */
