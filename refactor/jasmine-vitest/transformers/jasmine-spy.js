@@ -99,7 +99,7 @@ function transformSpies(node, refactorCtx) {
                 }
                 if (newMethodName) {
                     reporter.reportTransformation(sourceFile, node, `Transformed spy strategy \`.and.${strategyName}()\` to \`.${newMethodName}()\`.`);
-                    const newExpression = (0, ast_helpers_1.createPropertyAccess)(spyCall, newMethodName);
+                    const newExpression = typescript_1.default.factory.updatePropertyAccessExpression(pae, spyCall, typescript_1.default.factory.createIdentifier(newMethodName));
                     return typescript_1.default.factory.updateCallExpression(node, newExpression, node.typeArguments, node.arguments);
                 }
             }

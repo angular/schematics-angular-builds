@@ -36,19 +36,26 @@ function transformJasmineToVitest(filePath, content, reporter) {
             // Transform the node itself based on its type
             if (typescript_1.default.isCallExpression(transformedNode)) {
                 const transformations = [
+                    // **Stage 1: High-Level & Context-Sensitive Transformations**
+                    // These transformers often wrap or fundamentally change the nature of the call,
+                    // so they need to run before more specific matchers.
                     jasmine_matcher_1.transformWithContext,
                     jasmine_matcher_1.transformExpectAsync,
-                    jasmine_matcher_1.transformSyntacticSugarMatchers,
                     jasmine_lifecycle_1.transformFocusedAndSkippedTests,
+                    jasmine_lifecycle_1.transformPending,
+                    jasmine_lifecycle_1.transformDoneCallback,
+                    // **Stage 2: Core Matcher & Spy Transformations**
+                    // This is the bulk of the `expect(...)` and `spyOn(...)` conversions.
+                    jasmine_matcher_1.transformSyntacticSugarMatchers,
                     jasmine_matcher_1.transformComplexMatchers,
                     jasmine_spy_1.transformSpies,
                     jasmine_spy_1.transformCreateSpyObj,
                     jasmine_spy_1.transformSpyReset,
                     jasmine_spy_1.transformSpyCallInspection,
-                    jasmine_lifecycle_1.transformPending,
-                    jasmine_lifecycle_1.transformDoneCallback,
                     jasmine_matcher_1.transformtoHaveBeenCalledBefore,
                     jasmine_matcher_1.transformToHaveClass,
+                    // **Stage 3: Global Functions & Cleanup**
+                    // These handle global Jasmine functions and catch-alls for unsupported APIs.
                     jasmine_misc_1.transformTimerMocks,
                     jasmine_misc_1.transformGlobalFunctions,
                     jasmine_misc_1.transformUnsupportedJasmineCalls,
@@ -59,6 +66,7 @@ function transformJasmineToVitest(filePath, content, reporter) {
             }
             else if (typescript_1.default.isPropertyAccessExpression(transformedNode)) {
                 const transformations = [
+                    // These transformers handle `jasmine.any()` and other `jasmine.*` properties.
                     jasmine_matcher_1.transformAsymmetricMatchers,
                     jasmine_spy_1.transformSpyCallInspection,
                     jasmine_misc_1.transformUnknownJasmineProperties,
@@ -68,6 +76,8 @@ function transformJasmineToVitest(filePath, content, reporter) {
                 }
             }
             else if (typescript_1.default.isExpressionStatement(transformedNode)) {
+                // Statement-level transformers are mutually exclusive. The first one that
+                // matches will be applied, and then the visitor will stop for this node.
                 const statementTransformers = [
                     jasmine_matcher_1.transformCalledOnceWith,
                     jasmine_matcher_1.transformArrayWithExactContents,
@@ -91,7 +101,7 @@ function transformJasmineToVitest(filePath, content, reporter) {
                 return typescript_1.default.visitEachChild(transformedNode, visitor, context);
             }
         };
-        return (node) => typescript_1.default.visitNode(node, visitor);
+        return (node) => typescript_1.default.visitEachChild(node, visitor, context);
     };
     const result = typescript_1.default.transform(sourceFile, [transformer]);
     if (result.transformed[0] === sourceFile && !reporter.hasTodos) {

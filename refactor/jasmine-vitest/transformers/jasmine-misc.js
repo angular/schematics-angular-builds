@@ -66,7 +66,8 @@ function transformFail(node, { sourceFile, reporter }) {
         node.expression.expression.text === 'fail') {
         reporter.reportTransformation(sourceFile, node, 'Transformed `fail()` to `throw new Error()`.');
         const reason = node.expression.arguments[0];
-        return typescript_1.default.factory.createThrowStatement(typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Error'), undefined, reason ? [reason] : []));
+        const replacement = typescript_1.default.factory.createThrowStatement(typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Error'), undefined, reason ? [reason] : []));
+        return typescript_1.default.setOriginalNode(typescript_1.default.setTextRange(replacement, node), node);
     }
     return node;
 }
@@ -84,7 +85,7 @@ function transformDefaultTimeoutInterval(node, { sourceFile, reporter }) {
             const setConfigCall = (0, ast_helpers_1.createViCallExpression)('setConfig', [
                 typescript_1.default.factory.createObjectLiteralExpression([typescript_1.default.factory.createPropertyAssignment('testTimeout', timeoutValue)], false),
             ]);
-            return typescript_1.default.factory.createExpressionStatement(setConfigCall);
+            return typescript_1.default.factory.updateExpressionStatement(node, setConfigCall);
         }
     }
     return node;
