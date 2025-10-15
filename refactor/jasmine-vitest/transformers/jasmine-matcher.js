@@ -53,14 +53,15 @@ function transformSyntacticSugarMatchers(node, { sourceFile, reporter }) {
     const pae = node.expression;
     const matcherName = pae.name.text;
     if (matcherName === 'toHaveSpyInteractions') {
-        reporter.recordTodo('toHaveSpyInteractions');
-        (0, comment_helpers_1.addTodoComment)(node, 'Unsupported matcher ".toHaveSpyInteractions()" found. ' +
-            'Please migrate this manually by checking the `mock.calls.length` of the individual spies.');
+        const category = 'toHaveSpyInteractions';
+        reporter.recordTodo(category);
+        (0, comment_helpers_1.addTodoComment)(node, category);
         return node;
     }
     if (matcherName === 'toThrowMatching') {
-        reporter.recordTodo('toThrowMatching');
-        (0, comment_helpers_1.addTodoComment)(node, 'Unsupported matcher ".toThrowMatching()" found. Please migrate this manually.');
+        const category = 'toThrowMatching';
+        reporter.recordTodo(category);
+        (0, comment_helpers_1.addTodoComment)(node, category, { name: matcherName });
         return node;
     }
     const mapping = SUGAR_MATCHER_CHANGES.get(matcherName);
@@ -198,13 +199,14 @@ function transformExpectAsync(node, { sourceFile, reporter }) {
     }
     if (matcherName) {
         if (matcherName === 'toBePending') {
-            reporter.recordTodo('toBePending');
-            (0, comment_helpers_1.addTodoComment)(node, 'Unsupported matcher ".toBePending()" found. Vitest does not have a direct equivalent. ' +
-                'Please migrate this manually, for example by using `Promise.race` to check if the promise settles within a short timeout.');
+            const category = 'toBePending';
+            reporter.recordTodo(category);
+            (0, comment_helpers_1.addTodoComment)(node, category);
         }
         else {
-            reporter.recordTodo('unsupported-expect-async-matcher');
-            (0, comment_helpers_1.addTodoComment)(node, `Unsupported expectAsync matcher ".${matcherName}()" found. Please migrate this manually.`);
+            const category = 'unsupported-expect-async-matcher';
+            reporter.recordTodo(category);
+            (0, comment_helpers_1.addTodoComment)(node, category, { name: matcherName });
         }
     }
     return node;
@@ -280,8 +282,9 @@ function transformArrayWithExactContents(node, { sourceFile, reporter }) {
         return node;
     }
     if (!typescript_1.default.isArrayLiteralExpression(argument.arguments[0])) {
-        reporter.recordTodo('arrayWithExactContents-dynamic-variable');
-        (0, comment_helpers_1.addTodoComment)(node, 'Cannot transform jasmine.arrayWithExactContents with a dynamic variable. Please migrate this manually.');
+        const category = 'arrayWithExactContents-dynamic-variable';
+        reporter.recordTodo(category);
+        (0, comment_helpers_1.addTodoComment)(node, category);
         return node;
     }
     reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.arrayWithExactContents()` to `.toHaveLength()` and `.toEqual(expect.arrayContaining())`.');
@@ -386,8 +389,9 @@ function transformExpectNothing(node, { sourceFile, reporter }) {
     const replacement = typescript_1.default.factory.createEmptyStatement();
     const originalText = node.getFullText().trim();
     reporter.reportTransformation(sourceFile, node, 'Removed `expect().nothing()` statement.');
-    reporter.recordTodo('expect-nothing');
-    (0, comment_helpers_1.addTodoComment)(replacement, 'expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.');
+    const category = 'expect-nothing';
+    reporter.recordTodo(category);
+    (0, comment_helpers_1.addTodoComment)(replacement, category);
     typescript_1.default.addSyntheticLeadingComment(replacement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${originalText}`, true);
     return replacement;
 }

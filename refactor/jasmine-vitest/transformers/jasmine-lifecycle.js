@@ -61,8 +61,9 @@ function transformPending(node, { sourceFile, reporter, tsContext }) {
             const replacement = typescript_1.default.factory.createEmptyStatement();
             const originalText = bodyNode.getFullText().trim();
             reporter.reportTransformation(sourceFile, bodyNode, 'Converted `pending()` to a skipped test (`it.skip`).');
-            reporter.recordTodo('pending');
-            (0, comment_helpers_1.addTodoComment)(replacement, 'The pending() function was converted to a skipped test (`it.skip`).');
+            const category = 'pending';
+            reporter.recordTodo(category);
+            (0, comment_helpers_1.addTodoComment)(replacement, category);
             typescript_1.default.addSyntheticLeadingComment(replacement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${originalText}`, true);
             return replacement;
         }

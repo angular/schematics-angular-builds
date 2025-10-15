@@ -95,42 +95,28 @@ function transformGlobalFunctions(node, { sourceFile, reporter }) {
         (node.expression.text === 'setSpecProperty' || node.expression.text === 'setSuiteProperty')) {
         const functionName = node.expression.text;
         reporter.reportTransformation(sourceFile, node, `Found unsupported global function \`${functionName}\`.`);
-        reporter.recordTodo(functionName);
-        (0, comment_helpers_1.addTodoComment)(node, `Unsupported global function \`${functionName}\` found. This function is used for custom reporters in Jasmine ` +
-            'and has no direct equivalent in Vitest.');
+        const category = 'unsupported-global-function';
+        reporter.recordTodo(category);
+        (0, comment_helpers_1.addTodoComment)(node, category, { name: functionName });
     }
     return node;
 }
-const JASMINE_UNSUPPORTED_CALLS = new Map([
-    [
-        'addMatchers',
-        'jasmine.addMatchers is not supported. Please manually migrate to expect.extend().',
-    ],
-    [
-        'addCustomEqualityTester',
-        'jasmine.addCustomEqualityTester is not supported. Please manually migrate to expect.addEqualityTesters().',
-    ],
-    [
-        'mapContaining',
-        'jasmine.mapContaining is not supported. Vitest does not have a built-in matcher for Maps.' +
-            ' Please manually assert the contents of the Map.',
-    ],
-    [
-        'setContaining',
-        'jasmine.setContaining is not supported. Vitest does not have a built-in matcher for Sets.' +
-            ' Please manually assert the contents of the Set.',
-    ],
+const UNSUPPORTED_JASMINE_CALLS_CATEGORIES = new Set([
+    'addMatchers',
+    'addCustomEqualityTester',
+    'mapContaining',
+    'setContaining',
 ]);
+// A type guard to ensure that the methodName is one of the categories handled by this transformer.
+function isUnsupportedJasmineCall(methodName) {
+    return UNSUPPORTED_JASMINE_CALLS_CATEGORIES.has(methodName);
+}
 function transformUnsupportedJasmineCalls(node, { sourceFile, reporter }) {
     const methodName = (0, ast_validation_1.getJasmineMethodName)(node);
-    if (!methodName) {
-        return node;
-    }
-    const message = JASMINE_UNSUPPORTED_CALLS.get(methodName);
-    if (message) {
+    if (methodName && isUnsupportedJasmineCall(methodName)) {
         reporter.reportTransformation(sourceFile, node, `Found unsupported call \`jasmine.${methodName}\`.`);
         reporter.recordTodo(methodName);
-        (0, comment_helpers_1.addTodoComment)(node, message);
+        (0, comment_helpers_1.addTodoComment)(node, methodName);
     }
     return node;
 }
@@ -167,8 +153,9 @@ function transformUnknownJasmineProperties(node, { sourceFile, reporter }) {
         const propName = node.name.text;
         if (!HANDLED_JASMINE_PROPERTIES.has(propName)) {
             reporter.reportTransformation(sourceFile, node, `Found unknown jasmine property \`jasmine.${propName}\`.`);
-            reporter.recordTodo(`unknown-jasmine-property: ${propName}`);
-            (0, comment_helpers_1.addTodoComment)(node, `Unsupported jasmine property "${propName}" found. Please migrate this manually.`);
+            const category = 'unknown-jasmine-property';
+            reporter.recordTodo(category);
+            (0, comment_helpers_1.addTodoComment)(node, category, { name: propName });
         }
     }
     return node;
