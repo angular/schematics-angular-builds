@@ -28,7 +28,7 @@ async function addBrowserslistConfig(projectRoot) {
     return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
         (0, schematics_1.filter)((p) => p.endsWith('.browserslistrc.template')),
         // The below is replaced by bazel `npm_package`.
-        (0, schematics_1.applyTemplates)({ baselineDate: '2025-08-20' }),
+        (0, schematics_1.applyTemplates)({ baselineDate: '2025-10-20' }),
         (0, schematics_1.move)(projectRoot),
     ]));
 }
