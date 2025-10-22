@@ -16,6 +16,17 @@ const jasmine_lifecycle_1 = require("./transformers/jasmine-lifecycle");
 const jasmine_matcher_1 = require("./transformers/jasmine-matcher");
 const jasmine_misc_1 = require("./transformers/jasmine-misc");
 const jasmine_spy_1 = require("./transformers/jasmine-spy");
+const BLANK_LINE_PLACEHOLDER = '// __PRESERVE_BLANK_LINE__';
+function preserveBlankLines(content) {
+    return content
+        .split('\n')
+        .map((line) => (line.trim() === '' ? BLANK_LINE_PLACEHOLDER : line))
+        .join('\n');
+}
+function restoreBlankLines(content) {
+    const regex = new RegExp(`^\\s*${BLANK_LINE_PLACEHOLDER.replace(/\//g, '\\/')}\\s*$`, 'gm');
+    return content.replace(regex, '');
+}
 /**
  * Transforms a string of Jasmine test code to Vitest test code.
  * This is the main entry point for the transformation.
@@ -24,7 +35,8 @@ const jasmine_spy_1 = require("./transformers/jasmine-spy");
  * @returns The transformed code.
  */
 function transformJasmineToVitest(filePath, content, reporter) {
-    const sourceFile = typescript_1.default.createSourceFile(filePath, content, typescript_1.default.ScriptTarget.Latest, true, typescript_1.default.ScriptKind.TS);
+    const contentWithPlaceholders = preserveBlankLines(content);
+    const sourceFile = typescript_1.default.createSourceFile(filePath, contentWithPlaceholders, typescript_1.default.ScriptTarget.Latest, true, typescript_1.default.ScriptKind.TS);
     const transformer = (context) => {
         const refactorCtx = {
             sourceFile,
@@ -108,6 +120,7 @@ function transformJasmineToVitest(filePath, content, reporter) {
         return content;
     }
     const printer = typescript_1.default.createPrinter();
-    return printer.printFile(result.transformed[0]);
+    const transformedContentWithPlaceholders = printer.printFile(result.transformed[0]);
+    return restoreBlankLines(transformedContentWithPlaceholders);
 }
 //# sourceMappingURL=test-file-transformer.js.map
