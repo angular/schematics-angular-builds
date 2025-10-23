@@ -59,7 +59,7 @@ function addDependenciesToPackageJson(skipInstall) {
         }),
     ]);
 }
-function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDependency) {
+function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDependency, hasVitest) {
     return (0, workspace_1.updateWorkspace)((workspace) => {
         workspace.projects.add({
             name: projectName,
@@ -80,13 +80,20 @@ function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDepende
                         },
                     },
                 },
-                test: {
-                    builder: workspace_models_1.Builders.BuildKarma,
-                    options: {
-                        tsConfig: `${projectRoot}/tsconfig.spec.json`,
-                        polyfills: hasZoneDependency ? ['zone.js', 'zone.js/testing'] : undefined,
+                test: hasVitest
+                    ? {
+                        builder: workspace_models_1.Builders.BuildUnitTest,
+                        options: {
+                            tsConfig: `${projectRoot}/tsconfig.spec.json`,
+                        },
+                    }
+                    : {
+                        builder: workspace_models_1.Builders.BuildKarma,
+                        options: {
+                            tsConfig: `${projectRoot}/tsconfig.spec.json`,
+                            polyfills: hasZoneDependency ? ['zone.js', 'zone.js/testing'] : undefined,
+                        },
                     },
-                },
             },
         });
     });
@@ -111,6 +118,7 @@ function default_1(options) {
             : (0, posix_1.join)(newProjectRoot, folderName);
         const distRoot = `dist/${folderName}`;
         const sourceDir = `${libDir}/src/lib`;
+        const hasVitest = (0, dependency_1.getDependency)(host, 'vitest') !== null;
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
             (0, schematics_1.applyTemplates)({
                 ...schematics_1.strings,
@@ -123,13 +131,14 @@ function default_1(options) {
                 angularLatestVersion: latest_versions_1.latestVersions.Angular.replace(/~|\^/, ''),
                 tsLibLatestVersion: latest_versions_1.latestVersions['tslib'].replace(/~|\^/, ''),
                 folderName,
+                testTypesPackage: hasVitest ? 'vitest/globals' : 'jasmine',
             }),
             (0, schematics_1.move)(libDir),
         ]);
         const hasZoneDependency = (0, dependency_1.getDependency)(host, 'zone.js') !== null;
         return (0, schematics_1.chain)([
             (0, schematics_1.mergeWith)(templateSource),
-            addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
+            addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency, hasVitest),
             options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(!!options.skipInstall),
             options.skipTsConfig ? (0, schematics_1.noop)() : updateTsConfig(packageName, './' + distRoot),
             options.skipTsConfig

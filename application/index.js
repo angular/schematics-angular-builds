@@ -101,6 +101,7 @@ function default_1(options) {
                     appName: options.name,
                     folderName,
                     suffix,
+                    testRunner: options.testRunner,
                 }),
                 (0, schematics_1.move)(appDir),
             ]), schematics_1.MergeStrategy.Overwrite),
@@ -139,6 +140,50 @@ function addDependenciesToPackageJson(options) {
             existing: dependency_1.ExistingBehavior.Skip,
             install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
         }));
+    }
+    if (!options.skipTests) {
+        if (options.testRunner === 'vitest') {
+            rules.push((0, dependency_1.addDependency)('vitest', latest_versions_1.latestVersions['vitest'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }), (0, dependency_1.addDependency)('jsdom', latest_versions_1.latestVersions['jsdom'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }));
+        }
+        else {
+            rules.push((0, dependency_1.addDependency)('karma', latest_versions_1.latestVersions['karma'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }), (0, dependency_1.addDependency)('karma-chrome-launcher', latest_versions_1.latestVersions['karma-chrome-launcher'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }), (0, dependency_1.addDependency)('karma-coverage', latest_versions_1.latestVersions['karma-coverage'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }), (0, dependency_1.addDependency)('karma-jasmine', latest_versions_1.latestVersions['karma-jasmine'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }), (0, dependency_1.addDependency)('karma-jasmine-html-reporter', latest_versions_1.latestVersions['karma-jasmine-html-reporter'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }), (0, dependency_1.addDependency)('jasmine-core', latest_versions_1.latestVersions['jasmine-core'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }), (0, dependency_1.addDependency)('@types/jasmine', latest_versions_1.latestVersions['@types/jasmine'], {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
+            }));
+        }
     }
     return (0, schematics_1.chain)(rules);
 }
@@ -271,18 +316,23 @@ function addAppToWorkspaceFile(options, appDir) {
                     },
                 },
             },
-            test: options.minimal
+            test: options.skipTests || options.minimal
                 ? undefined
-                : {
-                    builder: workspace_models_1.Builders.BuildKarma,
-                    options: {
-                        polyfills: options.zoneless ? undefined : ['zone.js', 'zone.js/testing'],
-                        tsConfig: `${projectRoot}tsconfig.spec.json`,
-                        inlineStyleLanguage,
-                        assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
-                        styles: [`${sourceRoot}/styles.${options.style}`],
+                : options.testRunner === 'vitest'
+                    ? {
+                        builder: workspace_models_1.Builders.BuildUnitTest,
+                        options: {},
+                    }
+                    : {
+                        builder: workspace_models_1.Builders.BuildKarma,
+                        options: {
+                            polyfills: options.zoneless ? undefined : ['zone.js', 'zone.js/testing'],
+                            tsConfig: `${projectRoot}tsconfig.spec.json`,
+                            inlineStyleLanguage,
+                            assets: [{ 'glob': '**/*', 'input': `${projectRoot}public` }],
+                            styles: [`${sourceRoot}/styles.${options.style}`],
+                        },
                     },
-                },
         },
     };
     return (0, workspace_1.updateWorkspace)((workspace) => {

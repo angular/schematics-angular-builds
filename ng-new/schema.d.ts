@@ -108,6 +108,10 @@ export type Schema = {
      */
     style?: Style;
     /**
+     * The unit testing runner to use.
+     */
+    testRunner?: TestRunner;
+    /**
      * The version of the Angular CLI to use.
      */
     version: string;
@@ -171,6 +175,13 @@ export declare enum Style {
     Sass = "sass",
     Scss = "scss",
     Tailwind = "tailwind"
+}
+/**
+ * The unit testing runner to use.
+ */
+export declare enum TestRunner {
+    Karma = "karma",
+    Vitest = "vitest"
 }
 /**
  * Sets the view encapsulation mode for components in the initial project. This determines

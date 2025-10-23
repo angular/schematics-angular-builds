@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const tasks_1 = require("@angular-devkit/schematics/tasks");
+const json_file_1 = require("../utility/json-file");
 function default_1(options) {
     if (!options.directory) {
         // If scoped project (i.e. "@foo/bar"), convert directory to "foo/bar".
@@ -33,6 +34,7 @@ function default_1(options) {
         routing: options.routing,
         style: options.style,
         skipTests: options.skipTests,
+        testRunner: options.testRunner,
         skipPackageJson: false,
         // always 'skipInstall' here, so that we do it after the move
         skipInstall: true,
@@ -50,6 +52,12 @@ function default_1(options) {
             (0, schematics_1.schematic)('ai-config', {
                 tool: options.aiConfig?.length ? options.aiConfig : undefined,
             }),
+            (tree) => {
+                if (options.testRunner === 'karma') {
+                    const file = new json_file_1.JSONFile(tree, 'angular.json');
+                    file.modify(['schematics', '@schematics/angular:application', 'testRunner'], 'karma');
+                }
+            },
             (0, schematics_1.move)(options.directory),
         ])),
         (_host, context) => {

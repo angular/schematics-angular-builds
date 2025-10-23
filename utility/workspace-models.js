@@ -30,6 +30,7 @@ var Builders;
     Builders["BrowserEsbuild"] = "@angular-devkit/build-angular:browser-esbuild";
     Builders["Karma"] = "@angular-devkit/build-angular:karma";
     Builders["BuildKarma"] = "@angular/build:karma";
+    Builders["BuildUnitTest"] = "@angular/build:unit-test";
     Builders["TsLint"] = "@angular-devkit/build-angular:tslint";
     Builders["NgPackagr"] = "@angular-devkit/build-angular:ng-packagr";
     Builders["BuildNgPackagr"] = "@angular/build:ng-packagr";
