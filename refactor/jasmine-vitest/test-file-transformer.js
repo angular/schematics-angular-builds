@@ -16,6 +16,8 @@ const jasmine_lifecycle_1 = require("./transformers/jasmine-lifecycle");
 const jasmine_matcher_1 = require("./transformers/jasmine-matcher");
 const jasmine_misc_1 = require("./transformers/jasmine-misc");
 const jasmine_spy_1 = require("./transformers/jasmine-spy");
+const jasmine_type_1 = require("./transformers/jasmine-type");
+const ast_helpers_1 = require("./utils/ast-helpers");
 const BLANK_LINE_PLACEHOLDER = '// __PRESERVE_BLANK_LINE__';
 function preserveBlankLines(content) {
     return content
@@ -37,11 +39,13 @@ function restoreBlankLines(content) {
 function transformJasmineToVitest(filePath, content, reporter) {
     const contentWithPlaceholders = preserveBlankLines(content);
     const sourceFile = typescript_1.default.createSourceFile(filePath, contentWithPlaceholders, typescript_1.default.ScriptTarget.Latest, true, typescript_1.default.ScriptKind.TS);
+    const pendingVitestImports = new Set();
     const transformer = (context) => {
         const refactorCtx = {
             sourceFile,
             reporter,
             tsContext: context,
+            pendingVitestImports,
         };
         const visitor = (node) => {
             let transformedNode = node;
@@ -105,6 +109,9 @@ function transformJasmineToVitest(filePath, content, reporter) {
                     }
                 }
             }
+            else if (typescript_1.default.isQualifiedName(transformedNode) || typescript_1.default.isTypeReferenceNode(transformedNode)) {
+                transformedNode = (0, jasmine_type_1.transformJasmineTypes)(transformedNode, refactorCtx);
+            }
             // Visit the children of the node to ensure they are transformed
             if (Array.isArray(transformedNode)) {
                 return transformedNode.map((node) => typescript_1.default.visitEachChild(node, visitor, context));
@@ -116,11 +123,19 @@ function transformJasmineToVitest(filePath, content, reporter) {
         return (node) => typescript_1.default.visitEachChild(node, visitor, context);
     };
     const result = typescript_1.default.transform(sourceFile, [transformer]);
-    if (result.transformed[0] === sourceFile && !reporter.hasTodos) {
+    let transformedSourceFile = result.transformed[0];
+    if (transformedSourceFile === sourceFile && !reporter.hasTodos && !pendingVitestImports.size) {
         return content;
     }
+    const vitestImport = (0, ast_helpers_1.getVitestAutoImports)(pendingVitestImports);
+    if (vitestImport) {
+        transformedSourceFile = typescript_1.default.factory.updateSourceFile(transformedSourceFile, [
+            vitestImport,
+            ...transformedSourceFile.statements,
+        ]);
+    }
     const printer = typescript_1.default.createPrinter();
-    const transformedContentWithPlaceholders = printer.printFile(result.transformed[0]);
+    const transformedContentWithPlaceholders = printer.printFile(transformedSourceFile);
     return restoreBlankLines(transformedContentWithPlaceholders);
 }
 //# sourceMappingURL=test-file-transformer.js.map
