@@ -16,4 +16,4 @@ import { RefactorContext } from '../utils/refactor-context';
 export declare function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.Node;
 export declare function transformCreateSpyObj(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformSpyReset(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
-export declare function transformSpyCallInspection(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
+export declare function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorContext): ts.Node;
