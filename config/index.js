@@ -20,10 +20,50 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project }) =
             return addKarmaConfig(options);
         case schema_1.Type.Browserslist:
             return addBrowserslistConfig(project.root);
+        case schema_1.Type.Vitest:
+            return addVitestConfig(options);
         default:
             throw new schematics_1.SchematicsException(`"${options.type}" is an unknown configuration file type.`);
     }
 });
+function addVitestConfig(options) {
+    return (tree, context) => (0, workspace_1.updateWorkspace)((workspace) => {
+        const project = workspace.projects.get(options.project);
+        if (!project) {
+            throw new schematics_1.SchematicsException(`Project name "${options.project}" doesn't not exist.`);
+        }
+        const testTarget = project.targets.get('test');
+        if (!testTarget) {
+            throw new schematics_1.SchematicsException(`No "test" target found for project "${options.project}".` +
+                ' A "test" target is required to generate a Vitest configuration.');
+        }
+        if (testTarget.builder !== workspace_models_1.Builders.BuildUnitTest) {
+            throw new schematics_1.SchematicsException(`Cannot add a Vitest configuration as builder for "test" target in project does not` +
+                ` use "${workspace_models_1.Builders.BuildUnitTest}".`);
+        }
+        testTarget.options ??= {};
+        testTarget.options.runnerConfig = true;
+        // Check runner option.
+        if (testTarget.options.runner === 'karma') {
+            context.logger.warn(`The "test" target is configured to use the "karma" runner in the main options.` +
+                ' The generated "vitest-base.config.ts" file may not be used.');
+        }
+        for (const [name, config] of Object.entries(testTarget.configurations ?? {})) {
+            if (config &&
+                typeof config === 'object' &&
+                'runner' in config &&
+                config.runner === 'karma') {
+                context.logger.warn(`The "test" target's "${name}" configuration is configured to use the "karma" runner.` +
+                    ' The generated "vitest-base.config.ts" file may not be used for that configuration.');
+            }
+        }
+        return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
+            (0, schematics_1.filter)((p) => p.endsWith('vitest-base.config.ts.template')),
+            (0, schematics_1.applyTemplates)({}),
+            (0, schematics_1.move)(project.root),
+        ]));
+    });
+}
 async function addBrowserslistConfig(projectRoot) {
     return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
         (0, schematics_1.filter)((p) => p.endsWith('.browserslistrc.template')),
