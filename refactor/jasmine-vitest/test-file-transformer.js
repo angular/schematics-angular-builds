@@ -32,25 +32,35 @@ function restoreBlankLines(content) {
 /**
  * Transforms a string of Jasmine test code to Vitest test code.
  * This is the main entry point for the transformation.
+ * @param filePath The path to the file being transformed.
  * @param content The source code to transform.
  * @param reporter The reporter to track TODOs.
+ * @param options Transformation options.
  * @returns The transformed code.
  */
-function transformJasmineToVitest(filePath, content, reporter) {
+function transformJasmineToVitest(filePath, content, reporter, options) {
     const contentWithPlaceholders = preserveBlankLines(content);
     const sourceFile = typescript_1.default.createSourceFile(filePath, contentWithPlaceholders, typescript_1.default.ScriptTarget.Latest, true, typescript_1.default.ScriptKind.TS);
-    const pendingVitestImports = new Set();
+    const pendingVitestValueImports = new Set();
+    const pendingVitestTypeImports = new Set();
     const transformer = (context) => {
         const refactorCtx = {
             sourceFile,
             reporter,
             tsContext: context,
-            pendingVitestImports,
+            pendingVitestValueImports,
+            pendingVitestTypeImports,
         };
         const visitor = (node) => {
             let transformedNode = node;
             // Transform the node itself based on its type
             if (typescript_1.default.isCallExpression(transformedNode)) {
+                if (options.addImports && typescript_1.default.isIdentifier(transformedNode.expression)) {
+                    const name = transformedNode.expression.text;
+                    if (name === 'describe' || name === 'it' || name === 'expect') {
+                        (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, name);
+                    }
+                }
                 const transformations = [
                     // **Stage 1: High-Level & Context-Sensitive Transformations**
                     // These transformers often wrap or fundamentally change the nature of the call,
@@ -124,15 +134,22 @@ function transformJasmineToVitest(filePath, content, reporter) {
     };
     const result = typescript_1.default.transform(sourceFile, [transformer]);
     let transformedSourceFile = result.transformed[0];
-    if (transformedSourceFile === sourceFile && !reporter.hasTodos && !pendingVitestImports.size) {
+    const hasPendingValueImports = pendingVitestValueImports.size > 0;
+    const hasPendingTypeImports = pendingVitestTypeImports.size > 0;
+    if (transformedSourceFile === sourceFile &&
+        !reporter.hasTodos &&
+        !hasPendingValueImports &&
+        !hasPendingTypeImports) {
         return content;
     }
-    const vitestImport = (0, ast_helpers_1.getVitestAutoImports)(pendingVitestImports);
-    if (vitestImport) {
-        transformedSourceFile = typescript_1.default.factory.updateSourceFile(transformedSourceFile, [
-            vitestImport,
-            ...transformedSourceFile.statements,
-        ]);
+    if (hasPendingTypeImports || (options.addImports && hasPendingValueImports)) {
+        const vitestImport = (0, ast_helpers_1.getVitestAutoImports)(options.addImports ? pendingVitestValueImports : new Set(), pendingVitestTypeImports);
+        if (vitestImport) {
+            transformedSourceFile = typescript_1.default.factory.updateSourceFile(transformedSourceFile, [
+                vitestImport,
+                ...transformedSourceFile.statements,
+            ]);
+        }
     }
     const printer = typescript_1.default.createPrinter();
     const transformedContentWithPlaceholders = printer.printFile(transformedSourceFile);

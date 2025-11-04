@@ -9,8 +9,12 @@ import { RefactorReporter } from './utils/refactor-reporter';
 /**
  * Transforms a string of Jasmine test code to Vitest test code.
  * This is the main entry point for the transformation.
+ * @param filePath The path to the file being transformed.
  * @param content The source code to transform.
  * @param reporter The reporter to track TODOs.
+ * @param options Transformation options.
  * @returns The transformed code.
  */
-export declare function transformJasmineToVitest(filePath: string, content: string, reporter: RefactorReporter): string;
+export declare function transformJasmineToVitest(filePath: string, content: string, reporter: RefactorReporter, options: {
+    addImports: boolean;
+}): string;

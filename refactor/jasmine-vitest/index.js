@@ -91,7 +91,9 @@ function default_1(options) {
         for (const file of files) {
             reporter.incrementScannedFiles();
             const content = tree.readText(file);
-            const newContent = (0, test_file_transformer_1.transformJasmineToVitest)(file, content, reporter);
+            const newContent = (0, test_file_transformer_1.transformJasmineToVitest)(file, content, reporter, {
+                addImports: !!options.addImports,
+            });
             if (content !== newContent) {
                 tree.overwrite(file, newContent);
                 reporter.incrementTransformedFiles();

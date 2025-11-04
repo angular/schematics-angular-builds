@@ -13,4 +13,4 @@
  */
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { RefactorContext } from '../utils/refactor-context';
-export declare function transformJasmineTypes(node: ts.Node, { sourceFile, reporter, pendingVitestImports }: RefactorContext): ts.Node;
+export declare function transformJasmineTypes(node: ts.Node, { sourceFile, reporter, pendingVitestTypeImports }: RefactorContext): ts.Node;

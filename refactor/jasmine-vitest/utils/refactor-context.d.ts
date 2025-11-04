@@ -18,8 +18,10 @@ export interface RefactorContext {
     readonly reporter: RefactorReporter;
     /** The official context from the TypeScript Transformer API. */
     readonly tsContext: ts.TransformationContext;
+    /** A set of Vitest value imports to be added to the file. */
+    readonly pendingVitestValueImports: Set<string>;
     /** A set of Vitest type imports to be added to the file. */
-    readonly pendingVitestImports: Set<string>;
+    readonly pendingVitestTypeImports: Set<string>;
 }
 /**
  * A generic transformer function that operates on a specific type of ts.Node.

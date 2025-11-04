@@ -10,23 +10,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addVitestAutoImport = addVitestAutoImport;
+exports.addVitestValueImport = addVitestValueImport;
+exports.addVitestTypeImport = addVitestTypeImport;
 exports.getVitestAutoImports = getVitestAutoImports;
 exports.createViCallExpression = createViCallExpression;
 exports.createExpectCallExpression = createExpectCallExpression;
 exports.createPropertyAccess = createPropertyAccess;
 const typescript_1 = __importDefault(require("../../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
-function addVitestAutoImport(imports, importName) {
+function addVitestValueImport(imports, importName) {
     imports.add(importName);
 }
-function getVitestAutoImports(imports) {
-    if (!imports?.size) {
+function addVitestTypeImport(imports, importName) {
+    imports.add(importName);
+}
+function getVitestAutoImports(valueImports, typeImports) {
+    if (valueImports.size === 0 && typeImports.size === 0) {
         return undefined;
     }
-    const importNames = [...imports];
-    importNames.sort();
-    const importSpecifiers = importNames.map((i) => typescript_1.default.factory.createImportSpecifier(false, undefined, typescript_1.default.factory.createIdentifier(i)));
-    return typescript_1.default.factory.createImportDeclaration(undefined, typescript_1.default.factory.createImportClause(typescript_1.default.SyntaxKind.TypeKeyword, undefined, typescript_1.default.factory.createNamedImports(importSpecifiers)), typescript_1.default.factory.createStringLiteral('vitest'));
+    const isClauseTypeOnly = valueImports.size === 0 && typeImports.size > 0;
+    const allSpecifiers = [];
+    // Add value imports
+    for (const i of [...valueImports].sort()) {
+        allSpecifiers.push(typescript_1.default.factory.createImportSpecifier(false, undefined, typescript_1.default.factory.createIdentifier(i)));
+    }
+    // Add type imports
+    for (const i of [...typeImports].sort()) {
+        // Only set isTypeOnly on individual specifiers if the clause itself is NOT type-only
+        allSpecifiers.push(typescript_1.default.factory.createImportSpecifier(!isClauseTypeOnly, undefined, typescript_1.default.factory.createIdentifier(i)));
+    }
+    allSpecifiers.sort((a, b) => a.name.text.localeCompare(b.name.text));
+    const importClause = typescript_1.default.factory.createImportClause(isClauseTypeOnly, // Set isTypeOnly on the clause if only type imports
+    undefined, typescript_1.default.factory.createNamedImports(allSpecifiers));
+    return typescript_1.default.factory.createImportDeclaration(undefined, importClause, typescript_1.default.factory.createStringLiteral('vitest'));
 }
 function createViCallExpression(methodName, args = [], typeArgs = undefined) {
     const callee = typescript_1.default.factory.createPropertyAccessExpression(typescript_1.default.factory.createIdentifier('vi'), methodName);
