@@ -12,7 +12,7 @@ import { RefactorReporter } from './utils/refactor-reporter';
  * @param filePath The path to the file being transformed.
  * @param content The source code to transform.
  * @param reporter The reporter to track TODOs.
- * @param options Transformation options.
+ * @param options Transformation options, including whether to add Vitest API imports.
  * @returns The transformed code.
  */
 export declare function transformJasmineToVitest(filePath: string, content: string, reporter: RefactorReporter, options: {
