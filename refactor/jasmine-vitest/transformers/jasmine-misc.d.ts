@@ -13,9 +13,9 @@
  */
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { RefactorContext } from '../utils/refactor-context';
-export declare function transformTimerMocks(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
+export declare function transformTimerMocks(node: ts.Node, { sourceFile, reporter, pendingVitestValueImports }: RefactorContext): ts.Node;
 export declare function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
-export declare function transformDefaultTimeoutInterval(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
+export declare function transformDefaultTimeoutInterval(node: ts.Node, { sourceFile, reporter, pendingVitestValueImports }: RefactorContext): ts.Node;
 export declare function transformGlobalFunctions(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformUnsupportedJasmineCalls(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformUnknownJasmineProperties(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;

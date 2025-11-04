@@ -3,6 +3,13 @@
  */
 export type Schema = {
     /**
+     * Whether to add imports for the Vitest API. The Angular `unit-test` system automatically
+     * uses the Vitest globals option, which means explicit imports for global APIs like
+     * `describe`, `it`, `expect`, and `vi` are often not strictly necessary unless Vitest has
+     * been configured not to use globals.
+     */
+    addImports?: boolean;
+    /**
      * The file suffix to identify test files (e.g., '.spec.ts', '.test.ts').
      */
     fileSuffix?: string;

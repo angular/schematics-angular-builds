@@ -81,12 +81,13 @@ const ASYMMETRIC_MATCHER_NAMES = [
     'arrayContaining',
     'stringContaining',
 ];
-function transformAsymmetricMatchers(node, { sourceFile, reporter }) {
+function transformAsymmetricMatchers(node, { sourceFile, reporter, pendingVitestValueImports }) {
     if (typescript_1.default.isPropertyAccessExpression(node) &&
         typescript_1.default.isIdentifier(node.expression) &&
         node.expression.text === 'jasmine') {
         const matcherName = node.name.text;
         if (ASYMMETRIC_MATCHER_NAMES.includes(matcherName)) {
+            (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'expect');
             reporter.reportTransformation(sourceFile, node, `Transformed asymmetric matcher \`jasmine.${matcherName}\` to \`expect.${matcherName}\`.`);
             return (0, ast_helpers_1.createPropertyAccess)('expect', node.name);
         }

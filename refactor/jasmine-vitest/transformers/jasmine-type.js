@@ -19,7 +19,7 @@ exports.transformJasmineTypes = transformJasmineTypes;
  */
 const typescript_1 = __importDefault(require("../../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
-function transformJasmineTypes(node, { sourceFile, reporter, pendingVitestImports }) {
+function transformJasmineTypes(node, { sourceFile, reporter, pendingVitestTypeImports }) {
     const typeNameNode = typescript_1.default.isTypeReferenceNode(node) ? node.typeName : node;
     if (!typescript_1.default.isQualifiedName(typeNameNode) ||
         !typescript_1.default.isIdentifier(typeNameNode.left) ||
@@ -31,13 +31,13 @@ function transformJasmineTypes(node, { sourceFile, reporter, pendingVitestImport
         case 'Spy': {
             const vitestTypeName = 'Mock';
             reporter.reportTransformation(sourceFile, node, `Transformed type \`jasmine.Spy\` to \`${vitestTypeName}\`.`);
-            (0, ast_helpers_1.addVitestAutoImport)(pendingVitestImports, vitestTypeName);
+            (0, ast_helpers_1.addVitestTypeImport)(pendingVitestTypeImports, vitestTypeName);
             return typescript_1.default.factory.createIdentifier(vitestTypeName);
         }
         case 'SpyObj': {
             const vitestTypeName = 'MockedObject';
             reporter.reportTransformation(sourceFile, node, `Transformed type \`jasmine.SpyObj\` to \`${vitestTypeName}\`.`);
-            (0, ast_helpers_1.addVitestAutoImport)(pendingVitestImports, vitestTypeName);
+            (0, ast_helpers_1.addVitestTypeImport)(pendingVitestTypeImports, vitestTypeName);
             if (typescript_1.default.isTypeReferenceNode(node)) {
                 return typescript_1.default.factory.updateTypeReferenceNode(node, typescript_1.default.factory.createIdentifier(vitestTypeName), node.typeArguments);
             }

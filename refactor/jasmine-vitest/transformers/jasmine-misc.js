@@ -26,7 +26,7 @@ const typescript_1 = __importDefault(require("../../../third_party/github.com/Mi
 const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");
-function transformTimerMocks(node, { sourceFile, reporter }) {
+function transformTimerMocks(node, { sourceFile, reporter, pendingVitestValueImports }) {
     if (!typescript_1.default.isCallExpression(node) ||
         !typescript_1.default.isPropertyAccessExpression(node.expression) ||
         !typescript_1.default.isIdentifier(node.expression.name)) {
@@ -53,6 +53,7 @@ function transformTimerMocks(node, { sourceFile, reporter }) {
             break;
     }
     if (newMethodName) {
+        (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
         reporter.reportTransformation(sourceFile, node, `Transformed \`jasmine.clock().${pae.name.text}\` to \`vi.${newMethodName}\`.`);
         const newArgs = newMethodName === 'useFakeTimers' ? [] : node.arguments;
         return (0, ast_helpers_1.createViCallExpression)(newMethodName, newArgs);
@@ -71,7 +72,7 @@ function transformFail(node, { sourceFile, reporter }) {
     }
     return node;
 }
-function transformDefaultTimeoutInterval(node, { sourceFile, reporter }) {
+function transformDefaultTimeoutInterval(node, { sourceFile, reporter, pendingVitestValueImports }) {
     if (typescript_1.default.isExpressionStatement(node) &&
         typescript_1.default.isBinaryExpression(node.expression) &&
         node.expression.operatorToken.kind === typescript_1.default.SyntaxKind.EqualsToken) {
@@ -80,6 +81,7 @@ function transformDefaultTimeoutInterval(node, { sourceFile, reporter }) {
             typescript_1.default.isIdentifier(assignment.left.expression) &&
             assignment.left.expression.text === 'jasmine' &&
             assignment.left.name.text === 'DEFAULT_TIMEOUT_INTERVAL') {
+            (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
             reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.DEFAULT_TIMEOUT_INTERVAL` to `vi.setConfig()`.');
             const timeoutValue = assignment.right;
             const setConfigCall = (0, ast_helpers_1.createViCallExpression)('setConfig', [
