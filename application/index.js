@@ -42,6 +42,7 @@ function default_1(options) {
         }
         const { appDir, appRootSelector, componentOptions, folderName, sourceDir } = await getAppOptions(host, options);
         const suffix = options.fileNameStyleGuide === '2016' ? '.component' : '';
+        const typeSeparator = options.fileNameStyleGuide === '2016' ? '.' : '-';
         return (0, schematics_1.chain)([
             addAppToWorkspaceFile(options, appDir),
             addTsProjectReference('./' + (0, core_1.join)((0, core_1.normalize)(appDir), 'tsconfig.app.json')),
@@ -58,7 +59,7 @@ function default_1(options) {
                     routingScope: 'Root',
                     path: sourceDir,
                     project: options.name,
-                    typeSeparator: undefined,
+                    typeSeparator,
                 }),
             (0, schematics_1.schematic)('component', {
                 name: 'app',
@@ -83,6 +84,7 @@ function default_1(options) {
                     appName: options.name,
                     folderName,
                     suffix,
+                    typeSeparator,
                 }),
                 (0, schematics_1.move)(appDir),
             ]), schematics_1.MergeStrategy.Overwrite),
