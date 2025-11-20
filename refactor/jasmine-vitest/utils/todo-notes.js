@@ -52,6 +52,9 @@ exports.TODO_NOTES = {
     'arrayWithExactContents-dynamic-variable': {
         message: 'Cannot transform jasmine.arrayWithExactContents with a dynamic variable. Please migrate this manually.',
     },
+    'arrayWithExactContents-check': {
+        message: "Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.",
+    },
     'expect-nothing': {
         message: 'expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.',
     },
@@ -103,6 +106,9 @@ exports.TODO_NOTES = {
         message: 'Direct usage of mostRecent() is not supported.' +
             ' Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall.',
         url: 'https://vitest.dev/api/mocked.html#mock-lastcall',
+    },
+    'unhandled-done-usage': {
+        message: "The 'done' callback was used in an unhandled way. Please migrate manually.",
     },
 };
 //# sourceMappingURL=todo-notes.js.map

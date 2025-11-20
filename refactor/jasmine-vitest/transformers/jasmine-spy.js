@@ -129,20 +129,22 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
     }
     (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
     reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.createSpyObj()` to an object literal with `vi.fn()`.');
+    const baseNameArg = node.arguments[0];
+    const baseName = typescript_1.default.isStringLiteral(baseNameArg) ? baseNameArg.text : undefined;
+    const methods = node.arguments[1];
+    const propertiesArg = node.arguments[2];
+    let properties = [];
     if (node.arguments.length < 2) {
         const category = 'createSpyObj-single-argument';
         reporter.recordTodo(category);
         (0, comment_helpers_1.addTodoComment)(node, category);
         return node;
     }
-    const methods = node.arguments[1];
-    const propertiesArg = node.arguments[2];
-    let properties = [];
     if (typescript_1.default.isArrayLiteralExpression(methods)) {
-        properties = createSpyObjWithArray(methods);
+        properties = createSpyObjWithArray(methods, baseName);
     }
     else if (typescript_1.default.isObjectLiteralExpression(methods)) {
-        properties = createSpyObjWithObject(methods);
+        properties = createSpyObjWithObject(methods, baseName);
     }
     else {
         const category = 'createSpyObj-dynamic-variable';
@@ -162,23 +164,32 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
     }
     return typescript_1.default.factory.createObjectLiteralExpression(properties, true);
 }
-function createSpyObjWithArray(methods) {
+function createSpyObjWithArray(methods, baseName) {
     return methods.elements
         .map((element) => {
         if (typescript_1.default.isStringLiteral(element)) {
-            return typescript_1.default.factory.createPropertyAssignment(typescript_1.default.factory.createIdentifier(element.text), (0, ast_helpers_1.createViCallExpression)('fn'));
+            const mockFn = (0, ast_helpers_1.createViCallExpression)('fn');
+            const methodName = element.text;
+            let finalExpression = mockFn;
+            if (baseName) {
+                finalExpression = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(finalExpression, 'mockName'), undefined, [typescript_1.default.factory.createStringLiteral(`${baseName}.${methodName}`)]);
+            }
+            return typescript_1.default.factory.createPropertyAssignment(typescript_1.default.factory.createIdentifier(methodName), finalExpression);
         }
         return undefined;
     })
         .filter((p) => !!p);
 }
-function createSpyObjWithObject(methods) {
+function createSpyObjWithObject(methods, baseName) {
     return methods.properties
         .map((prop) => {
         if (typescript_1.default.isPropertyAssignment(prop) && typescript_1.default.isIdentifier(prop.name)) {
             const methodName = prop.name.text;
             const returnValue = prop.initializer;
-            const mockFn = (0, ast_helpers_1.createViCallExpression)('fn');
+            let mockFn = (0, ast_helpers_1.createViCallExpression)('fn');
+            if (baseName) {
+                mockFn = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(mockFn, 'mockName'), undefined, [typescript_1.default.factory.createStringLiteral(`${baseName}.${methodName}`)]);
+            }
             const mockReturnValue = (0, ast_helpers_1.createPropertyAccess)(mockFn, 'mockReturnValue');
             return typescript_1.default.factory.createPropertyAssignment(typescript_1.default.factory.createIdentifier(methodName), typescript_1.default.factory.createCallExpression(mockReturnValue, undefined, [returnValue]));
         }

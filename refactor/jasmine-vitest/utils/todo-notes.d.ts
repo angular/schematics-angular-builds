@@ -51,6 +51,9 @@ export declare const TODO_NOTES: {
     readonly 'arrayWithExactContents-dynamic-variable': {
         readonly message: "Cannot transform jasmine.arrayWithExactContents with a dynamic variable. Please migrate this manually.";
     };
+    readonly 'arrayWithExactContents-check': {
+        readonly message: "Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.";
+    };
     readonly 'expect-nothing': {
         readonly message: "expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.";
     };
@@ -103,6 +106,9 @@ export declare const TODO_NOTES: {
     readonly 'mostRecent-without-args': {
         readonly message: string;
         readonly url: "https://vitest.dev/api/mocked.html#mock-lastcall";
+    };
+    readonly 'unhandled-done-usage': {
+        readonly message: "The 'done' callback was used in an unhandled way. Please migrate manually.";
     };
 };
 /**

@@ -295,10 +295,12 @@ function transformArrayWithExactContents(node, { sourceFile, reporter }) {
     const containingCall = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(expectCall, 'toEqual'), undefined, [
         typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)('expect', 'arrayContaining'), undefined, [arrayLiteral]),
     ]);
-    return [
-        typescript_1.default.factory.createExpressionStatement(lengthCall),
-        typescript_1.default.factory.createExpressionStatement(containingCall),
-    ];
+    const lengthStmt = typescript_1.default.factory.createExpressionStatement(lengthCall);
+    const containingStmt = typescript_1.default.factory.createExpressionStatement(containingCall);
+    const category = 'arrayWithExactContents-check';
+    reporter.recordTodo(category);
+    (0, comment_helpers_1.addTodoComment)(lengthStmt, category);
+    return [lengthStmt, containingStmt];
 }
 function transformCalledOnceWith(node, { sourceFile, reporter }) {
     if (!typescript_1.default.isExpressionStatement(node)) {
