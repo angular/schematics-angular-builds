@@ -166,6 +166,17 @@ function transformPromiseBasedDone(callExpr, doneIdentifier, refactorCtx) {
     }
     return undefined;
 }
+function countDoneUsages(node, doneIdentifier) {
+    let count = 0;
+    const visitor = (n) => {
+        if (typescript_1.default.isIdentifier(n) && n.text === doneIdentifier.text) {
+            count++;
+        }
+        typescript_1.default.forEachChild(n, visitor);
+    };
+    typescript_1.default.forEachChild(node, visitor);
+    return count;
+}
 function transformDoneCallback(node, refactorCtx) {
     const { sourceFile, reporter, tsContext } = refactorCtx;
     if (!typescript_1.default.isCallExpression(node) ||
@@ -185,11 +196,15 @@ function transformDoneCallback(node, refactorCtx) {
         return node;
     }
     const doneIdentifier = doneParam.name;
+    // Count total usages of 'done' in the body
+    const totalUsages = countDoneUsages(functionArg.body, doneIdentifier);
+    let handledUsages = 0;
     let doneWasUsed = false;
     const bodyVisitor = (bodyNode) => {
         const complexTransformed = transformComplexDoneCallback(bodyNode, doneIdentifier, refactorCtx);
         if (complexTransformed !== bodyNode) {
             doneWasUsed = true;
+            handledUsages++; // complex transform handles one usage
             return complexTransformed;
         }
         if (typescript_1.default.isExpressionStatement(bodyNode) && typescript_1.default.isCallExpression(bodyNode.expression)) {
@@ -200,6 +215,7 @@ function transformDoneCallback(node, refactorCtx) {
                 callExpr.expression.expression.text === doneIdentifier.text &&
                 callExpr.expression.name.text === 'fail') {
                 doneWasUsed = true;
+                handledUsages++;
                 reporter.reportTransformation(sourceFile, bodyNode, 'Transformed `done.fail()` to `throw new Error()`.');
                 const errorArgs = callExpr.arguments.length > 0 ? [callExpr.arguments[0]] : [];
                 return typescript_1.default.factory.createThrowStatement(typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Error'), undefined, errorArgs));
@@ -208,12 +224,14 @@ function transformDoneCallback(node, refactorCtx) {
             const promiseTransformed = transformPromiseBasedDone(callExpr, doneIdentifier, refactorCtx);
             if (promiseTransformed) {
                 doneWasUsed = true;
+                handledUsages++;
                 return promiseTransformed;
             }
             // Remove `done()`
             if (typescript_1.default.isIdentifier(callExpr.expression) &&
                 callExpr.expression.text === doneIdentifier.text) {
                 doneWasUsed = true;
+                handledUsages++;
                 return typescript_1.default.setTextRange(typescript_1.default.factory.createEmptyStatement(), callExpr.expression);
             }
         }
@@ -226,6 +244,14 @@ function transformDoneCallback(node, refactorCtx) {
         }
         return bodyVisitor(node);
     });
+    // Safety check: if we found usages but didn't handle all of them, abort.
+    if (handledUsages < totalUsages) {
+        reporter.reportTransformation(sourceFile, node, `Found unhandled usage of \`${doneIdentifier.text}\` callback. Skipping transformation.`);
+        const category = 'unhandled-done-usage';
+        reporter.recordTodo(category);
+        (0, comment_helpers_1.addTodoComment)(node, category);
+        return node;
+    }
     if (!doneWasUsed) {
         return node;
     }
