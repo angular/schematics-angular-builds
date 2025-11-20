@@ -10,12 +10,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
+const dependencies_1 = require("../utility/dependencies");
 const dependency_1 = require("../utility/dependency");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const paths_1 = require("../utility/paths");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
+const schema_1 = require("./schema");
 const LIBRARY_DEV_DEPENDENCIES = [
     { name: '@angular/compiler-cli', version: latest_versions_1.latestVersions.Angular },
     { name: '@angular/build', version: latest_versions_1.latestVersions.AngularBuild },
@@ -45,13 +47,14 @@ function addTsProjectReference(...paths) {
         file.modify(jsonPath, Array.isArray(value) ? [...value, ...newReferences] : newReferences);
     };
 }
-function addDependenciesToPackageJson(skipInstall) {
+function addDependenciesToPackageJson({ skipInstall, testRunner }) {
     return (0, schematics_1.chain)([
         ...LIBRARY_DEV_DEPENDENCIES.map((dependency) => (0, dependency_1.addDependency)(dependency.name, dependency.version, {
             type: dependency_1.DependencyType.Dev,
             existing: dependency_1.ExistingBehavior.Skip,
             install: skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
         })),
+        ...(0, dependencies_1.addTestRunnerDependencies)(testRunner, !!skipInstall),
         (0, dependency_1.addDependency)('tslib', latest_versions_1.latestVersions['tslib'], {
             type: dependency_1.DependencyType.Default,
             existing: dependency_1.ExistingBehavior.Skip,
@@ -59,7 +62,7 @@ function addDependenciesToPackageJson(skipInstall) {
         }),
     ]);
 }
-function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDependency, hasVitest) {
+function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDependency) {
     return (0, workspace_1.updateWorkspace)((workspace) => {
         workspace.projects.add({
             name: projectName,
@@ -80,7 +83,7 @@ function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDepende
                         },
                     },
                 },
-                test: hasVitest
+                test: options.testRunner === schema_1.TestRunner.Vitest
                     ? {
                         builder: workspace_models_1.Builders.BuildUnitTest,
                         options: {
@@ -118,7 +121,6 @@ function default_1(options) {
             : (0, posix_1.join)(newProjectRoot, folderName);
         const distRoot = `dist/${folderName}`;
         const sourceDir = `${libDir}/src/lib`;
-        const hasVitest = (0, dependency_1.getDependency)(host, 'vitest') !== null;
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
             (0, schematics_1.applyTemplates)({
                 ...schematics_1.strings,
@@ -131,15 +133,15 @@ function default_1(options) {
                 angularLatestVersion: latest_versions_1.latestVersions.Angular.replace(/~|\^/, ''),
                 tsLibLatestVersion: latest_versions_1.latestVersions['tslib'].replace(/~|\^/, ''),
                 folderName,
-                testTypesPackage: hasVitest ? 'vitest/globals' : 'jasmine',
+                testTypesPackage: options.testRunner === schema_1.TestRunner.Vitest ? 'vitest/globals' : 'jasmine',
             }),
             (0, schematics_1.move)(libDir),
         ]);
         const hasZoneDependency = (0, dependency_1.getDependency)(host, 'zone.js') !== null;
         return (0, schematics_1.chain)([
             (0, schematics_1.mergeWith)(templateSource),
-            addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency, hasVitest),
-            options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(!!options.skipInstall),
+            addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
+            options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(options),
             options.skipTsConfig ? (0, schematics_1.noop)() : updateTsConfig(packageName, './' + distRoot),
             options.skipTsConfig
                 ? (0, schematics_1.noop)()

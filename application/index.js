@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const core_1 = require("@angular-devkit/core");
 const schematics_1 = require("@angular-devkit/schematics");
+const dependencies_1 = require("../utility/dependencies");
 const dependency_1 = require("../utility/dependency");
 const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
@@ -144,48 +145,7 @@ function addDependenciesToPackageJson(options) {
         }));
     }
     if (!options.skipTests) {
-        if (options.testRunner === 'vitest') {
-            rules.push((0, dependency_1.addDependency)('vitest', latest_versions_1.latestVersions['vitest'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }), (0, dependency_1.addDependency)('jsdom', latest_versions_1.latestVersions['jsdom'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }));
-        }
-        else {
-            rules.push((0, dependency_1.addDependency)('karma', latest_versions_1.latestVersions['karma'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }), (0, dependency_1.addDependency)('karma-chrome-launcher', latest_versions_1.latestVersions['karma-chrome-launcher'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }), (0, dependency_1.addDependency)('karma-coverage', latest_versions_1.latestVersions['karma-coverage'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }), (0, dependency_1.addDependency)('karma-jasmine', latest_versions_1.latestVersions['karma-jasmine'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }), (0, dependency_1.addDependency)('karma-jasmine-html-reporter', latest_versions_1.latestVersions['karma-jasmine-html-reporter'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }), (0, dependency_1.addDependency)('jasmine-core', latest_versions_1.latestVersions['jasmine-core'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }), (0, dependency_1.addDependency)('@types/jasmine', latest_versions_1.latestVersions['@types/jasmine'], {
-                type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Skip,
-                install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
-            }));
-        }
+        rules.push(...(0, dependencies_1.addTestRunnerDependencies)(options.testRunner, !!options.skipInstall));
     }
     return (0, schematics_1.chain)(rules);
 }
@@ -320,17 +280,14 @@ function addAppToWorkspaceFile(options, appDir) {
             },
             test: options.skipTests || options.minimal
                 ? undefined
-                : options.testRunner === 'vitest'
-                    ? {
-                        builder: workspace_models_1.Builders.BuildUnitTest,
-                        options: {},
-                    }
-                    : {
-                        builder: workspace_models_1.Builders.BuildUnitTest,
-                        options: {
+                : {
+                    builder: workspace_models_1.Builders.BuildUnitTest,
+                    options: options.testRunner === schema_1.TestRunner.Vitest
+                        ? {}
+                        : {
                             runner: 'karma',
                         },
-                    },
+                },
         },
     };
     return (0, workspace_1.updateWorkspace)((workspace) => {
