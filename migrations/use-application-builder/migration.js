@@ -267,10 +267,14 @@ function default_1() {
         updateJsonFile('package.json', (pkgJson) => ['build:ssr', 'dev:ssr', 'serve:ssr', 'prerender'].forEach((s) => pkgJson.remove(['scripts', s]))),
         // Update main tsconfig
         updateJsonFile('tsconfig.json', (rootJson) => {
-            rootJson.modify(['compilerOptions', 'esModuleInterop'], true);
+            const module = rootJson.get(['compilerOptions', 'module']);
+            const hasPreserveModule = typeof module === 'string' && module.toLowerCase() === 'preserve';
+            if (!hasPreserveModule) {
+                rootJson.modify(['compilerOptions', 'esModuleInterop'], true);
+                rootJson.modify(['compilerOptions', 'moduleResolution'], 'bundler');
+            }
             rootJson.modify(['compilerOptions', 'downlevelIteration'], undefined);
             rootJson.modify(['compilerOptions', 'allowSyntheticDefaultImports'], undefined);
-            rootJson.modify(['compilerOptions', 'moduleResolution'], 'bundler');
         }),
     ]);
 }
