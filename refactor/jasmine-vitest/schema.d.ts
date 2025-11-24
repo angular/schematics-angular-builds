@@ -10,6 +10,12 @@ export type Schema = {
      */
     addImports?: boolean;
     /**
+     * Whether the tests are intended to run in browser mode. If true, the `toHaveClass`
+     * assertions are left as is because Vitest browser mode has such an assertion. Otherwise
+     * they're migrated to an equivalent assertion.
+     */
+    browserMode?: boolean;
+    /**
      * The file suffix to identify test files (e.g., '.spec.ts', '.test.ts').
      */
     fileSuffix?: string;

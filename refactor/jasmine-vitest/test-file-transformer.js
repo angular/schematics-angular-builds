@@ -149,7 +149,9 @@ function transformJasmineToVitest(filePath, content, reporter, options) {
                     }
                 }
                 for (const transformer of callExpressionTransformers) {
-                    transformedNode = transformer(transformedNode, refactorCtx);
+                    if (!(options.browserMode && transformer === jasmine_matcher_1.transformToHaveClass)) {
+                        transformedNode = transformer(transformedNode, refactorCtx);
+                    }
                 }
             }
             else if (typescript_1.default.isPropertyAccessExpression(transformedNode)) {
