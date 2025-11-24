@@ -55,7 +55,15 @@ function transformTimerMocks(node, { sourceFile, reporter, pendingVitestValueImp
     if (newMethodName) {
         (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
         reporter.reportTransformation(sourceFile, node, `Transformed \`jasmine.clock().${pae.name.text}\` to \`vi.${newMethodName}\`.`);
-        const newArgs = newMethodName === 'useFakeTimers' ? [] : node.arguments;
+        let newArgs = node.arguments;
+        if (newMethodName === 'useFakeTimers') {
+            newArgs = [];
+        }
+        if (newMethodName === 'setSystemTime' && node.arguments.length === 0) {
+            newArgs = [
+                typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Date'), undefined, []),
+            ];
+        }
         return (0, ast_helpers_1.createViCallExpression)(newMethodName, newArgs);
     }
     return node;
