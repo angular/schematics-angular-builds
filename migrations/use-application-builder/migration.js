@@ -116,7 +116,9 @@ function updateProjects(tree, context) {
                 continue;
             }
             const buildTarget = project.targets.get('build');
-            if (!buildTarget || buildTarget.builder === workspace_models_1.Builders.Application) {
+            if (!buildTarget ||
+                buildTarget.builder === workspace_models_1.Builders.Application ||
+                buildTarget.builder === workspace_models_1.Builders.BuildApplication) {
                 continue;
             }
             if (buildTarget.builder !== workspace_models_1.Builders.BrowserEsbuild &&
