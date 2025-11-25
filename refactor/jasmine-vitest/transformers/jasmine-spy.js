@@ -129,12 +129,13 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
     }
     (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
     reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.createSpyObj()` to an object literal with `vi.fn()`.');
-    const baseNameArg = node.arguments[0];
-    const baseName = typescript_1.default.isStringLiteral(baseNameArg) ? baseNameArg.text : undefined;
-    const methods = node.arguments[1];
-    const propertiesArg = node.arguments[2];
+    const firstArg = node.arguments[0];
+    const hasBaseName = typescript_1.default.isStringLiteral(firstArg);
+    const baseName = hasBaseName ? firstArg.text : undefined;
+    const methods = hasBaseName ? node.arguments[1] : firstArg;
+    const propertiesArg = hasBaseName ? node.arguments[2] : node.arguments[1];
     let properties = [];
-    if (node.arguments.length < 2) {
+    if (node.arguments.length < 2 && hasBaseName) {
         const category = 'createSpyObj-single-argument';
         reporter.recordTodo(category);
         (0, comment_helpers_1.addTodoComment)(node, category);
