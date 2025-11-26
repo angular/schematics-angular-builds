@@ -54,13 +54,13 @@ function transformSyntacticSugarMatchers(node, { sourceFile, reporter }) {
     const matcherName = pae.name.text;
     if (matcherName === 'toHaveSpyInteractions') {
         const category = 'toHaveSpyInteractions';
-        reporter.recordTodo(category);
+        reporter.recordTodo(category, sourceFile, node);
         (0, comment_helpers_1.addTodoComment)(node, category);
         return node;
     }
     if (matcherName === 'toThrowMatching') {
         const category = 'toThrowMatching';
-        reporter.recordTodo(category);
+        reporter.recordTodo(category, sourceFile, node);
         (0, comment_helpers_1.addTodoComment)(node, category, { name: matcherName });
         return node;
     }
@@ -201,12 +201,12 @@ function transformExpectAsync(node, { sourceFile, reporter }) {
     if (matcherName) {
         if (matcherName === 'toBePending') {
             const category = 'toBePending';
-            reporter.recordTodo(category);
+            reporter.recordTodo(category, sourceFile, node);
             (0, comment_helpers_1.addTodoComment)(node, category);
         }
         else {
             const category = 'unsupported-expect-async-matcher';
-            reporter.recordTodo(category);
+            reporter.recordTodo(category, sourceFile, node);
             (0, comment_helpers_1.addTodoComment)(node, category, { name: matcherName });
         }
     }
@@ -284,7 +284,7 @@ function transformArrayWithExactContents(node, { sourceFile, reporter }) {
     }
     if (!typescript_1.default.isArrayLiteralExpression(argument.arguments[0])) {
         const category = 'arrayWithExactContents-dynamic-variable';
-        reporter.recordTodo(category);
+        reporter.recordTodo(category, sourceFile, node);
         (0, comment_helpers_1.addTodoComment)(node, category);
         return node;
     }
@@ -298,7 +298,7 @@ function transformArrayWithExactContents(node, { sourceFile, reporter }) {
     const lengthStmt = typescript_1.default.factory.createExpressionStatement(lengthCall);
     const containingStmt = typescript_1.default.factory.createExpressionStatement(containingCall);
     const category = 'arrayWithExactContents-check';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     (0, comment_helpers_1.addTodoComment)(lengthStmt, category);
     return [lengthStmt, containingStmt];
 }
@@ -393,7 +393,7 @@ function transformExpectNothing(node, { sourceFile, reporter }) {
     const originalText = node.getFullText().trim();
     reporter.reportTransformation(sourceFile, node, 'Removed `expect().nothing()` statement.');
     const category = 'expect-nothing';
-    reporter.recordTodo(category);
+    reporter.recordTodo(category, sourceFile, node);
     (0, comment_helpers_1.addTodoComment)(replacement, category);
     typescript_1.default.addSyntheticLeadingComment(replacement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${originalText}`, true);
     return replacement;

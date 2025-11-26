@@ -93,7 +93,7 @@ function transformSpies(node, refactorCtx) {
                     }
                     default: {
                         const category = 'unsupported-spy-strategy';
-                        reporter.recordTodo(category);
+                        reporter.recordTodo(category, sourceFile, node);
                         (0, comment_helpers_1.addTodoComment)(node, category, { name: strategyName });
                         break;
                     }
@@ -116,7 +116,7 @@ function transformSpies(node, refactorCtx) {
         case 'spyOnAllFunctions': {
             reporter.reportTransformation(sourceFile, node, 'Found unsupported `jasmine.spyOnAllFunctions()`.');
             const category = 'spyOnAllFunctions';
-            reporter.recordTodo(category);
+            reporter.recordTodo(category, sourceFile, node);
             (0, comment_helpers_1.addTodoComment)(node, category);
             return node;
         }
@@ -137,7 +137,7 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
     let properties = [];
     if (node.arguments.length < 2 && hasBaseName) {
         const category = 'createSpyObj-single-argument';
-        reporter.recordTodo(category);
+        reporter.recordTodo(category, sourceFile, node);
         (0, comment_helpers_1.addTodoComment)(node, category);
         return node;
     }
@@ -149,7 +149,7 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
     }
     else {
         const category = 'createSpyObj-dynamic-variable';
-        reporter.recordTodo(category);
+        reporter.recordTodo(category, sourceFile, node);
         (0, comment_helpers_1.addTodoComment)(node, category);
         return node;
     }
@@ -159,7 +159,7 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
         }
         else {
             const category = 'createSpyObj-dynamic-property-map';
-            reporter.recordTodo(category);
+            reporter.recordTodo(category, sourceFile, node);
             (0, comment_helpers_1.addTodoComment)(node, category);
         }
     }
@@ -301,7 +301,7 @@ function transformSpyCallInspection(node, refactorCtx) {
                     !typescript_1.default.isIdentifier(node.parent.name) ||
                     node.parent.name.text !== 'args') {
                     const category = 'mostRecent-without-args';
-                    reporter.recordTodo(category);
+                    reporter.recordTodo(category, sourceFile, node);
                     (0, comment_helpers_1.addTodoComment)(node, category);
                 }
                 return node;

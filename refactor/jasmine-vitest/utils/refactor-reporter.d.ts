@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { logging } from '@angular-devkit/core';
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
 import { TodoCategory } from './todo-notes';
 export declare class RefactorReporter {
@@ -14,11 +13,16 @@ export declare class RefactorReporter {
     private filesTransformed;
     private readonly todos;
     private readonly verboseLogs;
-    constructor(logger: logging.LoggerApi);
+    private readonly fileTodos;
+    constructor(logger: {
+        info(message: string): void;
+        warn(message: string): void;
+    });
     get hasTodos(): boolean;
     incrementScannedFiles(): void;
     incrementTransformedFiles(): void;
-    recordTodo(category: TodoCategory): void;
+    recordTodo(category: TodoCategory, sourceFile: ts.SourceFile, node: ts.Node): void;
     reportTransformation(sourceFile: ts.SourceFile, node: ts.Node, message: string): void;
+    generateReportContent(): string;
     printSummary(verbose?: boolean): void;
 }

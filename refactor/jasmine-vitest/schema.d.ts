@@ -30,6 +30,10 @@ export type Schema = {
      */
     project?: string;
     /**
+     * Whether to generate a summary report file (jasmine-vitest-<date>.md) in the project root.
+     */
+    report?: boolean;
+    /**
      * Enable verbose logging to see detailed information about the transformations being
      * applied.
      */

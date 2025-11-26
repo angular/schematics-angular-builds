@@ -62,7 +62,7 @@ function transformPending(node, { sourceFile, reporter, tsContext }) {
             const originalText = bodyNode.getFullText().trim();
             reporter.reportTransformation(sourceFile, bodyNode, 'Converted `pending()` to a skipped test (`it.skip`).');
             const category = 'pending';
-            reporter.recordTodo(category);
+            reporter.recordTodo(category, sourceFile, bodyNode);
             (0, comment_helpers_1.addTodoComment)(replacement, category);
             typescript_1.default.addSyntheticLeadingComment(replacement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${originalText}`, true);
             return replacement;
@@ -248,7 +248,7 @@ function transformDoneCallback(node, refactorCtx) {
     if (handledUsages < totalUsages) {
         reporter.reportTransformation(sourceFile, node, `Found unhandled usage of \`${doneIdentifier.text}\` callback. Skipping transformation.`);
         const category = 'unhandled-done-usage';
-        reporter.recordTodo(category);
+        reporter.recordTodo(category, sourceFile, node);
         (0, comment_helpers_1.addTodoComment)(node, category);
         return node;
     }

@@ -107,7 +107,7 @@ function transformGlobalFunctions(node, { sourceFile, reporter }) {
         const functionName = node.expression.text;
         reporter.reportTransformation(sourceFile, node, `Found unsupported global function \`${functionName}\`.`);
         const category = 'unsupported-global-function';
-        reporter.recordTodo(category);
+        reporter.recordTodo(category, sourceFile, node);
         (0, comment_helpers_1.addTodoComment)(node, category, { name: functionName });
     }
     return node;
@@ -126,7 +126,7 @@ function transformUnsupportedJasmineCalls(node, { sourceFile, reporter }) {
     const methodName = (0, ast_validation_1.getJasmineMethodName)(node);
     if (methodName && isUnsupportedJasmineCall(methodName)) {
         reporter.reportTransformation(sourceFile, node, `Found unsupported call \`jasmine.${methodName}\`.`);
-        reporter.recordTodo(methodName);
+        reporter.recordTodo(methodName, sourceFile, node);
         (0, comment_helpers_1.addTodoComment)(node, methodName);
     }
     return node;
@@ -165,7 +165,7 @@ function transformUnknownJasmineProperties(node, { sourceFile, reporter }) {
         if (!HANDLED_JASMINE_PROPERTIES.has(propName)) {
             reporter.reportTransformation(sourceFile, node, `Found unknown jasmine property \`jasmine.${propName}\`.`);
             const category = 'unknown-jasmine-property';
-            reporter.recordTodo(category);
+            reporter.recordTodo(category, sourceFile, node);
             (0, comment_helpers_1.addTodoComment)(node, category, { name: propName });
         }
     }

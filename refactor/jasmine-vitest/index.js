@@ -100,6 +100,10 @@ function default_1(options) {
                 reporter.incrementTransformedFiles();
             }
         }
+        if (options.report) {
+            const reportContent = reporter.generateReportContent();
+            tree.create(`jasmine-vitest-${new Date().toISOString()}.md`, reportContent);
+        }
         reporter.printSummary(options.verbose);
     };
 }
