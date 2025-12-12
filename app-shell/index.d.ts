@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { Rule } from '@angular-devkit/schematics';
+import { RuleFactory } from '@angular-devkit/schematics';
 import { Schema as AppShellOptions } from './schema';
-declare const _default: (options: AppShellOptions) => Rule;
-export default _default;
+declare const appShellSchematic: RuleFactory<AppShellOptions>;
+export default appShellSchematic;

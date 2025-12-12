@@ -75,7 +75,7 @@ function getTsSourceFile(host, path) {
     const source = typescript_1.default.createSourceFile(path, content, typescript_1.default.ScriptTarget.Latest, true);
     return source;
 }
-exports.default = (0, project_1.createProjectSchematic)(async (options, { project, workspace, tree }) => {
+const serviceWorkerSchematic = (0, project_1.createProjectSchematic)(async (options, { project, workspace, tree }) => {
     if (project.extensions.projectType !== 'application') {
         throw new schematics_1.SchematicsException(`Service worker requires a project type of "application".`);
     }
@@ -112,6 +112,7 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { projec
             : updateAppModule(browserEntryPoint),
     ]);
 });
+exports.default = serviceWorkerSchematic;
 function addImport(host, filePath, symbolName, moduleName) {
     const moduleSource = getTsSourceFile(host, filePath);
     const change = (0, ast_utils_1.insertImport)(moduleSource, filePath, symbolName, moduleName);

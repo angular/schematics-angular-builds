@@ -148,7 +148,7 @@ function addServerRoutingConfig(options, isStandalone) {
         host.commitUpdate(recorder);
     };
 }
-exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }) => {
+const appShellSchematic = (0, project_1.createProjectSchematic)(async (options, { tree }) => {
     const browserEntryPoint = await (0, util_1.getMainFilePath)(tree, options.project);
     const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(tree, browserEntryPoint);
     return (0, schematics_1.chain)([
@@ -163,4 +163,5 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }
         }),
     ]);
 });
+exports.default = appShellSchematic;
 //# sourceMappingURL=index.js.map

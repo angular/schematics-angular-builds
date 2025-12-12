@@ -14,7 +14,7 @@ const project_1 = require("../utility/project");
 const workspace_1 = require("../utility/workspace");
 const workspace_models_1 = require("../utility/workspace-models");
 const schema_1 = require("./schema");
-exports.default = (0, project_1.createProjectSchematic)((options, { project }) => {
+const configSchematic = (0, project_1.createProjectSchematic)((options, { project }) => {
     switch (options.type) {
         case schema_1.Type.Karma:
             return addKarmaConfig(options);
@@ -26,6 +26,7 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project }) =
             throw new schematics_1.SchematicsException(`"${options.type}" is an unknown configuration file type.`);
     }
 });
+exports.default = configSchematic;
 function addVitestConfig(options) {
     return (tree, context) => (0, workspace_1.updateWorkspace)((workspace) => {
         const project = workspace.projects.get(options.project);

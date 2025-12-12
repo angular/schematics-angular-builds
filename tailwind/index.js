@@ -93,7 +93,7 @@ function managePostCssConfiguration(project) {
         return (0, schematics_1.mergeWith)(templateSource);
     };
 }
-exports.default = (0, project_1.createProjectSchematic)((options, { project }) => {
+const tailwindSchematic = (0, project_1.createProjectSchematic)((options, { project }) => {
     return (0, schematics_1.chain)([
         addTailwindStyles(options, project),
         managePostCssConfiguration(project),
@@ -104,4 +104,5 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project }) =
         })),
     ]);
 });
+exports.default = tailwindSchematic;
 //# sourceMappingURL=index.js.map

@@ -268,7 +268,7 @@ function addServerFile(projectSourceRoot, options, isStandalone) {
         ]));
     };
 }
-exports.default = (0, project_1.createProjectSchematic)(async (options, { project, tree, context }) => {
+const ssrSchematic = (0, project_1.createProjectSchematic)(async (options, { project, tree, context }) => {
     const browserEntryPoint = await (0, util_1.getMainFilePath)(tree, options.project);
     const isStandalone = (0, ng_ast_utils_1.isStandaloneApp)(tree, browserEntryPoint);
     const usingApplicationBuilder = (0, project_targets_1.isUsingApplicationBuilder)(project);
@@ -292,4 +292,5 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { projec
         addDependencies(options, usingApplicationBuilder),
     ]);
 });
+exports.default = ssrSchematic;
 //# sourceMappingURL=index.js.map

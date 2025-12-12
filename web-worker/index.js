@@ -52,7 +52,7 @@ if (typeof Worker !== 'undefined') {
         return host;
     };
 }
-exports.default = (0, project_1.createProjectSchematic)((options, { project }) => {
+const webWorkerSchematic = (0, project_1.createProjectSchematic)((options, { project }) => {
     const projectType = project.extensions['projectType'];
     if (projectType !== 'application') {
         throw new schematics_1.SchematicsException(`Web Worker requires a project type of "application".`);
@@ -98,4 +98,5 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project }) =
         (0, schematics_1.mergeWith)(templateSourceWorkerConfig),
     ]);
 });
+exports.default = webWorkerSchematic;
 //# sourceMappingURL=index.js.map

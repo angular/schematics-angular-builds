@@ -132,7 +132,7 @@ function addDependencies(skipInstall) {
         ]);
     };
 }
-exports.default = (0, project_1.createProjectSchematic)(async (options, { project, tree }) => {
+const serverSchematic = (0, project_1.createProjectSchematic)(async (options, { project, tree }) => {
     if (project?.extensions.projectType !== 'application') {
         throw new schematics_1.SchematicsException(`Server schematic requires a project type of "application".`);
     }
@@ -199,4 +199,5 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { projec
         (0, utility_1.addRootProvider)(options.project, ({ code, external }) => code `${external('provideClientHydration', '@angular/platform-browser')}(${external('withEventReplay', '@angular/platform-browser')}())`),
     ]);
 });
+exports.default = serverSchematic;
 //# sourceMappingURL=index.js.map

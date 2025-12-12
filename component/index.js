@@ -26,7 +26,7 @@ function buildSelector(options, projectPrefix) {
     }
     return selector;
 }
-exports.default = (0, project_1.createProjectSchematic)((options, { project, tree }) => {
+const componentSchematic = (0, project_1.createProjectSchematic)((options, { project, tree }) => {
     if (options.path === undefined) {
         options.path = (0, workspace_1.buildDefaultPath)(project);
     }
@@ -36,7 +36,8 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
     const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
     options.name = parsedPath.name;
     options.path = parsedPath.path;
-    options.selector = options.selector || buildSelector(options, (project && project.prefix) || '');
+    options.selector =
+        options.selector || buildSelector(options, (project && project.prefix) || '');
     (0, validation_1.validateHtmlSelector)(options.selector);
     const classifiedName = schematics_1.strings.classify(options.name) +
         (options.addTypeToClassName && options.type ? schematics_1.strings.classify(options.type) : '');
@@ -76,4 +77,5 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
         (0, schematics_1.mergeWith)(templateSource),
     ]);
 });
+exports.default = componentSchematic;
 //# sourceMappingURL=index.js.map

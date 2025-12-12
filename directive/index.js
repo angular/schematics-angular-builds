@@ -25,7 +25,7 @@ function buildSelector(options, projectPrefix) {
     }
     return schematics_1.strings.camelize(selector);
 }
-exports.default = (0, project_1.createProjectSchematic)((options, { project, tree }) => {
+const directiveSchematic = (0, project_1.createProjectSchematic)((options, { project, tree }) => {
     if (options.path === undefined) {
         options.path = (0, workspace_1.buildDefaultPath)(project);
     }
@@ -49,4 +49,5 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
         }),
     ]);
 });
+exports.default = directiveSchematic;
 //# sourceMappingURL=index.js.map

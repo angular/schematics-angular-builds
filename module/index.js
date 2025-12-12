@@ -112,7 +112,7 @@ function buildRoute(options, modulePath) {
     const loadChildren = `() => import('${relativeModulePath}').then(m => m.${moduleName})`;
     return `{ path: '${options.route}', loadChildren: ${loadChildren} }`;
 }
-exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }) => {
+const moduleSchematic = (0, project_1.createProjectSchematic)(async (options, { tree }) => {
     if (options.path === undefined) {
         options.path = await (0, workspace_1.createDefaultPath)(tree, options.project);
     }
@@ -160,4 +160,5 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }
         isLazyLoadedModuleGen ? (0, schematics_1.schematic)('component', componentOptions) : (0, schematics_1.noop)(),
     ]);
 });
+exports.default = moduleSchematic;
 //# sourceMappingURL=index.js.map

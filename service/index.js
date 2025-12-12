@@ -13,7 +13,7 @@ const parse_name_1 = require("../utility/parse-name");
 const project_1 = require("../utility/project");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
-exports.default = (0, project_1.createProjectSchematic)((options, { project, tree }) => {
+const serviceSchematic = (0, project_1.createProjectSchematic)((options, { project, tree }) => {
     if (options.path === undefined) {
         options.path = (0, workspace_1.buildDefaultPath)(project);
     }
@@ -28,4 +28,5 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
         classifiedName,
     });
 });
+exports.default = serviceSchematic;
 //# sourceMappingURL=index.js.map

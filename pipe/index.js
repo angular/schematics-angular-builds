@@ -15,7 +15,7 @@ const parse_name_1 = require("../utility/parse-name");
 const project_1 = require("../utility/project");
 const validation_1 = require("../utility/validation");
 const workspace_1 = require("../utility/workspace");
-exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }) => {
+const pipeSchematic = (0, project_1.createProjectSchematic)(async (options, { tree }) => {
     options.path ??= await (0, workspace_1.createDefaultPath)(tree, options.project);
     options.module = (0, find_module_1.findModuleFromOptions)(tree, options);
     const parsedPath = (0, parse_name_1.parseName)(options.path, options.name);
@@ -30,4 +30,5 @@ exports.default = (0, project_1.createProjectSchematic)(async (options, { tree }
         (0, generate_from_files_1.generateFromFiles)(options),
     ]);
 });
+exports.default = pipeSchematic;
 //# sourceMappingURL=index.js.map

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { Rule } from '@angular-devkit/schematics';
+import { RuleFactory } from '@angular-devkit/schematics';
 import { Schema as DirectiveOptions } from './schema';
-declare const _default: (options: DirectiveOptions) => Rule;
-export default _default;
+declare const directiveSchematic: RuleFactory<DirectiveOptions>;
+export default directiveSchematic;
