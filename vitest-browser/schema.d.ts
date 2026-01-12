@@ -2,7 +2,7 @@ export type Schema = {
     /**
      * The package to be added.
      */
-    package?: string;
+    package: string;
     /**
      * The name of the project.
      */
