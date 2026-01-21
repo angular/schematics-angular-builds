@@ -102,7 +102,7 @@ function default_1(options) {
         }
         if (options.report) {
             const reportContent = reporter.generateReportContent();
-            tree.create(`jasmine-vitest-${new Date().toISOString()}.md`, reportContent);
+            tree.create(`jasmine-vitest-${new Date().toISOString().replaceAll(/[-:.]/g, '')}.md`, reportContent);
         }
         reporter.printSummary(options.verbose);
     };
