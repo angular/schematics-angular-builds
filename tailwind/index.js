@@ -34,7 +34,7 @@ function addTailwindStyles(options, project) {
         }
         if (!stylesheetPath) {
             const newStylesheetPath = (0, posix_1.join)(project.sourceRoot ?? 'src', 'tailwind.css');
-            tree.create(newStylesheetPath, '@import "tailwindcss";\n');
+            tree.create(newStylesheetPath, `@import 'tailwindcss';\n`);
             return (0, utility_1.updateWorkspace)((workspace) => {
                 const project = workspace.projects.get(options.project);
                 if (project) {
@@ -59,8 +59,8 @@ function addTailwindStyles(options, project) {
         }
         else {
             let stylesheetContent = tree.readText(stylesheetPath);
-            if (!stylesheetContent.includes('@import "tailwindcss";')) {
-                stylesheetContent += '\n@import "tailwindcss";\n';
+            if (!/@import ["']tailwindcss["'];/.test(stylesheetContent)) {
+                stylesheetContent += `\n@import 'tailwindcss';\n`;
                 tree.overwrite(stylesheetPath, stylesheetContent);
             }
         }
