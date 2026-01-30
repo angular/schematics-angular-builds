@@ -75,7 +75,7 @@ function getTsSourceFile(host, path) {
     const source = typescript_1.default.createSourceFile(path, content, typescript_1.default.ScriptTarget.Latest, true);
     return source;
 }
-const serviceWorkerSchematic = (0, project_1.createProjectSchematic)(async (options, { project, workspace, tree }) => {
+const serviceWorkerSchematic = (0, project_1.createProjectSchematic)(async (options, { project, workspace, tree, context: { logger } }) => {
     if (project.extensions.projectType !== 'application') {
         throw new schematics_1.SchematicsException(`Service worker requires a project type of "application".`);
     }
@@ -91,6 +91,10 @@ const serviceWorkerSchematic = (0, project_1.createProjectSchematic)(async (opti
         const productionConf = buildTarget.configurations?.production;
         if (productionConf) {
             productionConf.serviceWorker = ngswConfigPath;
+        }
+        else {
+            logger.warn('No "production" configuration found for build target. ' +
+                `The "serviceWorker" option with a value of "${ngswConfigPath}" will need to be set manually.`);
         }
     }
     else {
