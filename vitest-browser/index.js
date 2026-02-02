@@ -69,6 +69,11 @@ function default_1(options) {
                 existing: dependency_1.ExistingBehavior.Skip,
                 install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
             })),
+            (_, context) => {
+                context.logger.info('Vitest browser testing support has been added. ' +
+                    "To run tests in a browser, add a 'browsers' field to the 'test' target in 'angular.json', " +
+                    "or use the '--browsers' command line option.");
+            },
         ]);
     };
 }
