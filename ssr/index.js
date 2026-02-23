@@ -141,6 +141,10 @@ function updateApplicationBuilderWorkspaceConfigRule(projectSourceRoot, options,
         }
         buildTarget.options = {
             ...buildTarget.options,
+            security: {
+                ...(buildTarget.options?.security ?? {}),
+                allowedHosts: [],
+            },
             outputPath,
             outputMode: 'server',
             ssr: {
