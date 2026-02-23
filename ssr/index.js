@@ -173,6 +173,10 @@ function updateApplicationBuilderWorkspaceConfigRule(projectSourceRoot, options,
         }
         buildTarget.options = {
             ...buildTarget.options,
+            security: {
+                ...(buildTarget.options?.security ?? {}),
+                allowedHosts: [],
+            },
             outputPath,
             outputMode: options.serverRouting ? 'server' : undefined,
             prerender: options.serverRouting ? undefined : true,
