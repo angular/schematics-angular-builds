@@ -131,7 +131,6 @@ function addServerRoutingConfig(options, isStandalone) {
         if (!configFilePath || !host.exists(configFilePath)) {
             throw new schematics_1.SchematicsException(`Cannot find "${configFilePath}".`);
         }
-        let recorder = host.beginUpdate(configFilePath);
         const configSourceFile = getSourceFile(host, configFilePath);
         const functionCall = (0, ast_utils_1.findNodes)(configSourceFile, typescript_1.default.isCallExpression, 
         /** max */ undefined, 
@@ -139,7 +138,7 @@ function addServerRoutingConfig(options, isStandalone) {
         if (!functionCall) {
             throw new schematics_1.SchematicsException(`Cannot find the "provideServerRendering" function call in "${configFilePath}".`);
         }
-        recorder = host.beginUpdate(configFilePath);
+        const recorder = host.beginUpdate(configFilePath);
         recorder.insertLeft(functionCall.end - 1, `, withAppShell(AppShell)`);
         (0, change_1.applyToUpdateRecorder)(recorder, [
             (0, ast_utils_1.insertImport)(configSourceFile, configFilePath, 'withAppShell', '@angular/ssr'),

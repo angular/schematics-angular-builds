@@ -54,8 +54,7 @@ function findBootstrapModuleCall(host, mainPath) {
     const allNodes = (0, ast_utils_1.getSourceNodes)(source);
     let bootstrapCall = null;
     for (const node of allNodes) {
-        let bootstrapCallNode = null;
-        bootstrapCallNode = (0, ast_utils_1.findNode)(node, ts.SyntaxKind.Identifier, 'bootstrapModule');
+        let bootstrapCallNode = (0, ast_utils_1.findNode)(node, ts.SyntaxKind.Identifier, 'bootstrapModule');
         // Walk up the parent until CallExpression is found.
         while (bootstrapCallNode &&
             bootstrapCallNode.parent &&

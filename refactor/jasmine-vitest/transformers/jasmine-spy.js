@@ -134,7 +134,7 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
     const baseName = hasBaseName ? firstArg.text : undefined;
     const methods = hasBaseName ? node.arguments[1] : firstArg;
     const propertiesArg = hasBaseName ? node.arguments[2] : node.arguments[1];
-    let properties = [];
+    let properties;
     if (node.arguments.length < 2 && hasBaseName) {
         const category = 'createSpyObj-single-argument';
         reporter.recordTodo(category, sourceFile, node);

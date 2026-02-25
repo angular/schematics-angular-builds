@@ -205,7 +205,7 @@ function addAppToWorkspaceFile(options, appDir) {
         });
     }
     const sourceRoot = (0, core_1.join)((0, core_1.normalize)(projectRoot), 'src');
-    let budgets = [];
+    let budgets;
     if (options.strict) {
         budgets = [
             {
