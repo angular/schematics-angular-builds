@@ -144,7 +144,7 @@ function addDependenciesToPackageJson(options) {
             install: options.skipInstall ? dependency_1.InstallBehavior.None : dependency_1.InstallBehavior.Auto,
         }));
     }
-    if (!options.skipTests) {
+    if (!options.skipTests && !options.minimal) {
         rules.push(...(0, dependencies_1.addTestRunnerDependencies)(options.testRunner, !!options.skipInstall));
     }
     return (0, schematics_1.chain)(rules);
