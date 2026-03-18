@@ -34,14 +34,12 @@ export type Schema = {
     fileNameStyleGuide?: FileNameStyleGuide;
     /**
      * Include the styles for the initial application's root component directly within the
-     * `app.component.ts` file. By default, a separate stylesheet file (e.g.,
-     * `app.component.css`) is created.
+     * `app.ts` file. By default, a separate stylesheet file (e.g., `app.css`) is created.
      */
     inlineStyle?: boolean;
     /**
      * Include the HTML template for the initial application's root component directly within
-     * the `app.component.ts` file. By default, a separate template file (e.g.,
-     * `app.component.html`) is created.
+     * the `app.ts` file. By default, a separate template file (e.g., `app.html`) is created.
      */
     inlineTemplate?: boolean;
     /**

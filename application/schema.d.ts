@@ -13,14 +13,14 @@ export type Schema = {
      */
     fileNameStyleGuide?: FileNameStyleGuide;
     /**
-     * Include the styles for the root component directly within the `app.component.ts` file.
-     * Only CSS styles can be included inline. By default, a separate stylesheet file (e.g.,
-     * `app.component.css`) is created.
+     * Include the styles for the root component directly within the `app.ts` file. Only CSS
+     * styles can be included inline. By default, a separate stylesheet file (e.g., `app.css`)
+     * is created.
      */
     inlineStyle?: boolean;
     /**
-     * Include the HTML template for the root component directly within the `app.component.ts`
-     * file. By default, a separate template file (e.g., `app.component.html`) is created.
+     * Include the HTML template for the root component directly within the `app.ts` file. By
+     * default, a separate template file (e.g., `app.html`) is created.
      */
     inlineTemplate?: boolean;
     /**
