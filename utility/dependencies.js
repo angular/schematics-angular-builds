@@ -69,6 +69,7 @@ function addTestRunnerDependencies(testRunner, skipInstall) {
             'karma-jasmine-html-reporter',
             'jasmine-core',
             '@types/jasmine',
+            'istanbul-lib-instrument',
         ];
     return dependencies.map((name) => (0, dependency_1.addDependency)(name, latest_versions_1.latestVersions[name], {
         type: dependency_1.DependencyType.Dev,
