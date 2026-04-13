@@ -11,6 +11,6 @@
  * `jasmine.SpyObj` to Vitest's `Mock` and `MockedObject` types, and ensures that the
  * necessary `vitest` imports are added to the file.
  */
-import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../../third_party/typescript';
 import { RefactorContext } from '../utils/refactor-context';
 export declare function transformJasmineTypes(node: ts.Node, { sourceFile, reporter, pendingVitestTypeImports }: RefactorContext): ts.Node;

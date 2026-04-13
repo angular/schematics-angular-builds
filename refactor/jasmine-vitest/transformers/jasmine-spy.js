@@ -20,7 +20,7 @@ exports.transformSpyCallInspection = transformSpyCallInspection;
  * `createSpy`, `createSpyObj`), spy strategies (`and.returnValue`, `and.callFake`),
  * and the inspection of spy calls (`spy.calls.reset`, `spy.calls.mostRecent`).
  */
-const typescript_1 = __importDefault(require("../../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const typescript_1 = __importDefault(require("../../../third_party/typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");

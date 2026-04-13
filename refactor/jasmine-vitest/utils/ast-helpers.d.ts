@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../../third_party/typescript';
 export declare function addVitestValueImport(imports: Set<string>, importName: string): void;
 export declare function addVitestTypeImport(imports: Set<string>, importName: string): void;
 export declare function getVitestAutoImports(valueImports: Set<string>, typeImports: Set<string>): ts.ImportDeclaration | undefined;

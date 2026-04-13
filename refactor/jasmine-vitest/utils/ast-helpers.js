@@ -16,7 +16,7 @@ exports.getVitestAutoImports = getVitestAutoImports;
 exports.createViCallExpression = createViCallExpression;
 exports.createExpectCallExpression = createExpectCallExpression;
 exports.createPropertyAccess = createPropertyAccess;
-const typescript_1 = __importDefault(require("../../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const typescript_1 = __importDefault(require("../../../third_party/typescript"));
 function addVitestValueImport(imports, importName) {
     imports.add(importName);
 }

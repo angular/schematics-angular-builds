@@ -57,7 +57,7 @@ exports.isImported = isImported;
 exports.getRouterModuleDeclaration = getRouterModuleDeclaration;
 exports.addRouteDeclarationToModule = addRouteDeclarationToModule;
 exports.hasTopLevelIdentifier = hasTopLevelIdentifier;
-const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const ts = __importStar(require("../third_party/typescript"));
 const change_1 = require("./change");
 const eol_1 = require("./eol");
 /**

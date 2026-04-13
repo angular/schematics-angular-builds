@@ -27,7 +27,7 @@ exports.transformExpectNothing = transformExpectNothing;
  * (`expectAsync`), and complex matchers that require restructuring, such as
  * `toHaveBeenCalledOnceWith` and `arrayWithExactContents`.
  */
-const typescript_1 = __importDefault(require("../../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const typescript_1 = __importDefault(require("../../../third_party/typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");

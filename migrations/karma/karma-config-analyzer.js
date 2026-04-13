@@ -11,7 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.analyzeKarmaConfig = analyzeKarmaConfig;
-const typescript_1 = __importDefault(require("../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const typescript_1 = __importDefault(require("../../third_party/typescript"));
 function isRequireInfo(value) {
     return typeof value === 'object' && value !== null && !Array.isArray(value) && 'module' in value;
 }

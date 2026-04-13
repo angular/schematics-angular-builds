@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
-const typescript_1 = __importDefault(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const typescript_1 = __importDefault(require("../third_party/typescript"));
 const ast_utils_1 = require("../utility/ast-utils");
 const change_1 = require("../utility/change");
 const ng_ast_utils_1 = require("../utility/ng-ast-utils");

@@ -45,7 +45,7 @@ exports.getAppModulePath = getAppModulePath;
 exports.isStandaloneApp = isStandaloneApp;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
-const ts = __importStar(require("../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const ts = __importStar(require("../third_party/typescript"));
 const ast_utils_1 = require("../utility/ast-utils");
 const util_1 = require("./standalone/util");
 function findBootstrapModuleCall(host, mainPath) {

@@ -12,7 +12,7 @@
  * (`expectAsync`), and complex matchers that require restructuring, such as
  * `toHaveBeenCalledOnceWith` and `arrayWithExactContents`.
  */
-import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../../third_party/typescript';
 import { RefactorContext } from '../utils/refactor-context';
 export declare function transformSyntacticSugarMatchers(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformAsymmetricMatchers(node: ts.Node, { sourceFile, reporter, pendingVitestValueImports }: RefactorContext): ts.Node;

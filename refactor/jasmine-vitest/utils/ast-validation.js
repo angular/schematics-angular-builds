@@ -16,7 +16,7 @@ exports.isJasmineCallExpression = isJasmineCallExpression;
  * @fileoverview This file contains helper functions for validating the structure of
  * TypeScript AST nodes, particularly for identifying specific patterns in Jasmine tests.
  */
-const typescript_1 = __importDefault(require("../../../third_party/github.com/Microsoft/TypeScript/lib/typescript"));
+const typescript_1 = __importDefault(require("../../../third_party/typescript"));
 /**
  * If a node is a `jasmine.method()` call, returns the method name.
  * @param node The node to check.
