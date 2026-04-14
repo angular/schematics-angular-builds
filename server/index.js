@@ -196,7 +196,7 @@ const serverSchematic = (0, project_1.createProjectSchematic)(async (options, { 
                 updateConfigFileBrowserBuilder(options, tsConfigDirectory),
             ]),
         addDependencies(options.skipInstall),
-        (0, utility_1.addRootProvider)(options.project, ({ code, external }) => code `${external('provideClientHydration', '@angular/platform-browser')}(${external('withEventReplay', '@angular/platform-browser')}())`),
+        (0, utility_1.addRootProvider)(options.project, ({ code, external }) => code `${external('provideClientHydration', '@angular/platform-browser')}()`),
     ]);
 });
 exports.default = serverSchematic;
