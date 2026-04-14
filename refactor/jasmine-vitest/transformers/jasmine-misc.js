@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.transformTimerMocks = transformTimerMocks;
 exports.transformFail = transformFail;
-exports.transformDefaultTimeoutInterval = transformDefaultTimeoutInterval;
-exports.transformGlobalFunctions = transformGlobalFunctions;
+exports.transformJasmineMembers = transformJasmineMembers;
+exports.transformUnsupportedGlobalFunctions = transformUnsupportedGlobalFunctions;
 exports.transformUnsupportedJasmineCalls = transformUnsupportedJasmineCalls;
 exports.transformUnknownJasmineProperties = transformUnknownJasmineProperties;
 /**
@@ -51,6 +51,18 @@ function transformTimerMocks(node, { sourceFile, reporter, pendingVitestValueImp
         case 'mockDate':
             newMethodName = 'setSystemTime';
             break;
+        case 'autoTick': {
+            const category = 'clockAutoTick';
+            reporter.recordTodo(category, sourceFile, node);
+            (0, comment_helpers_1.addTodoComment)(node, category);
+            return node;
+        }
+        case 'withMock': {
+            const category = 'clockWithMock';
+            reporter.recordTodo(category, sourceFile, node);
+            (0, comment_helpers_1.addTodoComment)(node, category);
+            return node;
+        }
     }
     if (newMethodName) {
         (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
@@ -74,49 +86,87 @@ function transformFail(node, { sourceFile, reporter }) {
         typescript_1.default.isIdentifier(node.expression.expression) &&
         node.expression.expression.text === 'fail') {
         reporter.reportTransformation(sourceFile, node, 'Transformed `fail()` to `throw new Error()`.');
-        const reason = node.expression.arguments[0];
-        const replacement = typescript_1.default.factory.createThrowStatement(typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Error'), undefined, reason ? [reason] : []));
+        const arg = node.expression.arguments[0];
+        let throwExpression;
+        if (arg && typescript_1.default.isNewExpression(arg)) {
+            throwExpression = arg;
+        }
+        else {
+            throwExpression = typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Error'), undefined, arg ? [arg] : []);
+        }
+        const replacement = typescript_1.default.factory.createThrowStatement(throwExpression);
         return typescript_1.default.setOriginalNode(typescript_1.default.setTextRange(replacement, node), node);
     }
     return node;
 }
-function transformDefaultTimeoutInterval(node, { sourceFile, reporter, pendingVitestValueImports }) {
+function transformJasmineMembers(node, refactorCtx) {
+    const { sourceFile, reporter } = refactorCtx;
     if (typescript_1.default.isExpressionStatement(node) &&
         typescript_1.default.isBinaryExpression(node.expression) &&
         node.expression.operatorToken.kind === typescript_1.default.SyntaxKind.EqualsToken) {
         const assignment = node.expression;
         if (typescript_1.default.isPropertyAccessExpression(assignment.left) &&
             typescript_1.default.isIdentifier(assignment.left.expression) &&
-            assignment.left.expression.text === 'jasmine' &&
-            assignment.left.name.text === 'DEFAULT_TIMEOUT_INTERVAL') {
-            (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
-            reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.DEFAULT_TIMEOUT_INTERVAL` to `vi.setConfig()`.');
-            const timeoutValue = assignment.right;
-            const setConfigCall = (0, ast_helpers_1.createViCallExpression)('setConfig', [
-                typescript_1.default.factory.createObjectLiteralExpression([typescript_1.default.factory.createPropertyAssignment('testTimeout', timeoutValue)], false),
-            ]);
-            return typescript_1.default.factory.updateExpressionStatement(node, setConfigCall);
+            assignment.left.expression.text === 'jasmine') {
+            const memberName = assignment.left.name.text;
+            switch (memberName) {
+                case 'DEFAULT_TIMEOUT_INTERVAL':
+                    return transformJasmineDefaultTimeoutInterval(node, assignment.right, refactorCtx);
+                case 'MAX_PRETTY_PRINT_ARRAY_LENGTH':
+                case 'MAX_PRETTY_PRINT_DEPTH':
+                case 'MAX_PRETTY_PRINT_CHARS': {
+                    const replacement = typescript_1.default.factory.createEmptyStatement();
+                    const originalText = node.getFullText().trim();
+                    reporter.reportTransformation(sourceFile, node, `Removed \`${memberName}\` member assignment.`);
+                    const category = 'unsupported-jasmine-member';
+                    reporter.recordTodo(category, sourceFile, node);
+                    (0, comment_helpers_1.addTodoComment)(replacement, category, { name: memberName });
+                    typescript_1.default.addSyntheticLeadingComment(replacement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${originalText}`, true);
+                    return replacement;
+                }
+            }
         }
     }
     return node;
 }
-function transformGlobalFunctions(node, { sourceFile, reporter }) {
+function transformJasmineDefaultTimeoutInterval(expression, timeoutValue, { sourceFile, reporter, pendingVitestValueImports }) {
+    (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
+    reporter.reportTransformation(sourceFile, expression, 'Transformed `jasmine.DEFAULT_TIMEOUT_INTERVAL` to `vi.setConfig()`.');
+    const setConfigCall = (0, ast_helpers_1.createViCallExpression)('setConfig', [
+        typescript_1.default.factory.createObjectLiteralExpression([typescript_1.default.factory.createPropertyAssignment('testTimeout', timeoutValue)], false),
+    ]);
+    return typescript_1.default.factory.updateExpressionStatement(expression, setConfigCall);
+}
+const UNSUPPORTED_GLOBAL_FUNCTION_CATEGORIES = new Set([
+    'setSpecProperty',
+    'setSuiteProperty',
+    'throwUnless',
+    'throwUnlessAsync',
+    'getSpecProperty',
+]);
+// A type guard to ensure that the methodName is one of the categories handled by this transformer.
+function isUnsupportedGlobalFunction(methodName) {
+    return UNSUPPORTED_GLOBAL_FUNCTION_CATEGORIES.has(methodName);
+}
+function transformUnsupportedGlobalFunctions(node, { sourceFile, reporter }) {
     if (typescript_1.default.isCallExpression(node) &&
         typescript_1.default.isIdentifier(node.expression) &&
-        (node.expression.text === 'setSpecProperty' || node.expression.text === 'setSuiteProperty')) {
+        isUnsupportedGlobalFunction(node.expression.text)) {
         const functionName = node.expression.text;
         reporter.reportTransformation(sourceFile, node, `Found unsupported global function \`${functionName}\`.`);
-        const category = 'unsupported-global-function';
-        reporter.recordTodo(category, sourceFile, node);
-        (0, comment_helpers_1.addTodoComment)(node, category, { name: functionName });
+        reporter.recordTodo(functionName, sourceFile, node);
+        (0, comment_helpers_1.addTodoComment)(node, functionName);
     }
     return node;
 }
 const UNSUPPORTED_JASMINE_CALLS_CATEGORIES = new Set([
     'addMatchers',
+    'addAsyncMatchers',
     'addCustomEqualityTester',
+    'addCustomObjectFormatter',
     'mapContaining',
     'setContaining',
+    'addSpyStrategy',
 ]);
 // A type guard to ensure that the methodName is one of the categories handled by this transformer.
 function isUnsupportedJasmineCall(methodName) {
@@ -137,6 +187,7 @@ const HANDLED_JASMINE_PROPERTIES = new Set([
     'createSpy',
     'createSpyObj',
     'spyOnAllFunctions',
+    'addSpyStrategy',
     // Clock
     'clock',
     // Matchers
@@ -154,8 +205,13 @@ const HANDLED_JASMINE_PROPERTIES = new Set([
     'setContaining',
     // Other
     'DEFAULT_TIMEOUT_INTERVAL',
+    'MAX_PRETTY_PRINT_ARRAY_LENGTH',
+    'MAX_PRETTY_PRINT_DEPTH',
+    'MAX_PRETTY_PRINT_CHARS',
     'addMatchers',
+    'addAsyncMatchers',
     'addCustomEqualityTester',
+    'addCustomObjectFormatter',
 ]);
 function transformUnknownJasmineProperties(node, { sourceFile, reporter }) {
     if (typescript_1.default.isPropertyAccessExpression(node) &&

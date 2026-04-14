@@ -84,15 +84,17 @@ const callExpressionTransformers = [
     jasmine_matcher_1.transformSyntacticSugarMatchers,
     jasmine_matcher_1.transformComplexMatchers,
     jasmine_spy_1.transformSpies,
+    jasmine_spy_1.transformCreateSpy,
     jasmine_spy_1.transformCreateSpyObj,
     jasmine_spy_1.transformSpyReset,
     jasmine_spy_1.transformSpyCallInspection,
-    jasmine_matcher_1.transformtoHaveBeenCalledBefore,
+    jasmine_matcher_1.transformToHaveBeenCalledBefore,
     jasmine_matcher_1.transformToHaveClass,
+    jasmine_matcher_1.transformToBeNullish,
     // **Stage 3: Global Functions & Cleanup**
     // These handle global Jasmine functions and catch-alls for unsupported APIs.
     jasmine_misc_1.transformTimerMocks,
-    jasmine_misc_1.transformGlobalFunctions,
+    jasmine_misc_1.transformUnsupportedGlobalFunctions,
     jasmine_misc_1.transformUnsupportedJasmineCalls,
 ];
 /**
@@ -114,7 +116,7 @@ const expressionStatementTransformers = [
     jasmine_matcher_1.transformArrayWithExactContents,
     jasmine_matcher_1.transformExpectNothing,
     jasmine_misc_1.transformFail,
-    jasmine_misc_1.transformDefaultTimeoutInterval,
+    jasmine_misc_1.transformJasmineMembers,
 ];
 /**
  * Transforms a string of Jasmine test code to Vitest test code.

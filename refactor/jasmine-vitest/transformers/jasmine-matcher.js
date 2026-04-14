@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.transformSyntacticSugarMatchers = transformSyntacticSugarMatchers;
 exports.transformAsymmetricMatchers = transformAsymmetricMatchers;
-exports.transformtoHaveBeenCalledBefore = transformtoHaveBeenCalledBefore;
+exports.transformToHaveBeenCalledBefore = transformToHaveBeenCalledBefore;
 exports.transformToHaveClass = transformToHaveClass;
 exports.transformExpectAsync = transformExpectAsync;
 exports.transformComplexMatchers = transformComplexMatchers;
@@ -20,6 +20,7 @@ exports.transformArrayWithExactContents = transformArrayWithExactContents;
 exports.transformCalledOnceWith = transformCalledOnceWith;
 exports.transformWithContext = transformWithContext;
 exports.transformExpectNothing = transformExpectNothing;
+exports.transformToBeNullish = transformToBeNullish;
 /**
  * @fileoverview This file contains transformers that migrate Jasmine matchers to their
  * Vitest counterparts. It handles a wide range of matchers, including syntactic sugar
@@ -94,7 +95,7 @@ function transformAsymmetricMatchers(node, { sourceFile, reporter, pendingVitest
     }
     return node;
 }
-function transformtoHaveBeenCalledBefore(node, { sourceFile, reporter }) {
+function transformToHaveBeenCalledBefore(node, { sourceFile, reporter }) {
     if (!typescript_1.default.isCallExpression(node) ||
         !typescript_1.default.isPropertyAccessExpression(node.expression) ||
         node.arguments.length !== 1) {
@@ -142,23 +143,18 @@ function transformToHaveClass(node, { sourceFile, reporter }) {
         isNegated = true;
         expectExpression = expectExpression.expression;
     }
-    if (matcherName !== 'toHaveClass') {
+    if (matcherName !== 'toHaveClass' || !typescript_1.default.isCallExpression(expectExpression)) {
         return node;
     }
     reporter.reportTransformation(sourceFile, node, 'Transformed `.toHaveClass()` to a `classList.contains()` check.');
     const [className] = node.arguments;
     const newExpectArgs = [];
-    if (typescript_1.default.isCallExpression(expectExpression)) {
-        const [element] = expectExpression.arguments;
-        const classListContains = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)((0, ast_helpers_1.createPropertyAccess)(element, 'classList'), 'contains'), undefined, [className]);
-        newExpectArgs.push(classListContains);
-        // Pass the context message from withContext to the new expect call
-        if (expectExpression.arguments.length > 1) {
-            newExpectArgs.push(expectExpression.arguments[1]);
-        }
-    }
-    else {
-        return node;
+    const [element] = expectExpression.arguments;
+    const classListContains = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)((0, ast_helpers_1.createPropertyAccess)(element, 'classList'), 'contains'), undefined, [className]);
+    newExpectArgs.push(classListContains);
+    // Pass the context message from withContext to the new expect call
+    if (expectExpression.arguments.length > 1) {
+        newExpectArgs.push(expectExpression.arguments[1]);
     }
     const newExpect = (0, ast_helpers_1.createExpectCallExpression)(newExpectArgs);
     const newMatcher = isNegated ? typescript_1.default.factory.createFalse() : typescript_1.default.factory.createTrue();
@@ -397,5 +393,31 @@ function transformExpectNothing(node, { sourceFile, reporter }) {
     (0, comment_helpers_1.addTodoComment)(replacement, category);
     typescript_1.default.addSyntheticLeadingComment(replacement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${originalText}`, true);
     return replacement;
+}
+function transformToBeNullish(node, { sourceFile, reporter }) {
+    if (!typescript_1.default.isCallExpression(node) ||
+        !typescript_1.default.isPropertyAccessExpression(node.expression) ||
+        node.arguments.length !== 0) {
+        return node;
+    }
+    const pae = node.expression;
+    const matcherName = pae.name.text;
+    let isNegated = false;
+    let expectExpression = pae.expression;
+    if (typescript_1.default.isPropertyAccessExpression(expectExpression) && expectExpression.name.text === 'not') {
+        isNegated = true;
+        expectExpression = expectExpression.expression;
+    }
+    if (matcherName !== 'toBeNullish' || !typescript_1.default.isCallExpression(expectExpression)) {
+        return node;
+    }
+    reporter.reportTransformation(sourceFile, node, 'Transformed `.toBeNullish()` to a `element == null` check.');
+    const element = expectExpression.arguments[0];
+    const nullCheckExpression = typescript_1.default.factory.createBinaryExpression(element, typescript_1.default.SyntaxKind.EqualsEqualsToken, typescript_1.default.factory.createNull());
+    const newExpect = (0, ast_helpers_1.createExpectCallExpression)([nullCheckExpression]);
+    const newMatcher = isNegated ? typescript_1.default.factory.createFalse() : typescript_1.default.factory.createTrue();
+    return typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(newExpect, 'toBe'), undefined, [
+        newMatcher,
+    ]);
 }
 //# sourceMappingURL=jasmine-matcher.js.map

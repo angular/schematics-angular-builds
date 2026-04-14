@@ -16,6 +16,7 @@ exports.getVitestAutoImports = getVitestAutoImports;
 exports.createViCallExpression = createViCallExpression;
 exports.createExpectCallExpression = createExpectCallExpression;
 exports.createPropertyAccess = createPropertyAccess;
+exports.getPromiseResolveRejectMethod = getPromiseResolveRejectMethod;
 const typescript_1 = __importDefault(require("../../../third_party/typescript"));
 function addVitestValueImport(imports, importName) {
     imports.add(importName);
@@ -54,5 +55,25 @@ function createPropertyAccess(expressionOrIndentifierText, name) {
     return typescript_1.default.factory.createPropertyAccessExpression(typeof expressionOrIndentifierText === 'string'
         ? typescript_1.default.factory.createIdentifier(expressionOrIndentifierText)
         : expressionOrIndentifierText, name);
+}
+function getPromiseResolveRejectMethod(node) {
+    if (!typescript_1.default.isCallExpression(node)) {
+        return null;
+    }
+    const expr = node.expression;
+    if (!typescript_1.default.isPropertyAccessExpression(expr) ||
+        !typescript_1.default.isIdentifier(expr.expression) ||
+        expr.expression.escapedText !== 'Promise') {
+        return null;
+    }
+    const methodName = expr.name.escapedText;
+    const isResolveReject = methodName === 'resolve' || methodName === 'reject';
+    if (!isResolveReject) {
+        return null;
+    }
+    return {
+        methodName,
+        arguments: node.arguments,
+    };
 }
 //# sourceMappingURL=ast-helpers.js.map

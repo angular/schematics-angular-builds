@@ -57,24 +57,51 @@ export declare const TODO_NOTES: {
     readonly 'expect-nothing': {
         readonly message: "expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.";
     };
-    readonly 'unsupported-global-function': {
+    readonly 'unsupported-jasmine-member': {
         readonly message: (context: {
             name: string;
         }) => string;
     };
+    readonly setSpecProperty: {
+        readonly message: string;
+    };
+    readonly setSuiteProperty: {
+        readonly message: string;
+    };
+    readonly throwUnless: {
+        readonly message: "Unsupported global function `throwUnless` found. Please migrate manually to a direct assertion.";
+    };
+    readonly throwUnlessAsync: {
+        readonly message: "Unsupported global function `throwUnlessAsync` found. Please migrate manually to a direct assertion.";
+    };
+    readonly getSpecProperty: {
+        readonly message: "Unsupported global function `getSpecProperty` found. Please migrate manually.";
+    };
     readonly addMatchers: {
         readonly message: "jasmine.addMatchers is not supported. Please manually migrate to expect.extend().";
+        readonly url: "https://vitest.dev/api/expect.html#expect-extend";
+    };
+    readonly addAsyncMatchers: {
+        readonly message: "jasmine.addAsyncMatchers is not supported. Please manually migrate to expect.extend().";
         readonly url: "https://vitest.dev/api/expect.html#expect-extend";
     };
     readonly addCustomEqualityTester: {
         readonly message: "jasmine.addCustomEqualityTester is not supported. Please manually migrate to expect.addEqualityTesters().";
         readonly url: "https://vitest.dev/api/expect.html#expect-addequalitytesters";
     };
+    readonly addCustomObjectFormatter: {
+        readonly message: "jasmine.addCustomObjectFormatter is not supported. May be possible to migrate to expect.addSnapshotSerializer().";
+        readonly url: "https://vitest.dev/api/expect.html#expect-addsnapshotserializer";
+    };
     readonly mapContaining: {
         readonly message: string;
     };
     readonly setContaining: {
         readonly message: string;
+    };
+    readonly addSpyStrategy: {
+        readonly message: "jasmine.addSpyStrategy is not supported. Please manually migrate to spy.mockImplementation().";
+        readonly url: "https://vitest.dev/api/mock.html#mockimplementation";
     };
     readonly 'unknown-jasmine-property': {
         readonly message: (context: {
@@ -106,6 +133,17 @@ export declare const TODO_NOTES: {
     readonly 'mostRecent-without-args': {
         readonly message: string;
         readonly url: "https://vitest.dev/api/mocked.html#mock-lastcall";
+    };
+    readonly saveArgumentsByValue: {
+        readonly message: string;
+    };
+    readonly clockAutoTick: {
+        readonly message: "Vitest does not have a direct equivalent for jasmine.clock().autoTick(). Please migrate this manually.";
+        readonly url: "https://vitest.dev/api/vi.html#fake-timers";
+    };
+    readonly clockWithMock: {
+        readonly message: string;
+        readonly url: "https://vitest.dev/api/vi.html#vi-usefaketimers";
     };
     readonly 'unhandled-done-usage': {
         readonly message: "The 'done' callback was used in an unhandled way. Please migrate manually.";
