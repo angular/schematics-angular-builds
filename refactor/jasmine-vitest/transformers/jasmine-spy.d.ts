@@ -11,7 +11,7 @@
  * `createSpy`, `createSpyObj`), spy strategies (`and.returnValue`, `and.callFake`),
  * and the inspection of spy calls (`spy.calls.reset`, `spy.calls.mostRecent`).
  */
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 import { RefactorContext } from '../utils/refactor-context';
 export declare function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.Node;
 export declare function transformCreateSpy(node: ts.Node, { reporter, sourceFile, pendingVitestValueImports }: RefactorContext): ts.Node;

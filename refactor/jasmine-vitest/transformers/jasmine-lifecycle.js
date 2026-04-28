@@ -19,7 +19,7 @@ exports.transformDoneCallback = transformDoneCallback;
  * focused/skipped tests (fdescribe, fit, xdescribe, xit), pending tests, and asynchronous
  * operations that use the `done` callback.
  */
-const typescript_1 = __importDefault(require("../../../third_party/typescript"));
+const typescript_1 = __importDefault(require("typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 const comment_helpers_1 = require("../utils/comment-helpers");
 const FOCUSED_SKIPPED_RENAMES = new Map([

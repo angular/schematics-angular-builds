@@ -11,7 +11,7 @@
  * function, and configuration settings like `jasmine.DEFAULT_TIMEOUT_INTERVAL`. It also
  * includes logic to identify and add TODO comments for unsupported Jasmine features.
  */
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 import { RefactorContext } from '../utils/refactor-context';
 export declare function transformTimerMocks(node: ts.Node, { sourceFile, reporter, pendingVitestValueImports }: RefactorContext): ts.Node;
 export declare function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;

@@ -17,7 +17,7 @@ exports.transformJasmineTypes = transformJasmineTypes;
  * `jasmine.SpyObj` to Vitest's `Mock` and `MockedObject` types, and ensures that the
  * necessary `vitest` imports are added to the file.
  */
-const typescript_1 = __importDefault(require("../../../third_party/typescript"));
+const typescript_1 = __importDefault(require("typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 function transformJasmineTypes(node, { sourceFile, reporter, pendingVitestTypeImports }) {
     const typeNameNode = typescript_1.default.isTypeReferenceNode(node) ? node.typeName : node;

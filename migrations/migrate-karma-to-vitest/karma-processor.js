@@ -8,9 +8,9 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.processKarmaConfig = processKarmaConfig;
-const karma_config_analyzer_1 = require("../karma/karma-config-analyzer");
-const karma_config_comparer_1 = require("../karma/karma-config-comparer");
 const constants_1 = require("./constants");
+const karma_config_analyzer_1 = require("./karma-config-analyzer");
+const karma_config_comparer_1 = require("./karma-config-comparer");
 function extractReporters(analysis, options, projectName, context) {
     const reporters = analysis.settings.get('reporters');
     if (Array.isArray(reporters)) {
@@ -124,7 +124,8 @@ async function processKarmaConfig(karmaConfig, options, projectName, context, tr
         else {
             context.logger.warn(`Project "${projectName}" uses a custom Karma configuration file "${karmaConfig}". ` +
                 `Tests have been migrated to use Vitest, but you may need to manually migrate custom settings ` +
-                `from this Karma config to a Vitest config (e.g. vitest.config.ts).`);
+                `from this Karma config to a Vitest config (e.g. "vitest-base.config.ts") ` +
+                `and set the "runnerConfig" option to true.`);
             manualMigrationFiles.push(karmaConfig);
         }
     }

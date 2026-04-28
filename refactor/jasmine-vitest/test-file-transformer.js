@@ -17,7 +17,7 @@ exports.transformJasmineToVitest = transformJasmineToVitest;
  * syntax and APIs to their Vitest equivalents. It also handles import management,
  * blank line preservation, and reporting of transformation details.
  */
-const typescript_1 = __importDefault(require("../../third_party/typescript"));
+const typescript_1 = __importDefault(require("typescript"));
 const jasmine_lifecycle_1 = require("./transformers/jasmine-lifecycle");
 const jasmine_matcher_1 = require("./transformers/jasmine-matcher");
 const jasmine_misc_1 = require("./transformers/jasmine-misc");

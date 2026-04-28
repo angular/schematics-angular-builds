@@ -22,7 +22,7 @@ exports.transformUnknownJasmineProperties = transformUnknownJasmineProperties;
  * function, and configuration settings like `jasmine.DEFAULT_TIMEOUT_INTERVAL`. It also
  * includes logic to identify and add TODO comments for unsupported Jasmine features.
  */
-const typescript_1 = __importDefault(require("../../../third_party/typescript"));
+const typescript_1 = __importDefault(require("typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");

@@ -17,7 +17,7 @@ exports.createViCallExpression = createViCallExpression;
 exports.createExpectCallExpression = createExpectCallExpression;
 exports.createPropertyAccess = createPropertyAccess;
 exports.getPromiseResolveRejectMethod = getPromiseResolveRejectMethod;
-const typescript_1 = __importDefault(require("../../../third_party/typescript"));
+const typescript_1 = __importDefault(require("typescript"));
 function addVitestValueImport(imports, importName) {
     imports.add(importName);
 }

@@ -28,7 +28,7 @@ exports.transformToBeNullish = transformToBeNullish;
  * (`expectAsync`), and complex matchers that require restructuring, such as
  * `toHaveBeenCalledOnceWith` and `arrayWithExactContents`.
  */
-const typescript_1 = __importDefault(require("../../../third_party/typescript"));
+const typescript_1 = __importDefault(require("typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");

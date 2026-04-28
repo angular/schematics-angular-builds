@@ -9,7 +9,7 @@
  * @fileoverview This file contains helper functions for validating the structure of
  * TypeScript AST nodes, particularly for identifying specific patterns in Jasmine tests.
  */
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 /**
  * If a node is a `jasmine.method()` call, returns the method name.
  * @param node The node to check.

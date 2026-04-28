@@ -6,39 +6,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.insertImport = insertImport;
 exports.findNodes = findNodes;
@@ -57,7 +27,7 @@ exports.isImported = isImported;
 exports.getRouterModuleDeclaration = getRouterModuleDeclaration;
 exports.addRouteDeclarationToModule = addRouteDeclarationToModule;
 exports.hasTopLevelIdentifier = hasTopLevelIdentifier;
-const ts = __importStar(require("../third_party/typescript"));
+const typescript_1 = __importDefault(require("typescript"));
 const change_1 = require("./change");
 const eol_1 = require("./eol");
 /**
@@ -72,35 +42,35 @@ const eol_1 = require("./eol");
  */
 function insertImport(source, fileToEdit, symbolName, fileName, isDefault = false, alias) {
     const rootNode = source;
-    const allImports = findNodes(rootNode, ts.isImportDeclaration);
+    const allImports = findNodes(rootNode, typescript_1.default.isImportDeclaration);
     const importExpression = alias ? `${symbolName} as ${alias}` : symbolName;
     // get nodes that map to import statements from the file fileName
     const relevantImports = allImports.filter((node) => {
-        return ts.isStringLiteralLike(node.moduleSpecifier) && node.moduleSpecifier.text === fileName;
+        return typescript_1.default.isStringLiteralLike(node.moduleSpecifier) && node.moduleSpecifier.text === fileName;
     });
     if (relevantImports.length > 0) {
         const hasNamespaceImport = relevantImports.some((node) => {
-            return node.importClause?.namedBindings?.kind === ts.SyntaxKind.NamespaceImport;
+            return node.importClause?.namedBindings?.kind === typescript_1.default.SyntaxKind.NamespaceImport;
         });
         // if imports * from fileName, don't add symbolName
         if (hasNamespaceImport) {
             return new change_1.NoopChange();
         }
         const imports = relevantImports.flatMap((node) => {
-            return node.importClause?.namedBindings && ts.isNamedImports(node.importClause.namedBindings)
+            return node.importClause?.namedBindings && typescript_1.default.isNamedImports(node.importClause.namedBindings)
                 ? node.importClause.namedBindings.elements
                 : [];
         });
         // insert import if it's not there
         if (!imports.some((node) => (node.propertyName || node.name).text === symbolName)) {
-            const fallbackPos = findNodes(relevantImports[0], ts.SyntaxKind.CloseBraceToken)[0].getStart() ||
-                findNodes(relevantImports[0], ts.SyntaxKind.FromKeyword)[0].getStart();
+            const fallbackPos = findNodes(relevantImports[0], typescript_1.default.SyntaxKind.CloseBraceToken)[0].getStart() ||
+                findNodes(relevantImports[0], typescript_1.default.SyntaxKind.FromKeyword)[0].getStart();
             return insertAfterLastOccurrence(imports, `, ${importExpression}`, fileToEdit, fallbackPos);
         }
         return new change_1.NoopChange();
     }
     // no such import declaration exists
-    const useStrict = findNodes(rootNode, ts.isStringLiteral).filter((n) => n.text === 'use strict');
+    const useStrict = findNodes(rootNode, typescript_1.default.isStringLiteral).filter((n) => n.text === 'use strict');
     let fallbackPos = 0;
     if (useStrict.length > 0) {
         fallbackPos = useStrict[0].end;
@@ -113,7 +83,7 @@ function insertImport(source, fileToEdit, symbolName, fileName, isDefault = fals
     const separator = insertAtBeginning ? '' : `;${eol}`;
     const toInsert = `${separator}import ${open}${importExpression}${close}` +
         ` from '${fileName}'${insertAtBeginning ? `;${eol}` : ''}`;
-    return insertAfterLastOccurrence(allImports, toInsert, fileToEdit, fallbackPos, ts.SyntaxKind.StringLiteral);
+    return insertAfterLastOccurrence(allImports, toInsert, fileToEdit, fallbackPos, typescript_1.default.SyntaxKind.StringLiteral);
 }
 const findNodesCache = new WeakMap();
 function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
@@ -124,7 +94,7 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
         ? kindOrGuard
         : (node) => node.kind === kindOrGuard;
     // Caching is only supported for the entire file
-    if (ts.isSourceFile(node)) {
+    if (typescript_1.default.isSourceFile(node)) {
         const sourceFileCache = findNodesCache.get(node);
         if (sourceFileCache?.has(kindOrGuard)) {
             return sourceFileCache.get(kindOrGuard);
@@ -148,7 +118,7 @@ function findNodes(node, kindOrGuard, max = Infinity, recursive = false) {
             }
         }
     }
-    if (ts.isSourceFile(node)) {
+    if (typescript_1.default.isSourceFile(node)) {
         let sourceFileCache = findNodesCache.get(node);
         if (!sourceFileCache) {
             sourceFileCache = new Map();
@@ -177,7 +147,7 @@ function findNode(node, kind, text) {
         return node;
     }
     let foundNode = null;
-    ts.forEachChild(node, (childNode) => {
+    typescript_1.default.forEachChild(node, (childNode) => {
         foundNode = foundNode || findNode(childNode, kind, text);
     });
     return foundNode;
@@ -222,7 +192,7 @@ function _angularImportsFromNode(node) {
     const ms = node.moduleSpecifier;
     let modulePath;
     switch (ms.kind) {
-        case ts.SyntaxKind.StringLiteral:
+        case typescript_1.default.SyntaxKind.StringLiteral:
             modulePath = ms.text;
             break;
         default:
@@ -238,7 +208,7 @@ function _angularImportsFromNode(node) {
         }
         else if (node.importClause.namedBindings) {
             const nb = node.importClause.namedBindings;
-            if (nb.kind == ts.SyntaxKind.NamespaceImport) {
+            if (nb.kind == typescript_1.default.SyntaxKind.NamespaceImport) {
                 // This is of the form `import * as name from 'path'`. Return `name.`.
                 return {
                     [nb.name.text + '.']: modulePath,
@@ -263,7 +233,7 @@ function _angularImportsFromNode(node) {
     }
 }
 function getDecoratorMetadata(source, identifier, module) {
-    const angularImports = findNodes(source, ts.isImportDeclaration)
+    const angularImports = findNodes(source, typescript_1.default.isImportDeclaration)
         .map((node) => _angularImportsFromNode(node))
         .reduce((acc, current) => {
         for (const key of Object.keys(current)) {
@@ -273,20 +243,20 @@ function getDecoratorMetadata(source, identifier, module) {
     }, {});
     return getSourceNodes(source)
         .filter((node) => {
-        return (node.kind == ts.SyntaxKind.Decorator &&
-            node.expression.kind == ts.SyntaxKind.CallExpression);
+        return (node.kind == typescript_1.default.SyntaxKind.Decorator &&
+            node.expression.kind == typescript_1.default.SyntaxKind.CallExpression);
     })
         .map((node) => node.expression)
         .filter((expr) => {
-        if (expr.expression.kind == ts.SyntaxKind.Identifier) {
+        if (expr.expression.kind == typescript_1.default.SyntaxKind.Identifier) {
             const id = expr.expression;
             return id.text == identifier && angularImports[id.text] === module;
         }
-        else if (expr.expression.kind == ts.SyntaxKind.PropertyAccessExpression) {
+        else if (expr.expression.kind == typescript_1.default.SyntaxKind.PropertyAccessExpression) {
             // This covers foo.NgModule when importing * as foo.
             const paExpr = expr.expression;
             // If the left expression is not an identifier, just give up at that point.
-            if (paExpr.expression.kind !== ts.SyntaxKind.Identifier) {
+            if (paExpr.expression.kind !== typescript_1.default.SyntaxKind.Identifier) {
                 return false;
             }
             const id = paExpr.name.text;
@@ -295,23 +265,23 @@ function getDecoratorMetadata(source, identifier, module) {
         }
         return false;
     })
-        .filter((expr) => expr.arguments[0] && expr.arguments[0].kind == ts.SyntaxKind.ObjectLiteralExpression)
+        .filter((expr) => expr.arguments[0] && expr.arguments[0].kind == typescript_1.default.SyntaxKind.ObjectLiteralExpression)
         .map((expr) => expr.arguments[0]);
 }
 function getMetadataField(node, metadataField) {
     return (node.properties
-        .filter(ts.isPropertyAssignment)
+        .filter(typescript_1.default.isPropertyAssignment)
         // Filter out every fields that's not "metadataField". Also handles string literals
         // (but not expressions).
         .filter(({ name }) => {
-        return (ts.isIdentifier(name) || ts.isStringLiteral(name)) && name.text === metadataField;
+        return (typescript_1.default.isIdentifier(name) || typescript_1.default.isStringLiteral(name)) && name.text === metadataField;
     }));
 }
 function addSymbolToNgModuleMetadata(source, ngModulePath, metadataField, symbolName, importPath = null) {
     const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
     const node = nodes[0];
     // Find the decorator declaration.
-    if (!node || !ts.isObjectLiteralExpression(node)) {
+    if (!node || !typescript_1.default.isObjectLiteralExpression(node)) {
         return [];
     }
     // Get all the children property assignment of object literals.
@@ -355,8 +325,8 @@ ${' '.repeat(4)}${symbolName}
     }
     const assignment = matchingProperties[0];
     // If it's not an array, nothing we can do really.
-    if (!ts.isPropertyAssignment(assignment) ||
-        !ts.isArrayLiteralExpression(assignment.initializer)) {
+    if (!typescript_1.default.isPropertyAssignment(assignment) ||
+        !typescript_1.default.isArrayLiteralExpression(assignment.initializer)) {
         return [];
     }
     let expression;
@@ -374,7 +344,7 @@ ${' '.repeat(4)}${symbolName}
     }
     let toInsert;
     let position = expression.getEnd();
-    if (ts.isArrayLiteralExpression(expression)) {
+    if (typescript_1.default.isArrayLiteralExpression(expression)) {
         // We found the field but it's empty. Insert it just before the `]`.
         position--;
         toInsert = `\n${' '.repeat(4)}${symbolName}\n  `;
@@ -435,13 +405,13 @@ function addBootstrapToModule(source, modulePath, classifiedName, importPath) {
 function isImported(source, classifiedName, importPath) {
     const allNodes = getSourceNodes(source);
     const matchingNodes = allNodes
-        .filter(ts.isImportDeclaration)
-        .filter((imp) => ts.isStringLiteral(imp.moduleSpecifier) && imp.moduleSpecifier.text === importPath)
+        .filter(typescript_1.default.isImportDeclaration)
+        .filter((imp) => typescript_1.default.isStringLiteral(imp.moduleSpecifier) && imp.moduleSpecifier.text === importPath)
         .filter((imp) => {
         if (!imp.importClause) {
             return false;
         }
-        const nodes = findNodes(imp.importClause, ts.isImportSpecifier).filter((n) => n.getText() === classifiedName);
+        const nodes = findNodes(imp.importClause, typescript_1.default.isImportSpecifier).filter((n) => n.getText() === classifiedName);
         return nodes.length > 0;
     });
     return matchingNodes.length > 0;
@@ -452,17 +422,17 @@ function isImported(source, classifiedName, importPath) {
 function getRouterModuleDeclaration(source) {
     const result = getDecoratorMetadata(source, 'NgModule', '@angular/core');
     const node = result[0];
-    if (!node || !ts.isObjectLiteralExpression(node)) {
+    if (!node || !typescript_1.default.isObjectLiteralExpression(node)) {
         return undefined;
     }
     const matchingProperties = getMetadataField(node, 'imports');
     const assignment = matchingProperties[0];
-    if (!assignment || assignment.initializer.kind !== ts.SyntaxKind.ArrayLiteralExpression) {
+    if (!assignment || assignment.initializer.kind !== typescript_1.default.SyntaxKind.ArrayLiteralExpression) {
         return;
     }
     const arrLiteral = assignment.initializer;
     return arrLiteral.elements
-        .filter((el) => el.kind === ts.SyntaxKind.CallExpression)
+        .filter((el) => el.kind === typescript_1.default.SyntaxKind.CallExpression)
         .find((el) => el.getText().startsWith('RouterModule'));
 }
 /**
@@ -483,14 +453,14 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
     const routesArg = scopeConfigMethodArgs[0];
     // Check if the route declarations array is
     // an inlined argument of RouterModule or a standalone variable
-    if (ts.isArrayLiteralExpression(routesArg)) {
+    if (typescript_1.default.isArrayLiteralExpression(routesArg)) {
         routesArr = routesArg;
     }
     else {
         const routesVarName = routesArg.getText();
         let routesVar;
-        if (routesArg.kind === ts.SyntaxKind.Identifier) {
-            routesVar = source.statements.filter(ts.isVariableStatement).find((v) => {
+        if (routesArg.kind === typescript_1.default.SyntaxKind.Identifier) {
+            routesVar = source.statements.filter(typescript_1.default.isVariableStatement).find((v) => {
                 return v.declarationList.declarations[0].name.getText() === routesVarName;
             });
         }
@@ -499,7 +469,7 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
             throw new Error(`No route declaration array was found that corresponds ` +
                 `to router module at line ${line} in ${fileToAdd}`);
         }
-        routesArr = findNodes(routesVar, ts.SyntaxKind.ArrayLiteralExpression, 1)[0];
+        routesArr = findNodes(routesVar, typescript_1.default.SyntaxKind.ArrayLiteralExpression, 1)[0];
     }
     const occurrencesCount = routesArr.elements.length;
     const text = routesArr.getFullText(source);
@@ -507,11 +477,11 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
     let insertPos = routesArr.elements.pos;
     if (occurrencesCount > 0) {
         const lastRouteLiteral = [...routesArr.elements].pop();
-        const lastRouteIsWildcard = ts.isObjectLiteralExpression(lastRouteLiteral) &&
-            lastRouteLiteral.properties.some((n) => ts.isPropertyAssignment(n) &&
-                ts.isIdentifier(n.name) &&
+        const lastRouteIsWildcard = typescript_1.default.isObjectLiteralExpression(lastRouteLiteral) &&
+            lastRouteLiteral.properties.some((n) => typescript_1.default.isPropertyAssignment(n) &&
+                typescript_1.default.isIdentifier(n.name) &&
                 n.name.text === 'path' &&
-                ts.isStringLiteral(n.initializer) &&
+                typescript_1.default.isStringLiteral(n.initializer) &&
                 n.initializer.text === '**');
         const indentation = text.match(/\r?\n(\r?)\s*/) || [];
         const routeText = `${indentation[0] || ' '}${routeLiteral}`;
@@ -530,7 +500,7 @@ function addRouteDeclarationToModule(source, fileToAdd, routeLiteral) {
 }
 /** Asserts if the specified node is a named declaration (e.g. class, interface). */
 function isNamedNode(node) {
-    return !!node.name && ts.isIdentifier(node.name);
+    return !!node.name && typescript_1.default.isIdentifier(node.name);
 }
 /**
  * Determines if a SourceFile has a top-level declaration whose name matches a specific symbol.
@@ -545,17 +515,17 @@ function hasTopLevelIdentifier(sourceFile, symbolName, skipModule = null) {
         if (isNamedNode(node) && node.name.text === symbolName) {
             return true;
         }
-        if (ts.isVariableStatement(node) &&
+        if (typescript_1.default.isVariableStatement(node) &&
             node.declarationList.declarations.some((decl) => {
                 return isNamedNode(decl) && decl.name.text === symbolName;
             })) {
             return true;
         }
-        if (ts.isImportDeclaration(node) &&
-            ts.isStringLiteralLike(node.moduleSpecifier) &&
+        if (typescript_1.default.isImportDeclaration(node) &&
+            typescript_1.default.isStringLiteralLike(node.moduleSpecifier) &&
             node.moduleSpecifier.text !== skipModule &&
             node.importClause?.namedBindings &&
-            ts.isNamedImports(node.importClause.namedBindings) &&
+            typescript_1.default.isNamedImports(node.importClause.namedBindings) &&
             node.importClause.namedBindings.elements.some((el) => el.name.text === symbolName)) {
             return true;
         }

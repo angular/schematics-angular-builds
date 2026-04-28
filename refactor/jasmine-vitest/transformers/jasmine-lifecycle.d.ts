@@ -11,7 +11,7 @@
  * focused/skipped tests (fdescribe, fit, xdescribe, xit), pending tests, and asynchronous
  * operations that use the `done` callback.
  */
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 import { RefactorContext } from '../utils/refactor-context';
 export declare function transformFocusedAndSkippedTests(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformPending(node: ts.Node, { sourceFile, reporter, tsContext }: RefactorContext): ts.Node;
