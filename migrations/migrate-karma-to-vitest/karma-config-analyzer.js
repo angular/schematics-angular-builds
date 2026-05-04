@@ -55,6 +55,7 @@ function analyzeKarmaConfig(content) {
     function extractValue(node) {
         switch (node.kind) {
             case typescript_1.default.SyntaxKind.StringLiteral:
+            case typescript_1.default.SyntaxKind.NoSubstitutionTemplateLiteral:
                 return node.text;
             case typescript_1.default.SyntaxKind.NumericLiteral:
                 return Number(node.text);

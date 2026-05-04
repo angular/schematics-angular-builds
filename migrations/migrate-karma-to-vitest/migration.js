@@ -9,8 +9,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
+const posix_1 = require("node:path/posix");
 const util_1 = require("util");
 const dependency_1 = require("../../utility/dependency");
+const json_file_1 = require("../../utility/json-file");
 const latest_versions_1 = require("../../utility/latest-versions");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
@@ -18,6 +20,7 @@ const constants_1 = require("./constants");
 const karma_processor_1 = require("./karma-processor");
 async function processTestTargetOptions(testTarget, projectName, context, tree, removableKarmaConfigs, customBuildOptions, needDevkitPlugin, manualMigrationFiles) {
     let needsCoverage = false;
+    let needsIstanbul = false;
     for (const [configName, options] of (0, workspace_1.allTargetOptions)(testTarget, false)) {
         const configKey = configName || '';
         if (!customBuildOptions[configKey]) {
@@ -62,6 +65,16 @@ async function processTestTargetOptions(testTarget, projectName, context, tree, 
         }
         const updatedBrowsers = options['browsers'];
         if (Array.isArray(updatedBrowsers) && updatedBrowsers.length > 0) {
+            const hasNonChromium = updatedBrowsers.some((b) => {
+                if (typeof b !== 'string') {
+                    return false;
+                }
+                const normalized = b.toLowerCase();
+                return !['chrome', 'chromium', 'edge'].some((name) => normalized.includes(name));
+            });
+            if (hasNonChromium) {
+                needsIstanbul = true;
+            }
             context.logger.info(`Project "${projectName}" has browsers configured for tests. ` +
                 `To run tests in a browser with Vitest, you will need to install either ` +
                 `"@vitest/browser-playwright" or "@vitest/browser-webdriverio" depending on your preference.`);
@@ -82,13 +95,65 @@ async function processTestTargetOptions(testTarget, projectName, context, tree, 
         }
         delete options['main'];
     }
-    return needsCoverage;
+    return { needsCoverage, needsIstanbul };
+}
+function updateTsConfigTypes(tree, tsConfigsToUpdate, context) {
+    for (const tsConfigPath of tsConfigsToUpdate) {
+        if (tree.exists(tsConfigPath)) {
+            try {
+                const json = new json_file_1.JSONFile(tree, tsConfigPath);
+                const typesPath = ['compilerOptions', 'types'];
+                const existingTypes = json.get(typesPath) ?? [];
+                const newTypes = existingTypes.filter((t) => t !== 'jasmine');
+                if (!newTypes.includes('vitest/globals')) {
+                    newTypes.push('vitest/globals');
+                }
+                if (newTypes.length !== existingTypes.length ||
+                    newTypes.some((t, i) => t !== existingTypes[i])) {
+                    json.modify(typesPath, newTypes);
+                }
+            }
+            catch (err) {
+                context.logger.warn(`Failed to automatically update types in "${tsConfigPath}". ` +
+                    `Please manually remove "jasmine" and add "vitest/globals" to compilerOptions.types.`);
+            }
+        }
+    }
+}
+function logSummary(context, migratedProjects, skippedNonApplications, skippedMissingAppBuilder, manualMigrationFiles) {
+    context.logger.info('\n--- Karma to Vitest Migration Summary ---');
+    context.logger.info(`Projects migrated: ${migratedProjects.length}`);
+    if (migratedProjects.length > 0) {
+        context.logger.info(`  - ${migratedProjects.join(', ')}`);
+    }
+    context.logger.info(`Projects skipped (non-applications): ${skippedNonApplications.length}`);
+    if (skippedNonApplications.length > 0) {
+        context.logger.info(`  - ${skippedNonApplications.join(', ')}`);
+    }
+    context.logger.info(`Projects skipped (missing application builder): ${skippedMissingAppBuilder.length}`);
+    if (skippedMissingAppBuilder.length > 0) {
+        context.logger.info(`  - ${skippedMissingAppBuilder.join(', ')}`);
+    }
+    const uniqueManualFiles = [...new Set(manualMigrationFiles)];
+    if (uniqueManualFiles.length > 0) {
+        context.logger.warn(`\nThe following Karma configuration files require manual migration:`);
+        for (const file of uniqueManualFiles) {
+            context.logger.warn(`  - ${file}`);
+        }
+    }
+    if (migratedProjects.length > 0) {
+        context.logger.info(`\nNote: To refactor your test files from Jasmine to Vitest, consider running the following command:` +
+            `\n  ng g @schematics/angular:refactor-jasmine-vitest <project_name>`);
+    }
+    context.logger.info('-----------------------------------------\n');
 }
 function updateProjects(tree, context) {
     return (0, workspace_1.updateWorkspace)(async (workspace) => {
         let needsCoverage = false;
+        let needsIstanbul = false;
         const removableKarmaConfigs = new Map();
         const migratedProjects = [];
+        const tsConfigsToUpdate = new Set();
         const skippedNonApplications = [];
         const skippedMissingAppBuilder = [];
         const manualMigrationFiles = [];
@@ -126,11 +191,28 @@ function updateProjects(tree, context) {
             if (!isKarma) {
                 continue;
             }
+            // Collect tsConfig paths to perform globals updates
+            const baseTsConfig = testTarget.options?.['tsConfig'];
+            if (typeof baseTsConfig === 'string') {
+                tsConfigsToUpdate.add(baseTsConfig);
+            }
+            if (testTarget.configurations) {
+                for (const config of Object.values(testTarget.configurations)) {
+                    if (typeof config?.['tsConfig'] === 'string') {
+                        tsConfigsToUpdate.add(config['tsConfig']);
+                    }
+                }
+            }
+            // Always include fallback to the default tsconfig.spec.json path
+            tsConfigsToUpdate.add((0, posix_1.join)(project.root, 'tsconfig.spec.json'));
             // Store custom build options to move to a new build configuration if needed
             const customBuildOptions = {};
-            const projectNeedsCoverage = await processTestTargetOptions(testTarget, projectName, context, tree, removableKarmaConfigs, customBuildOptions, needDevkitPlugin, manualMigrationFiles);
-            if (projectNeedsCoverage) {
+            const projectCoverageInfo = await processTestTargetOptions(testTarget, projectName, context, tree, removableKarmaConfigs, customBuildOptions, needDevkitPlugin, manualMigrationFiles);
+            if (projectCoverageInfo.needsCoverage) {
                 needsCoverage = true;
+                if (projectCoverageInfo.needsIstanbul) {
+                    needsIstanbul = true;
+                }
             }
             // If we have custom build options, create testing configurations
             const baseOptions = buildTarget.options || {};
@@ -172,32 +254,16 @@ function updateProjects(tree, context) {
             testTarget.options['runner'] = 'vitest';
             migratedProjects.push(projectName);
         }
-        // Log summary
-        context.logger.info('\n--- Karma to Vitest Migration Summary ---');
-        context.logger.info(`Projects migrated: ${migratedProjects.length}`);
-        if (migratedProjects.length > 0) {
-            context.logger.info(`  - ${migratedProjects.join(', ')}`);
-        }
-        context.logger.info(`Projects skipped (non-applications): ${skippedNonApplications.length}`);
-        if (skippedNonApplications.length > 0) {
-            context.logger.info(`  - ${skippedNonApplications.join(', ')}`);
-        }
-        context.logger.info(`Projects skipped (missing application builder): ${skippedMissingAppBuilder.length}`);
-        if (skippedMissingAppBuilder.length > 0) {
-            context.logger.info(`  - ${skippedMissingAppBuilder.join(', ')}`);
-        }
-        const uniqueManualFiles = [...new Set(manualMigrationFiles)];
-        if (uniqueManualFiles.length > 0) {
-            context.logger.warn(`\nThe following Karma configuration files require manual migration:`);
-            for (const file of uniqueManualFiles) {
-                context.logger.warn(`  - ${file}`);
+        // Perform cleanup of removable karma config files
+        for (const [configPath, result] of removableKarmaConfigs) {
+            if (result.isRemovable && tree.exists(configPath)) {
+                tree.delete(configPath);
             }
         }
-        if (migratedProjects.length > 0) {
-            context.logger.info(`\nNote: To refactor your test files from Jasmine to Vitest, consider running the following command:` +
-                `\n  ng g @schematics/angular:refactor-jasmine-vitest <project_name>`);
-        }
-        context.logger.info('-----------------------------------------\n');
+        // Update TSConfig files to use Vitest types instead of Jasmine
+        updateTsConfigTypes(tree, tsConfigsToUpdate, context);
+        // Log summary
+        logSummary(context, migratedProjects, skippedNonApplications, skippedMissingAppBuilder, manualMigrationFiles);
         if (migratedProjects.length > 0) {
             const rules = [
                 (0, dependency_1.addDependency)('vitest', latest_versions_1.latestVersions['vitest'], {
@@ -210,6 +276,12 @@ function updateProjects(tree, context) {
                     type: dependency_1.DependencyType.Dev,
                     existing: dependency_1.ExistingBehavior.Skip,
                 }));
+                if (needsIstanbul) {
+                    rules.push((0, dependency_1.addDependency)('@vitest/coverage-istanbul', latest_versions_1.latestVersions['@vitest/coverage-istanbul'], {
+                        type: dependency_1.DependencyType.Dev,
+                        existing: dependency_1.ExistingBehavior.Skip,
+                    }));
+                }
             }
             return (0, schematics_1.chain)(rules);
         }

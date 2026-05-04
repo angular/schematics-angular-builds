@@ -7,4 +7,9 @@
  */
 import type { json } from '@angular-devkit/core';
 import { SchematicContext, Tree } from '@angular-devkit/schematics';
-export declare function processKarmaConfig(karmaConfig: string, options: Record<string, json.JsonValue | undefined>, projectName: string, context: SchematicContext, tree: Tree, removableKarmaConfigs: Map<string, boolean>, needDevkitPlugin: boolean, manualMigrationFiles: string[]): Promise<void>;
+import { KarmaConfigAnalysis } from './karma-config-analyzer';
+export interface KarmaConfigProcessingResult {
+    analysis: KarmaConfigAnalysis;
+    isRemovable: boolean;
+}
+export declare function processKarmaConfig(karmaConfig: string, options: Record<string, json.JsonValue | undefined>, projectName: string, context: SchematicContext, tree: Tree, cache: Map<string, KarmaConfigProcessingResult>, needDevkitPlugin: boolean, manualMigrationFiles: string[]): Promise<void>;
