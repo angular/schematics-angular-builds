@@ -15,6 +15,10 @@ export type Schema = {
      */
     flat?: boolean;
     /**
+     * When true, generates an `@Injectable` instead of `@Service`.
+     */
+    injectable?: boolean;
+    /**
      * The name for the new service. This will be used to create the service's class and spec
      * files (e.g., `my-service.service.ts` and `my-service.service.spec.ts`).
      */
