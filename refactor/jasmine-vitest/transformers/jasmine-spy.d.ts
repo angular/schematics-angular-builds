@@ -14,7 +14,7 @@
 import ts from 'typescript';
 import { RefactorContext } from '../utils/refactor-context';
 export declare function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.Node;
-export declare function transformCreateSpy(node: ts.Node, { reporter, sourceFile, pendingVitestValueImports }: RefactorContext): ts.Node;
-export declare function transformCreateSpyObj(node: ts.Node, { sourceFile, reporter, pendingVitestValueImports }: RefactorContext): ts.Node;
+export declare function transformCreateSpy(node: ts.Node, ctx: RefactorContext): ts.Node;
+export declare function transformCreateSpyObj(node: ts.Node, ctx: RefactorContext): ts.Node;
 export declare function transformSpyReset(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorContext): ts.Node;

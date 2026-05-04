@@ -25,6 +25,7 @@ const typescript_1 = __importDefault(require("typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");
+const refactor_helpers_1 = require("../utils/refactor-helpers");
 function transformSpies(node, refactorCtx) {
     const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
     if (!typescript_1.default.isCallExpression(node)) {
@@ -135,21 +136,23 @@ function transformSpies(node, refactorCtx) {
     }
     return node;
 }
-function transformCreateSpy(node, { reporter, sourceFile, pendingVitestValueImports }) {
+function transformCreateSpy(node, ctx) {
+    const { reporter, sourceFile, pendingVitestValueImports } = ctx;
     if (!(0, ast_validation_1.isJasmineCallExpression)(node, 'createSpy')) {
         return node;
     }
     (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
     reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.createSpy()` to `vi.fn()`.');
     const spyName = node.arguments[0];
-    const viFnCallExpression = (0, ast_helpers_1.createViCallExpression)('fn', node.arguments.length > 1 ? [node.arguments[1]] : []);
+    const viFnCallExpression = (0, refactor_helpers_1.createViCallExpression)(ctx, 'fn', node.arguments.length > 1 ? [node.arguments[1]] : []);
     // jasmine.createSpy() -> vi.fn()
     // jasmine.createSpy(name, originalFn) -> vi.fn(originalFn).mockName(name)
     return !spyName
         ? viFnCallExpression
         : typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(viFnCallExpression, 'mockName'), undefined, [node.arguments[0]]);
 }
-function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueImports }) {
+function transformCreateSpyObj(node, ctx) {
+    const { reporter, sourceFile, pendingVitestValueImports } = ctx;
     if (!(0, ast_validation_1.isJasmineCallExpression)(node, 'createSpyObj')) {
         return node;
     }
@@ -168,10 +171,10 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
         return node;
     }
     if (typescript_1.default.isArrayLiteralExpression(methods)) {
-        properties = createSpyObjWithArray(methods, baseName);
+        properties = createSpyObjWithArray(ctx, methods, baseName);
     }
     else if (typescript_1.default.isObjectLiteralExpression(methods)) {
-        properties = createSpyObjWithObject(methods, baseName);
+        properties = createSpyObjWithObject(ctx, methods, baseName);
     }
     else {
         const category = 'createSpyObj-dynamic-variable';
@@ -191,11 +194,11 @@ function transformCreateSpyObj(node, { sourceFile, reporter, pendingVitestValueI
     }
     return typescript_1.default.factory.createObjectLiteralExpression(properties, true);
 }
-function createSpyObjWithArray(methods, baseName) {
+function createSpyObjWithArray(ctx, methods, baseName) {
     return methods.elements
         .map((element) => {
         if (typescript_1.default.isStringLiteral(element)) {
-            const mockFn = (0, ast_helpers_1.createViCallExpression)('fn');
+            const mockFn = (0, refactor_helpers_1.createViCallExpression)(ctx, 'fn');
             const methodName = element.text;
             let finalExpression = mockFn;
             if (baseName) {
@@ -207,13 +210,13 @@ function createSpyObjWithArray(methods, baseName) {
     })
         .filter((p) => !!p);
 }
-function createSpyObjWithObject(methods, baseName) {
+function createSpyObjWithObject(ctx, methods, baseName) {
     return methods.properties
         .map((prop) => {
         if (typescript_1.default.isPropertyAssignment(prop) && typescript_1.default.isIdentifier(prop.name)) {
             const methodName = prop.name.text;
             const returnValue = prop.initializer;
-            let mockFn = (0, ast_helpers_1.createViCallExpression)('fn');
+            let mockFn = (0, refactor_helpers_1.createViCallExpression)(ctx, 'fn');
             if (baseName) {
                 mockFn = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(mockFn, 'mockName'), undefined, [typescript_1.default.factory.createStringLiteral(`${baseName}.${methodName}`)]);
             }

@@ -18,4 +18,5 @@ import { RefactorReporter } from './utils/refactor-reporter';
 export declare function transformJasmineToVitest(filePath: string, content: string, reporter: RefactorReporter, options: {
     addImports: boolean;
     browserMode: boolean;
+    fakeAsync?: boolean;
 }): string;

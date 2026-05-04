@@ -26,7 +26,9 @@ const typescript_1 = __importDefault(require("typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");
-function transformTimerMocks(node, { sourceFile, reporter, pendingVitestValueImports }) {
+const refactor_helpers_1 = require("../utils/refactor-helpers");
+function transformTimerMocks(node, ctx) {
+    const { sourceFile, reporter, pendingVitestValueImports } = ctx;
     if (!typescript_1.default.isCallExpression(node) ||
         !typescript_1.default.isPropertyAccessExpression(node.expression) ||
         !typescript_1.default.isIdentifier(node.expression.name)) {
@@ -76,7 +78,7 @@ function transformTimerMocks(node, { sourceFile, reporter, pendingVitestValueImp
                 typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Date'), undefined, []),
             ];
         }
-        return (0, ast_helpers_1.createViCallExpression)(newMethodName, newArgs);
+        return (0, refactor_helpers_1.createViCallExpression)(ctx, newMethodName, newArgs);
     }
     return node;
 }
@@ -129,10 +131,11 @@ function transformJasmineMembers(node, refactorCtx) {
     }
     return node;
 }
-function transformJasmineDefaultTimeoutInterval(expression, timeoutValue, { sourceFile, reporter, pendingVitestValueImports }) {
+function transformJasmineDefaultTimeoutInterval(expression, timeoutValue, ctx) {
+    const { sourceFile, reporter, pendingVitestValueImports } = ctx;
     (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
     reporter.reportTransformation(sourceFile, expression, 'Transformed `jasmine.DEFAULT_TIMEOUT_INTERVAL` to `vi.setConfig()`.');
-    const setConfigCall = (0, ast_helpers_1.createViCallExpression)('setConfig', [
+    const setConfigCall = (0, refactor_helpers_1.createViCallExpression)(ctx, 'setConfig', [
         typescript_1.default.factory.createObjectLiteralExpression([typescript_1.default.factory.createPropertyAssignment('testTimeout', timeoutValue)], false),
     ]);
     return typescript_1.default.factory.updateExpressionStatement(expression, setConfigCall);

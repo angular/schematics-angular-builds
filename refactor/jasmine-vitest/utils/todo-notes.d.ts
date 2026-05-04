@@ -148,6 +148,12 @@ export declare const TODO_NOTES: {
     readonly 'unhandled-done-usage': {
         readonly message: "The 'done' callback was used in an unhandled way. Please migrate manually.";
     };
+    readonly 'flush-max-turns': {
+        readonly message: "flush(maxTurns) was called but maxTurns parameter is not migrated. Please migrate manually.";
+    };
+    readonly 'flush-return-value': {
+        readonly message: "flush() return value is not migrated. Please migrate manually.";
+    };
 };
 /**
  * A union type of all possible "TODO" categories.

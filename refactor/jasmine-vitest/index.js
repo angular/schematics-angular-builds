@@ -94,6 +94,7 @@ function default_1(options) {
             const newContent = (0, test_file_transformer_1.transformJasmineToVitest)(file, content, reporter, {
                 addImports: !!options.addImports,
                 browserMode: !!options.browerMode,
+                fakeAsync: !!options.fakeAsync,
             });
             if (content !== newContent) {
                 tree.overwrite(file, newContent);

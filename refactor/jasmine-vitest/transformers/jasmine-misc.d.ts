@@ -13,7 +13,7 @@
  */
 import ts from 'typescript';
 import { RefactorContext } from '../utils/refactor-context';
-export declare function transformTimerMocks(node: ts.Node, { sourceFile, reporter, pendingVitestValueImports }: RefactorContext): ts.Node;
+export declare function transformTimerMocks(node: ts.Node, ctx: RefactorContext): ts.Node;
 export declare function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformJasmineMembers(node: ts.Node, refactorCtx: RefactorContext): ts.Node;
 export declare function transformUnsupportedGlobalFunctions(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;

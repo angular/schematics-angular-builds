@@ -16,6 +16,10 @@ export type Schema = {
      */
     browserMode?: boolean;
     /**
+     * Whether to transform `fakeAsync` tests to Vitest fake timers.
+     */
+    fakeAsync?: boolean;
+    /**
      * The file suffix to identify test files (e.g., '.spec.ts', '.test.ts').
      */
     fileSuffix?: string;

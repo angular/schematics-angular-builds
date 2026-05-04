@@ -18,6 +18,10 @@ exports.transformJasmineToVitest = transformJasmineToVitest;
  * blank line preservation, and reporting of transformation details.
  */
 const typescript_1 = __importDefault(require("typescript"));
+const fake_async_flush_1 = require("./transformers/fake-async-flush");
+const fake_async_flush_microtasks_1 = require("./transformers/fake-async-flush-microtasks");
+const fake_async_test_1 = require("./transformers/fake-async-test");
+const fake_async_tick_1 = require("./transformers/fake-async-tick");
 const jasmine_lifecycle_1 = require("./transformers/jasmine-lifecycle");
 const jasmine_matcher_1 = require("./transformers/jasmine-matcher");
 const jasmine_misc_1 = require("./transformers/jasmine-misc");
@@ -95,6 +99,10 @@ const callExpressionTransformers = [
     jasmine_matcher_1.transformToHaveBeenCalledBefore,
     jasmine_matcher_1.transformToHaveClass,
     jasmine_matcher_1.transformToBeNullish,
+    fake_async_test_1.transformFakeAsyncTest,
+    fake_async_tick_1.transformFakeAsyncTick,
+    fake_async_flush_1.transformFakeAsyncFlush,
+    fake_async_flush_microtasks_1.transformFakeAsyncFlushMicrotasks,
     // **Stage 3: Global Functions & Cleanup**
     // These handle global Jasmine functions and catch-alls for unsupported APIs.
     jasmine_misc_1.transformTimerMocks,
@@ -132,10 +140,12 @@ const expressionStatementTransformers = [
  * @returns The transformed code.
  */
 function transformJasmineToVitest(filePath, content, reporter, options) {
+    options.fakeAsync ??= false;
     const contentWithPlaceholders = preserveBlankLines(content);
     const sourceFile = typescript_1.default.createSourceFile(filePath, contentWithPlaceholders, typescript_1.default.ScriptTarget.Latest, true, typescript_1.default.ScriptKind.TS);
     const pendingVitestValueImports = new Set();
     const pendingVitestTypeImports = new Set();
+    const pendingImportSpecifierRemovals = new Map();
     const transformer = (context) => {
         const refactorCtx = {
             sourceFile,
@@ -143,6 +153,7 @@ function transformJasmineToVitest(filePath, content, reporter, options) {
             tsContext: context,
             pendingVitestValueImports,
             pendingVitestTypeImports,
+            pendingImportSpecifierRemovals,
         };
         const visitor = (node) => {
             let transformedNode = node;
@@ -156,7 +167,14 @@ function transformJasmineToVitest(filePath, content, reporter, options) {
                     }
                 }
                 for (const transformer of callExpressionTransformers) {
-                    if (!(options.browserMode && transformer === jasmine_matcher_1.transformToHaveClass)) {
+                    if (!((options.browserMode && transformer === jasmine_matcher_1.transformToHaveClass) ||
+                        (options.fakeAsync === false &&
+                            [
+                                fake_async_flush_1.transformFakeAsyncFlush,
+                                fake_async_flush_microtasks_1.transformFakeAsyncFlushMicrotasks,
+                                fake_async_tick_1.transformFakeAsyncTick,
+                                fake_async_test_1.transformFakeAsyncTest,
+                            ].includes(transformer)))) {
                         transformedNode = transformer(transformedNode, refactorCtx);
                     }
                 }
@@ -194,11 +212,16 @@ function transformJasmineToVitest(filePath, content, reporter, options) {
     let transformedSourceFile = result.transformed[0];
     const hasPendingValueImports = pendingVitestValueImports.size > 0;
     const hasPendingTypeImports = pendingVitestTypeImports.size > 0;
+    const hasPendingImportSpecifierRemovals = pendingImportSpecifierRemovals.size > 0;
     if (transformedSourceFile === sourceFile &&
         !reporter.hasTodos &&
         !hasPendingValueImports &&
-        !hasPendingTypeImports) {
+        !hasPendingTypeImports &&
+        !hasPendingImportSpecifierRemovals) {
         return content;
+    }
+    if (hasPendingImportSpecifierRemovals) {
+        transformedSourceFile = (0, ast_helpers_1.removeImportSpecifiers)(transformedSourceFile, pendingImportSpecifierRemovals);
     }
     if (hasPendingTypeImports || (options.addImports && hasPendingValueImports)) {
         const vitestImport = (0, ast_helpers_1.getVitestAutoImports)(options.addImports ? pendingVitestValueImports : new Set(), pendingVitestTypeImports);
