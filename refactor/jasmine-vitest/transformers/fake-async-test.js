@@ -72,13 +72,13 @@ function _transformFakeAsyncCall(node, ctx, currentOutermostDescribeContext) {
 }
 function _createFakeTimersHookStatements(ctx) {
     return [
-        // > beforeAll(() => {
+        // > beforeEach(() => {
         // >   vi.useFakeTimers({
         // >     advanceTimeDelta: 1,
         // >     shouldAdvanceTime: true
         // >   });
         // > });
-        typescript_1.default.factory.createExpressionStatement(typescript_1.default.factory.createCallExpression(typescript_1.default.factory.createIdentifier('beforeAll'), undefined, [
+        typescript_1.default.factory.createExpressionStatement(typescript_1.default.factory.createCallExpression(typescript_1.default.factory.createIdentifier('beforeEach'), undefined, [
             typescript_1.default.factory.createArrowFunction(undefined, undefined, [], undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock([
                 typescript_1.default.factory.createExpressionStatement((0, refactor_helpers_1.createViCallExpression)(ctx, 'useFakeTimers', [
                     typescript_1.default.factory.createObjectLiteralExpression([
@@ -88,10 +88,10 @@ function _createFakeTimersHookStatements(ctx) {
                 ])),
             ], true)),
         ])),
-        // > afterAll(() => {
+        // > afterEach(() => {
         // >   vi.useRealTimers();
         // > });
-        typescript_1.default.factory.createExpressionStatement(typescript_1.default.factory.createCallExpression(typescript_1.default.factory.createIdentifier('afterAll'), undefined, [
+        typescript_1.default.factory.createExpressionStatement(typescript_1.default.factory.createCallExpression(typescript_1.default.factory.createIdentifier('afterEach'), undefined, [
             typescript_1.default.factory.createArrowFunction(undefined, undefined, [], undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock([typescript_1.default.factory.createExpressionStatement((0, refactor_helpers_1.createViCallExpression)(ctx, 'useRealTimers'))], true)),
         ])),
     ];
