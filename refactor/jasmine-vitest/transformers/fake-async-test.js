@@ -68,7 +68,18 @@ function _transformFakeAsyncCall(node, ctx, currentOutermostDescribeContext) {
         ? fakeAsyncCallback.body
         : typescript_1.default.factory.createBlock([typescript_1.default.factory.createExpressionStatement(fakeAsyncCallback.body)]);
     ctx.reporter.reportTransformation(ctx.sourceFile, node, `Transformed \`fakeAsync\` to \`vi.useFakeTimers\`.`);
-    return typescript_1.default.factory.createArrowFunction([typescript_1.default.factory.createModifier(typescript_1.default.SyntaxKind.AsyncKeyword)], fakeAsyncCallback.typeParameters, fakeAsyncCallback.parameters, undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock(callbackBody.statements));
+    let statements = callbackBody.statements;
+    // Append `vi.runOnlyPendingTimersAsync()` as the last statement of `beforeEach` to mimic flush behavior.
+    if (typescript_1.default.isCallExpression(node.parent) &&
+        typescript_1.default.isIdentifier(node.parent.expression) &&
+        node.parent.expression.text === 'beforeEach' &&
+        !_isFakeAsyncFlushDisabled(node)) {
+        statements = typescript_1.default.factory.createNodeArray([
+            ...statements,
+            typescript_1.default.factory.createExpressionStatement(typescript_1.default.factory.createAwaitExpression((0, refactor_helpers_1.createViCallExpression)(ctx, 'runOnlyPendingTimersAsync'))),
+        ]);
+    }
+    return typescript_1.default.factory.createArrowFunction([typescript_1.default.factory.createModifier(typescript_1.default.SyntaxKind.AsyncKeyword)], fakeAsyncCallback.typeParameters, fakeAsyncCallback.parameters, undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock(statements));
 }
 function _createFakeTimersHookStatements(ctx) {
     return [
@@ -95,6 +106,18 @@ function _createFakeTimersHookStatements(ctx) {
             typescript_1.default.factory.createArrowFunction(undefined, undefined, [], undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock([typescript_1.default.factory.createExpressionStatement((0, refactor_helpers_1.createViCallExpression)(ctx, 'useRealTimers'))], true)),
         ])),
     ];
+}
+/**
+ * Detects if the `flush` option is set to false in the `fakeAsync` call expression.
+ * e.g. `fakeAsync(() => { ... }, { flush: false })`
+ */
+function _isFakeAsyncFlushDisabled(fakeAsyncCallExpression) {
+    const options = fakeAsyncCallExpression.arguments[1];
+    return (options &&
+        typescript_1.default.isObjectLiteralExpression(options) &&
+        options.properties.some((property) => typescript_1.default.isPropertyAssignment(property) &&
+            property.name.getText() === 'flush' &&
+            property.initializer.getText() === 'false'));
 }
 function _findDescribeBlock(node) {
     const args = node.arguments;
