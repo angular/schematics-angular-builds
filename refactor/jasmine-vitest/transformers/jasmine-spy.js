@@ -306,6 +306,36 @@ function transformThisFor(node, { sourceFile, reporter, pendingVitestValueImport
     const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
     return typescript_1.default.factory.createElementAccessExpression((0, ast_helpers_1.createPropertyAccess)(mockProperty, 'contexts'), node.arguments[0] ?? typescript_1.default.factory.createNumericLiteral(0));
 }
+function transformAllCallsArgs(node, { sourceFile, reporter, pendingVitestValueImports }) {
+    if (!typescript_1.default.isPropertyAccessExpression(node) ||
+        !typescript_1.default.isIdentifier(node.name) ||
+        node.name.text !== 'args') {
+        return node;
+    }
+    const elementAccess = node.expression;
+    if (!typescript_1.default.isElementAccessExpression(elementAccess)) {
+        return node;
+    }
+    const allCall = elementAccess.expression;
+    if (!typescript_1.default.isCallExpression(allCall) || !typescript_1.default.isPropertyAccessExpression(allCall.expression)) {
+        return node;
+    }
+    const allPae = allCall.expression;
+    if (!typescript_1.default.isIdentifier(allPae.name) || allPae.name.text !== 'all') {
+        return node;
+    }
+    if (!typescript_1.default.isPropertyAccessExpression(allPae.expression)) {
+        return node;
+    }
+    const spyIdentifier = getSpyIdentifierFromCalls(allPae.expression);
+    if (!spyIdentifier) {
+        return node;
+    }
+    reporter.reportTransformation(sourceFile, node, 'Transformed `spy.calls.all()[i].args` to `vi.mocked(spy).mock.calls[i]`.');
+    const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
+    const callsProperty = (0, ast_helpers_1.createPropertyAccess)(mockProperty, 'calls');
+    return typescript_1.default.factory.createElementAccessExpression(callsProperty, elementAccess.argumentExpression);
+}
 function transformSpyCallInspection(node, refactorCtx) {
     const mostRecentArgsTransformed = transformMostRecentArgs(node, refactorCtx);
     if (mostRecentArgsTransformed !== node) {
@@ -314,6 +344,10 @@ function transformSpyCallInspection(node, refactorCtx) {
     const thisForTransformed = transformThisFor(node, refactorCtx);
     if (thisForTransformed !== node) {
         return thisForTransformed;
+    }
+    const allCallsArgsTransformed = transformAllCallsArgs(node, refactorCtx);
+    if (allCallsArgsTransformed !== node) {
+        return allCallsArgsTransformed;
     }
     if (!typescript_1.default.isCallExpression(node) || !typescript_1.default.isPropertyAccessExpression(node.expression)) {
         return node;
