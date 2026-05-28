@@ -126,14 +126,12 @@ export type Schema = {
     zoneless?: boolean;
 };
 export declare enum AiConfig {
-    Agents = "agents",
-    Claude = "claude",
-    Copilot = "copilot",
+    ClaudeCode = "claude-code",
     Cursor = "cursor",
-    Gemini = "gemini",
-    Jetbrains = "jetbrains",
+    GeminiCli = "gemini-cli",
     None = "none",
-    Windsurf = "windsurf"
+    OpenAiCodex = "open-ai-codex",
+    Vscode = "vscode"
 }
 /**
  * Configure the initial Git commit for the new repository.

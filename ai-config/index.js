@@ -9,38 +9,59 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
+const file_utils_1 = require("./file_utils");
 const schema_1 = require("./schema");
+const types_1 = require("./types");
+const AGENTS_MD_CFG = {
+    type: types_1.ContextFileType.BestPracticesMd,
+    name: 'AGENTS.md',
+    directory: '.',
+};
 const AI_TOOLS = {
-    agents: {
-        rulesName: 'AGENTS.md',
-        directory: '.',
-    },
-    gemini: {
-        rulesName: 'GEMINI.md',
-        directory: '.gemini',
-    },
-    claude: {
-        rulesName: 'CLAUDE.md',
-        directory: '.claude',
-    },
-    copilot: {
-        rulesName: 'copilot-instructions.md',
-        directory: '.github',
-    },
-    windsurf: {
-        rulesName: 'guidelines.md',
-        directory: '.windsurf/rules',
-    },
-    jetbrains: {
-        rulesName: 'guidelines.md',
-        directory: '.junie',
-    },
-    // Cursor file has a front matter section.
-    cursor: {
-        rulesName: 'cursor.mdc',
-        directory: '.cursor/rules',
-        frontmatter: `---\ncontext: true\npriority: high\nscope: project\n---`,
-    },
+    ['claude-code']: [
+        AGENTS_MD_CFG,
+        {
+            type: types_1.ContextFileType.McpConfig,
+            name: '.mcp.json',
+            directory: '.',
+        },
+    ],
+    cursor: [
+        AGENTS_MD_CFG,
+        {
+            type: types_1.ContextFileType.McpConfig,
+            name: 'mcp.json',
+            directory: '.cursor',
+        },
+    ],
+    ['gemini-cli']: [
+        {
+            type: types_1.ContextFileType.BestPracticesMd,
+            name: 'GEMINI.md',
+            directory: '.gemini',
+        },
+        {
+            type: types_1.ContextFileType.McpConfig,
+            name: 'settings.json',
+            directory: '.gemini',
+        },
+    ],
+    ['open-ai-codex']: [
+        AGENTS_MD_CFG,
+        {
+            type: types_1.ContextFileType.McpConfig,
+            name: 'config.toml',
+            directory: '.codex',
+        },
+    ],
+    vscode: [
+        AGENTS_MD_CFG,
+        {
+            type: types_1.ContextFileType.McpConfig,
+            name: 'mcp.json',
+            directory: '.vscode',
+        },
+    ],
 };
 function default_1({ tool }) {
     return (tree, context) => {
@@ -49,26 +70,31 @@ function default_1({ tool }) {
         }
         const rules = tool
             .filter((tool) => tool !== schema_1.Tool.None)
-            .map((selectedTool) => {
-            const { rulesName, directory, frontmatter } = AI_TOOLS[selectedTool];
-            const path = `${directory}/${rulesName}`;
-            if (tree.exists(path)) {
-                const toolName = schematics_1.strings.classify(selectedTool);
-                context.logger.warn(`Skipping configuration file for '${toolName}' at '${path}' because it already exists.\n` +
-                    'This is to prevent overwriting a potentially customized file. ' +
-                    'If you want to regenerate it with Angular recommended defaults, please delete the existing file and re-run the command.\n' +
-                    'You can review the latest recommendations at https://angular.dev/ai/develop-with-ai.');
-                return (0, schematics_1.noop)();
+            .flatMap((selectedTool) => AI_TOOLS[selectedTool].map((fileInfo) => {
+            const fileCfgOpts = {
+                tree,
+                context,
+                fileInfo,
+                tool: selectedTool,
+            };
+            switch (fileInfo.type) {
+                case types_1.ContextFileType.BestPracticesMd:
+                    return (0, file_utils_1.addBestPracticesMarkdown)(fileCfgOpts);
+                case types_1.ContextFileType.McpConfig:
+                    switch (selectedTool) {
+                        case schema_1.Tool.ClaudeCode:
+                        case schema_1.Tool.Cursor:
+                        case schema_1.Tool.GeminiCli:
+                            return (0, file_utils_1.addJsonMcpConfig)(fileCfgOpts, 'mcpServers');
+                        case schema_1.Tool.OpenAiCodex:
+                            return (0, file_utils_1.addTomlMcpConfig)(fileCfgOpts);
+                        case schema_1.Tool.Vscode:
+                            return (0, file_utils_1.addJsonMcpConfig)(fileCfgOpts, 'servers');
+                        default:
+                            throw new Error(`Unsupported '${schematics_1.strings.classify(selectedTool)}' MCP server configuraiton.`);
+                    }
             }
-            return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
-                (0, schematics_1.applyTemplates)({
-                    ...schematics_1.strings,
-                    rulesName,
-                    frontmatter,
-                }),
-                (0, schematics_1.move)(directory),
-            ]));
-        });
+        }));
         return (0, schematics_1.chain)(rules);
     };
 }

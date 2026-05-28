@@ -1,22 +1,20 @@
 /**
- * Generates AI configuration files for Angular projects. This schematic creates
- * configuration files that help AI tools follow Angular best practices, improving the
- * quality of AI-generated code and suggestions.
+ * Generates AI configuration files for Angular projects. This schematic creates AGENTS.md
+ * file and Angular MCP server configuration, improving the quality of AI-generated code and
+ * suggestions.
  */
 export type Schema = {
     /**
-     * Specifies which AI tools to generate configuration files for. These file are used to
-     * improve the outputs of AI tools by following the best practices.
+     * Specifies which AI tools to generate configuration files (AGENTS.md, MCP server config)
+     * for.
      */
     tool?: Tool[];
 };
 export declare enum Tool {
-    Agents = "agents",
-    Claude = "claude",
-    Copilot = "copilot",
+    ClaudeCode = "claude-code",
     Cursor = "cursor",
-    Gemini = "gemini",
-    Jetbrains = "jetbrains",
+    GeminiCli = "gemini-cli",
     None = "none",
-    Windsurf = "windsurf"
+    OpenAiCodex = "open-ai-codex",
+    Vscode = "vscode"
 }

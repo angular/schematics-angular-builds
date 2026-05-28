@@ -5,14 +5,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ViewEncapsulation = exports.TestRunner = exports.Style = exports.PackageManager = exports.FileNameStyleGuide = exports.AiConfig = void 0;
 var AiConfig;
 (function (AiConfig) {
-    AiConfig["Agents"] = "agents";
-    AiConfig["Claude"] = "claude";
-    AiConfig["Copilot"] = "copilot";
+    AiConfig["ClaudeCode"] = "claude-code";
     AiConfig["Cursor"] = "cursor";
-    AiConfig["Gemini"] = "gemini";
-    AiConfig["Jetbrains"] = "jetbrains";
+    AiConfig["GeminiCli"] = "gemini-cli";
     AiConfig["None"] = "none";
-    AiConfig["Windsurf"] = "windsurf";
+    AiConfig["OpenAiCodex"] = "open-ai-codex";
+    AiConfig["Vscode"] = "vscode";
 })(AiConfig || (exports.AiConfig = AiConfig = {}));
 /**
  * The file naming convention to use for generated files. The '2025' style guide (default)

@@ -5,13 +5,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Tool = void 0;
 var Tool;
 (function (Tool) {
-    Tool["Agents"] = "agents";
-    Tool["Claude"] = "claude";
-    Tool["Copilot"] = "copilot";
+    Tool["ClaudeCode"] = "claude-code";
     Tool["Cursor"] = "cursor";
-    Tool["Gemini"] = "gemini";
-    Tool["Jetbrains"] = "jetbrains";
+    Tool["GeminiCli"] = "gemini-cli";
     Tool["None"] = "none";
-    Tool["Windsurf"] = "windsurf";
+    Tool["OpenAiCodex"] = "open-ai-codex";
+    Tool["Vscode"] = "vscode";
 })(Tool || (exports.Tool = Tool = {}));
 //# sourceMappingURL=schema.js.map
