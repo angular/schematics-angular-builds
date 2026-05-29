@@ -26,107 +26,154 @@ const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");
 const refactor_helpers_1 = require("../utils/refactor-helpers");
-function transformSpies(node, refactorCtx) {
-    const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
-    if (!typescript_1.default.isCallExpression(node)) {
-        return node;
+function isChainedWithAnd(node) {
+    let parent = node.parent;
+    while (parent) {
+        if (typescript_1.default.isPropertyAccessExpression(parent)) {
+            if (typescript_1.default.isIdentifier(parent.name) && parent.name.text === 'and') {
+                return true;
+            }
+        }
+        else if (typescript_1.default.isElementAccessExpression(parent)) {
+            if (typescript_1.default.isStringLiteralLike(parent.argumentExpression) &&
+                parent.argumentExpression.text === 'and') {
+                return true;
+            }
+        }
+        else if (typescript_1.default.isParenthesizedExpression(parent) ||
+            typescript_1.default.isAsExpression(parent) ||
+            typescript_1.default.isNonNullExpression(parent) ||
+            typescript_1.default.isTypeAssertionExpression(parent) ||
+            typescript_1.default.isSatisfiesExpression(parent)) {
+            parent = parent.parent;
+            continue;
+        }
+        break;
     }
+    return false;
+}
+function transformPrimarySpy(node, refactorCtx) {
+    const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
     if (typescript_1.default.isIdentifier(node.expression) &&
         (node.expression.text === 'spyOn' || node.expression.text === 'spyOnProperty')) {
         (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
-        reporter.reportTransformation(sourceFile, node, `Transformed \`${node.expression.text}\` to \`vi.spyOn\`.`);
-        return typescript_1.default.factory.updateCallExpression(node, (0, ast_helpers_1.createPropertyAccess)('vi', 'spyOn'), node.typeArguments, node.arguments);
+        const viSpyOnCall = typescript_1.default.factory.updateCallExpression(node, (0, ast_helpers_1.createPropertyAccess)('vi', 'spyOn'), node.typeArguments, node.arguments);
+        if (isChainedWithAnd(node)) {
+            reporter.reportTransformation(sourceFile, node, `Transformed \`${node.expression.text}\` to \`vi.spyOn\`.`);
+            return viSpyOnCall;
+        }
+        reporter.reportTransformation(sourceFile, node, `Transformed \`${node.expression.text}\` to \`vi.spyOn\`, ` +
+            `appending \`.mockReturnValue(undefined)\` to preserve stub-by-default semantics.`);
+        return typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(viSpyOnCall, 'mockReturnValue'), undefined, [typescript_1.default.factory.createIdentifier('undefined')]);
     }
-    if (typescript_1.default.isPropertyAccessExpression(node.expression)) {
-        const pae = node.expression;
-        if (typescript_1.default.isPropertyAccessExpression(pae.expression) &&
-            typescript_1.default.isIdentifier(pae.expression.name) &&
-            pae.expression.name.text === 'and') {
-            const spyCall = pae.expression.expression;
-            let newMethodName;
-            let args = node.arguments;
-            if (typescript_1.default.isIdentifier(pae.name)) {
-                const strategyName = pae.name.text;
-                switch (strategyName) {
-                    case 'returnValue':
-                        {
-                            const result = (0, ast_helpers_1.getPromiseResolveRejectMethod)(args[0]);
-                            if (result) {
-                                const methodMapping = {
-                                    'resolve': 'mockResolvedValue',
-                                    'reject': 'mockRejectedValue',
-                                };
-                                newMethodName = methodMapping[result.methodName];
-                                args = result.arguments;
-                            }
-                            else {
-                                newMethodName = 'mockReturnValue';
-                            }
+    return node;
+}
+function transformSpyStrategy(node, refactorCtx) {
+    const { sourceFile, reporter } = refactorCtx;
+    if (!typescript_1.default.isPropertyAccessExpression(node.expression)) {
+        return node;
+    }
+    const pae = node.expression;
+    let spyCall;
+    if (typescript_1.default.isPropertyAccessExpression(pae.expression) &&
+        typescript_1.default.isIdentifier(pae.expression.name) &&
+        pae.expression.name.text === 'and') {
+        spyCall = pae.expression.expression;
+    }
+    else if (typescript_1.default.isElementAccessExpression(pae.expression) &&
+        typescript_1.default.isStringLiteralLike(pae.expression.argumentExpression) &&
+        pae.expression.argumentExpression.text === 'and') {
+        spyCall = pae.expression.expression;
+    }
+    if (spyCall) {
+        let newMethodName;
+        let args = node.arguments;
+        if (typescript_1.default.isIdentifier(pae.name)) {
+            const strategyName = pae.name.text;
+            switch (strategyName) {
+                case 'returnValue':
+                    {
+                        const firstArg = args[0];
+                        const result = firstArg ? (0, ast_helpers_1.getPromiseResolveRejectMethod)(firstArg) : null;
+                        if (result) {
+                            const methodMapping = {
+                                'resolve': 'mockResolvedValue',
+                                'reject': 'mockRejectedValue',
+                            };
+                            newMethodName = methodMapping[result.methodName];
+                            args = result.arguments;
                         }
-                        break;
-                    case 'resolveTo':
-                        newMethodName = 'mockResolvedValue';
-                        break;
-                    case 'rejectWith':
-                        newMethodName = 'mockRejectedValue';
-                        break;
-                    case 'returnValues': {
-                        reporter.reportTransformation(sourceFile, node, 'Transformed `.and.returnValues()` to chained `.mockReturnValueOnce()` calls.');
-                        const returnValues = node.arguments;
-                        if (returnValues.length === 0) {
-                            // No values, so it's a no-op. Just transform the spyOn call.
-                            return transformSpies(spyCall, refactorCtx);
+                        else {
+                            newMethodName = 'mockReturnValue';
                         }
-                        // spy.and.returnValues(a, b) -> spy.mockReturnValueOnce(a).mockReturnValueOnce(b)
-                        let chainedCall = spyCall;
-                        for (const value of returnValues) {
-                            const mockCall = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(chainedCall, 'mockReturnValueOnce'), undefined, [value]);
-                            chainedCall = mockCall;
-                        }
-                        return chainedCall;
                     }
-                    case 'callFake':
-                        newMethodName = 'mockImplementation';
-                        break;
-                    case 'callThrough':
-                        reporter.reportTransformation(sourceFile, node, 'Removed redundant `.and.callThrough()` call.');
-                        return transformSpies(spyCall, refactorCtx); // .and.callThrough() is redundant, just transform spyOn.
-                    case 'stub': {
-                        reporter.reportTransformation(sourceFile, node, 'Transformed `.and.stub()` to `.mockImplementation()`.');
-                        const newExpression = (0, ast_helpers_1.createPropertyAccess)(spyCall, 'mockImplementation');
-                        const arrowFn = typescript_1.default.factory.createArrowFunction(undefined, undefined, [], undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock([], /* multiline */ true));
-                        return typescript_1.default.factory.createCallExpression(newExpression, undefined, [arrowFn]);
+                    break;
+                case 'resolveTo':
+                    newMethodName = 'mockResolvedValue';
+                    break;
+                case 'rejectWith':
+                    newMethodName = 'mockRejectedValue';
+                    break;
+                case 'returnValues': {
+                    reporter.reportTransformation(sourceFile, node, 'Transformed `.and.returnValues()` to chained `.mockReturnValueOnce()` calls.');
+                    const returnValues = node.arguments;
+                    if (returnValues.length === 0) {
+                        // No values, so it's a no-op. Just transform the spyOn call.
+                        return transformSpies(spyCall, refactorCtx);
                     }
-                    case 'throwError': {
-                        reporter.reportTransformation(sourceFile, node, 'Transformed `.and.throwError()` to `.mockImplementation()`.');
-                        const errorArg = node.arguments[0];
-                        const throwStatement = typescript_1.default.factory.createThrowStatement(typescript_1.default.isNewExpression(errorArg)
-                            ? errorArg
-                            : typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Error'), undefined, node.arguments));
-                        const arrowFunction = typescript_1.default.factory.createArrowFunction(undefined, undefined, [], undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock([throwStatement], true));
-                        const newExpression = (0, ast_helpers_1.createPropertyAccess)(spyCall, 'mockImplementation');
-                        return typescript_1.default.factory.createCallExpression(newExpression, undefined, [arrowFunction]);
+                    // spy.and.returnValues(a, b) -> spy.mockReturnValueOnce(a).mockReturnValueOnce(b)
+                    let chainedCall = spyCall;
+                    for (const value of returnValues) {
+                        const mockCall = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(chainedCall, 'mockReturnValueOnce'), undefined, [value]);
+                        chainedCall = mockCall;
                     }
-                    case 'identity': {
-                        reporter.reportTransformation(sourceFile, node, 'Transformed `.and.identity()` to `.getMockName()`.');
-                        const newExpression = (0, ast_helpers_1.createPropertyAccess)(spyCall, 'getMockName');
-                        return typescript_1.default.factory.createCallExpression(newExpression, undefined, undefined);
-                    }
-                    default: {
-                        const category = 'unsupported-spy-strategy';
-                        reporter.recordTodo(category, sourceFile, node);
-                        (0, comment_helpers_1.addTodoComment)(node, category, { name: strategyName });
-                        break;
-                    }
+                    return chainedCall;
                 }
-                if (newMethodName) {
-                    reporter.reportTransformation(sourceFile, node, `Transformed spy strategy \`.and.${strategyName}()\` to \`.${newMethodName}()\`.`);
-                    const newExpression = typescript_1.default.factory.updatePropertyAccessExpression(pae, spyCall, typescript_1.default.factory.createIdentifier(newMethodName));
-                    return typescript_1.default.factory.updateCallExpression(node, newExpression, node.typeArguments, args);
+                case 'callFake':
+                    newMethodName = 'mockImplementation';
+                    break;
+                case 'callThrough':
+                    reporter.reportTransformation(sourceFile, node, 'Removed redundant `.and.callThrough()` call.');
+                    return transformSpies(spyCall, refactorCtx); // .and.callThrough() is redundant, just transform spyOn.
+                case 'stub': {
+                    reporter.reportTransformation(sourceFile, node, 'Transformed `.and.stub()` to `.mockImplementation()`.');
+                    const newExpression = (0, ast_helpers_1.createPropertyAccess)(spyCall, 'mockImplementation');
+                    const arrowFn = typescript_1.default.factory.createArrowFunction(undefined, undefined, [], undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock([], /* multiline */ true));
+                    return typescript_1.default.factory.createCallExpression(newExpression, undefined, [arrowFn]);
                 }
+                case 'throwError': {
+                    reporter.reportTransformation(sourceFile, node, 'Transformed `.and.throwError()` to `.mockImplementation()`.');
+                    const errorArg = node.arguments[0];
+                    const throwStatement = typescript_1.default.factory.createThrowStatement(errorArg && typescript_1.default.isNewExpression(errorArg)
+                        ? errorArg
+                        : typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Error'), undefined, errorArg ? [errorArg] : []));
+                    const arrowFunction = typescript_1.default.factory.createArrowFunction(undefined, undefined, [], undefined, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.EqualsGreaterThanToken), typescript_1.default.factory.createBlock([throwStatement], true));
+                    const newExpression = (0, ast_helpers_1.createPropertyAccess)(spyCall, 'mockImplementation');
+                    return typescript_1.default.factory.createCallExpression(newExpression, undefined, [arrowFunction]);
+                }
+                case 'identity': {
+                    reporter.reportTransformation(sourceFile, node, 'Transformed `.and.identity()` to `.getMockName()`.');
+                    const newExpression = (0, ast_helpers_1.createPropertyAccess)(spyCall, 'getMockName');
+                    return typescript_1.default.factory.createCallExpression(newExpression, undefined, undefined);
+                }
+                default: {
+                    const category = 'unsupported-spy-strategy';
+                    reporter.recordTodo(category, sourceFile, node);
+                    (0, comment_helpers_1.addTodoComment)(node, category, { name: strategyName });
+                    break;
+                }
+            }
+            if (newMethodName) {
+                reporter.reportTransformation(sourceFile, node, `Transformed spy strategy \`.and.${strategyName}()\` to \`.${newMethodName}()\`.`);
+                const newExpression = typescript_1.default.factory.updatePropertyAccessExpression(pae, spyCall, typescript_1.default.factory.createIdentifier(newMethodName));
+                return typescript_1.default.factory.updateCallExpression(node, newExpression, node.typeArguments, args);
             }
         }
     }
+    return node;
+}
+function transformSpyOnAllFunctions(node, refactorCtx) {
+    const { sourceFile, reporter } = refactorCtx;
     if ((0, ast_validation_1.getJasmineMethodName)(node) === 'spyOnAllFunctions') {
         reporter.reportTransformation(sourceFile, node, 'Found unsupported `jasmine.spyOnAllFunctions()`.');
         const category = 'spyOnAllFunctions';
@@ -135,6 +182,20 @@ function transformSpies(node, refactorCtx) {
         return node;
     }
     return node;
+}
+function transformSpies(node, refactorCtx) {
+    if (!typescript_1.default.isCallExpression(node)) {
+        return node;
+    }
+    const primaryResult = transformPrimarySpy(node, refactorCtx);
+    if (primaryResult !== node) {
+        return primaryResult;
+    }
+    const strategyResult = transformSpyStrategy(node, refactorCtx);
+    if (strategyResult !== node) {
+        return strategyResult;
+    }
+    return transformSpyOnAllFunctions(node, refactorCtx);
 }
 function transformCreateSpy(node, ctx) {
     const { reporter, sourceFile, pendingVitestValueImports } = ctx;
