@@ -118,12 +118,11 @@ function transformJasmineMembers(node, refactorCtx) {
                 case 'MAX_PRETTY_PRINT_DEPTH':
                 case 'MAX_PRETTY_PRINT_CHARS': {
                     const replacement = typescript_1.default.factory.createEmptyStatement();
-                    const originalText = node.getFullText().trim();
                     reporter.reportTransformation(sourceFile, node, `Removed \`${memberName}\` member assignment.`);
                     const category = 'unsupported-jasmine-member';
                     reporter.recordTodo(category, sourceFile, node);
                     (0, comment_helpers_1.addTodoComment)(replacement, category, { name: memberName });
-                    typescript_1.default.addSyntheticLeadingComment(replacement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${originalText}`, true);
+                    (0, comment_helpers_1.addCommentedNodeText)(replacement, node);
                     return replacement;
                 }
             }

@@ -386,12 +386,11 @@ function transformExpectNothing(node, { sourceFile, reporter }) {
     }
     // The statement is `expect().nothing()`, which can be removed.
     const replacement = typescript_1.default.factory.createEmptyStatement();
-    const originalText = node.getFullText().trim();
     reporter.reportTransformation(sourceFile, node, 'Removed `expect().nothing()` statement.');
     const category = 'expect-nothing';
     reporter.recordTodo(category, sourceFile, node);
     (0, comment_helpers_1.addTodoComment)(replacement, category);
-    typescript_1.default.addSyntheticLeadingComment(replacement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${originalText}`, true);
+    (0, comment_helpers_1.addCommentedNodeText)(replacement, node);
     return replacement;
 }
 function transformToBeNullish(node, { sourceFile, reporter }) {
