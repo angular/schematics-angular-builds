@@ -11,6 +11,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addTodoComment = addTodoComment;
+exports.addCommentedNodeText = addCommentedNodeText;
 const typescript_1 = __importDefault(require("typescript"));
 const todo_notes_1 = require("./todo-notes");
 // Implementation that covers both overloads.
@@ -33,5 +34,19 @@ function addTodoComment(node, category, context) {
         statement = statement.parent;
     }
     typescript_1.default.addSyntheticLeadingComment(statement, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, commentText, true);
+}
+/**
+ * Safely comments out the full text of a node line-by-line and attaches
+ * it to a target node. This prevents multi-line statements from breaking
+ * syntax when converted to single-line comments.
+ * @param targetNode The node to which the comments will be added.
+ * @param nodeToComment The original node whose text will be commented out.
+ */
+function addCommentedNodeText(targetNode, nodeToComment) {
+    const originalText = nodeToComment.getFullText().trim();
+    const lines = originalText.split('\n');
+    for (const line of lines) {
+        typescript_1.default.addSyntheticLeadingComment(targetNode, typescript_1.default.SyntaxKind.SingleLineCommentTrivia, ` ${line.trim()}`, true);
+    }
 }
 //# sourceMappingURL=comment-helpers.js.map

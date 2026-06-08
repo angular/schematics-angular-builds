@@ -26,4 +26,12 @@ export declare function addTodoComment<T extends CategoriesWithNoContext>(node: 
  * @param context The context object providing dynamic values for the message.
  */
 export declare function addTodoComment<T extends TodoCategory>(node: ts.Node, category: T, context: TodoContextMap[T]): void;
+/**
+ * Safely comments out the full text of a node line-by-line and attaches
+ * it to a target node. This prevents multi-line statements from breaking
+ * syntax when converted to single-line comments.
+ * @param targetNode The node to which the comments will be added.
+ * @param nodeToComment The original node whose text will be commented out.
+ */
+export declare function addCommentedNodeText(targetNode: ts.Node, nodeToComment: ts.Node): void;
 export {};
