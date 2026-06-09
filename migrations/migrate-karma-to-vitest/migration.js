@@ -206,7 +206,7 @@ function updateProjects(tree, context) {
             // Always include fallback to the default tsconfig.spec.json path
             tsConfigsToUpdate.add((0, posix_1.join)(project.root, 'tsconfig.spec.json'));
             // Store custom build options to move to a new build configuration if needed
-            const customBuildOptions = {};
+            const customBuildOptions = Object.create(null);
             const projectCoverageInfo = await processTestTargetOptions(testTarget, projectName, context, tree, removableKarmaConfigs, customBuildOptions, needDevkitPlugin, manualMigrationFiles);
             if (projectCoverageInfo.needsCoverage) {
                 needsCoverage = true;

@@ -31,8 +31,8 @@ async function generateDefaultKarmaConfig(relativePathToWorkspaceRoot, projectNa
     let template = await (0, promises_1.readFile)(templatePath, 'utf-8');
     // TODO: Replace this with the actual schematic templating logic.
     template = template
-        .replace(/<%= relativePathToWorkspaceRoot %>/g, posix_1.default.normalize(relativePathToWorkspaceRoot).replace(/\\/g, '/'))
-        .replace(/<%= folderName %>/g, projectName);
+        .replace(/<%= relativePathToWorkspaceRoot %>/g, () => posix_1.default.normalize(relativePathToWorkspaceRoot).replace(/\\/g, '/'))
+        .replace(/<%= folderName %>/g, () => projectName);
     const devkitPluginRegex = /<% if \(needDevkitPlugin\) { %>(.*?)<% } %>/gs;
     const replacement = needDevkitPlugin ? '$1' : '';
     template = template.replace(devkitPluginRegex, replacement);
