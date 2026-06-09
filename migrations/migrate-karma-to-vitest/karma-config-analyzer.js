@@ -109,7 +109,7 @@ function analyzeKarmaConfig(content) {
             case typescript_1.default.SyntaxKind.ArrayLiteralExpression:
                 return node.elements.map(extractValue);
             case typescript_1.default.SyntaxKind.ObjectLiteralExpression: {
-                const obj = {};
+                const obj = Object.create(null);
                 for (const prop of node.properties) {
                     if (isSupportedPropertyAssignment(prop)) {
                         // Recursively extract values for nested objects.
