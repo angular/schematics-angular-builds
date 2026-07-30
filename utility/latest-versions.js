@@ -14,10 +14,10 @@ const dependencies = require('./latest-versions/package.json')['dependencies'];
 exports.latestVersions = {
     ...dependencies,
     // As Angular CLI works with same minor versions of Angular Framework, a tilde match for the current
-    Angular: '^22.1.0-next.0',
-    NgPackagr: '^22.1.0-next.0',
-    DevkitBuildAngular: '^22.2.0-next.0+sha-164d77f',
-    AngularBuild: '^22.2.0-next.0+sha-164d77f',
-    AngularSSR: '^22.2.0-next.0+sha-164d77f',
+    Angular: '^22.2.0-next.0',
+    NgPackagr: '^22.2.0-next.0',
+    DevkitBuildAngular: '^22.2.0-next.0+sha-082cac9',
+    AngularBuild: '^22.2.0-next.0+sha-082cac9',
+    AngularSSR: '^22.2.0-next.0+sha-082cac9',
 };
 //# sourceMappingURL=latest-versions.js.map
