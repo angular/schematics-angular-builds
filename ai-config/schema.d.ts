@@ -1,12 +1,12 @@
 /**
- * Generates AI configuration files for Angular projects. This schematic creates AGENTS.md
- * file and Angular MCP server configuration, improving the quality of AI-generated code and
- * suggestions.
+ * Generates AI configuration files for Angular projects. This schematic creates instruction
+ * files (e.g. AGENTS.md, CLAUDE.md) and Angular MCP server configuration, improving the
+ * quality of AI-generated code and suggestions.
  */
 export type Schema = {
     /**
-     * Specifies which AI tools to generate configuration files (AGENTS.md, MCP server config)
-     * for.
+     * Specifies which AI tools to generate configuration files (AGENTS.md, CLAUDE.md, MCP
+     * server config) for.
      */
     tool?: Tool[];
 };
