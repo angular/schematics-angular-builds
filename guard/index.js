@@ -29,7 +29,7 @@ function default_1(options) {
         const commonRouterNameImports = ['ActivatedRouteSnapshot', 'RouterStateSnapshot'];
         const routerNamedImports = [...options.implements, 'MaybeAsync', 'GuardResult'];
         if (options.implements.includes(schema_1.Implement.CanMatch)) {
-            routerNamedImports.push('Route', 'subPath');
+            routerNamedImports.push('Route', 'UrlSegment');
             if (options.implements.length > 1) {
                 routerNamedImports.push(...commonRouterNameImports);
             }
