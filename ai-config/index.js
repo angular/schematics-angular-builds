@@ -19,7 +19,11 @@ const AGENTS_MD_CFG = {
 };
 const AI_TOOLS = {
     ['claude-code']: [
-        AGENTS_MD_CFG,
+        {
+            type: types_1.ContextFileType.BestPracticesMd,
+            name: 'CLAUDE.md',
+            directory: '.',
+        },
         {
             type: types_1.ContextFileType.McpConfig,
             name: '.mcp.json',
