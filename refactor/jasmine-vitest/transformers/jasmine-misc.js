@@ -82,21 +82,32 @@ function transformTimerMocks(node, ctx) {
     }
     return node;
 }
-function transformFail(node, { sourceFile, reporter }) {
-    if (typescript_1.default.isExpressionStatement(node) &&
-        typescript_1.default.isCallExpression(node.expression) &&
-        typescript_1.default.isIdentifier(node.expression.expression) &&
-        node.expression.expression.text === 'fail') {
-        reporter.reportTransformation(sourceFile, node, 'Transformed `fail()` to `throw new Error()`.');
-        const arg = node.expression.arguments[0];
-        let throwExpression;
-        if (arg && typescript_1.default.isNewExpression(arg)) {
-            throwExpression = arg;
+function transformFail(node, { sourceFile, reporter, pendingVitestValueImports }) {
+    if (typescript_1.default.isCallExpression(node) &&
+        typescript_1.default.isIdentifier(node.expression) &&
+        node.expression.text === 'fail') {
+        (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'expect');
+        reporter.reportTransformation(sourceFile, node, 'Transformed `fail()` to `expect.fail()`.');
+        const arg = node.arguments[0];
+        let replacementArg = arg;
+        let hasNonStringArg = false;
+        if (arg) {
+            if (typescript_1.default.isNewExpression(arg)) {
+                replacementArg = arg.arguments && arg.arguments.length > 0 ? arg.arguments[0] : undefined;
+            }
+            else if (!typescript_1.default.isStringLiteral(arg) &&
+                !typescript_1.default.isNoSubstitutionTemplateLiteral(arg) &&
+                !typescript_1.default.isTemplateExpression(arg)) {
+                replacementArg = typescript_1.default.factory.createCallExpression(typescript_1.default.factory.createIdentifier('String'), undefined, [arg]);
+                hasNonStringArg = true;
+            }
         }
-        else {
-            throwExpression = typescript_1.default.factory.createNewExpression(typescript_1.default.factory.createIdentifier('Error'), undefined, arg ? [arg] : []);
+        const replacement = typescript_1.default.factory.createCallExpression(typescript_1.default.factory.createPropertyAccessExpression(typescript_1.default.factory.createIdentifier('expect'), typescript_1.default.factory.createIdentifier('fail')), undefined, replacementArg ? [replacementArg] : []);
+        if (hasNonStringArg) {
+            const category = 'fail-non-string-argument';
+            reporter.recordTodo(category, sourceFile, node);
+            (0, comment_helpers_1.addTodoComment)(replacement, category);
         }
-        const replacement = typescript_1.default.factory.createThrowStatement(throwExpression);
         return typescript_1.default.setOriginalNode(typescript_1.default.setTextRange(replacement, node), node);
     }
     return node;

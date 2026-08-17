@@ -105,6 +105,7 @@ const callExpressionTransformers = [
     fake_async_flush_microtasks_1.transformFakeAsyncFlushMicrotasks,
     // **Stage 3: Global Functions & Cleanup**
     // These handle global Jasmine functions and catch-alls for unsupported APIs.
+    jasmine_misc_1.transformFail,
     jasmine_misc_1.transformTimerMocks,
     jasmine_misc_1.transformUnsupportedGlobalFunctions,
     jasmine_misc_1.transformUnsupportedJasmineCalls,
@@ -127,7 +128,6 @@ const expressionStatementTransformers = [
     jasmine_matcher_1.transformCalledOnceWith,
     jasmine_matcher_1.transformArrayWithExactContents,
     jasmine_matcher_1.transformExpectNothing,
-    jasmine_misc_1.transformFail,
     jasmine_misc_1.transformJasmineMembers,
 ];
 /**

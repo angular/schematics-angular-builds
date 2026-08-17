@@ -58,6 +58,11 @@ exports.TODO_NOTES = {
     'expect-nothing': {
         message: 'expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.',
     },
+    'fail-non-string-argument': {
+        message: 'expect.fail() only accepts a string message. ' +
+            'Verify that converting this argument with String() produces the expected failure output.',
+        url: 'https://vitest.dev/api/expect.html#expect-fail',
+    },
     'unsupported-jasmine-member': {
         message: (context) => `jasmine.${context.name} is not supported.`,
     },
