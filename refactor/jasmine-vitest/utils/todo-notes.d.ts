@@ -57,6 +57,10 @@ export declare const TODO_NOTES: {
     readonly 'expect-nothing': {
         readonly message: "expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.";
     };
+    readonly 'fail-non-string-argument': {
+        readonly message: string;
+        readonly url: "https://vitest.dev/api/expect.html#expect-fail";
+    };
     readonly 'unsupported-jasmine-member': {
         readonly message: (context: {
             name: string;
