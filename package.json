@@ -1,6 +1,6 @@
 {
   "name": "@schematics/angular",
-  "version": "20.3.35+sha-c3e5982",
+  "version": "20.3.36+sha-a9f4dae",
   "description": "Schematics specific to Angular",
   "homepage": "https://github.com/angular/angular-cli",
   "keywords": [
@@ -22,8 +22,8 @@
   },
   "schematics": "./collection.json",
   "dependencies": {
-    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#c3e5982",
-    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#c3e5982",
+    "@angular-devkit/core": "github:angular/angular-devkit-core-builds#a9f4dae",
+    "@angular-devkit/schematics": "github:angular/angular-devkit-schematics-builds#a9f4dae",
     "jsonc-parser": "3.3.1"
   },
   "repository": {
