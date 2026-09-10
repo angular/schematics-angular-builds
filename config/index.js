@@ -47,7 +47,7 @@ function addVitestConfig(options) {
         // Check runner option.
         if (testTarget.options.runner === 'karma') {
             context.logger.warn(`The "test" target is configured to use the "karma" runner in the main options.` +
-                ' The generated "vitest-base.config.ts" file may not be used.');
+                ' The generated "vitest-base.config.mts" file may not be used.');
         }
         for (const [name, config] of Object.entries(testTarget.configurations ?? {})) {
             if (config &&
@@ -55,11 +55,11 @@ function addVitestConfig(options) {
                 'runner' in config &&
                 config.runner === 'karma') {
                 context.logger.warn(`The "test" target's "${name}" configuration is configured to use the "karma" runner.` +
-                    ' The generated "vitest-base.config.ts" file may not be used for that configuration.');
+                    ' The generated "vitest-base.config.mts" file may not be used for that configuration.');
             }
         }
         return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
-            (0, schematics_1.filter)((p) => p.endsWith('vitest-base.config.ts.template')),
+            (0, schematics_1.filter)((p) => p.endsWith('vitest-base.config.mts.template')),
             (0, schematics_1.applyTemplates)({}),
             (0, schematics_1.move)(project.root),
         ]));
