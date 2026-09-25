@@ -62,8 +62,17 @@ function default_1(options) {
                 }
             }
         };
+        // Update angular.json to add the browsers option to the test target
+        const defaultBrowser = packageName === '@vitest/browser-webdriverio' ? 'chrome' : 'chromium';
         return (0, schematics_1.chain)([
             updateTsConfigRule,
+            (0, workspace_1.updateWorkspace)((workspace) => {
+                const testTarget = workspace.projects.get(options.project)?.targets.get('test');
+                if (testTarget) {
+                    testTarget.options ??= {};
+                    testTarget.options['browsers'] ??= [defaultBrowser];
+                }
+            }),
             ...dependencies.map((name) => (0, dependency_1.addDependency)(name, latest_versions_1.latestVersions[name], {
                 type: dependency_1.DependencyType.Dev,
                 existing: dependency_1.ExistingBehavior.Skip,
@@ -71,8 +80,7 @@ function default_1(options) {
             })),
             (_, context) => {
                 context.logger.info('Vitest browser testing support has been added. ' +
-                    "To run tests in a browser, add a 'browsers' field to the 'test' target in 'angular.json', " +
-                    "or use the '--browsers' command line option.");
+                    `The test target has been configured with '${defaultBrowser}' as browser.`);
             },
         ]);
     };
