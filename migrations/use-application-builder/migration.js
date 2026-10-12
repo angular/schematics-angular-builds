@@ -194,9 +194,12 @@ function updateProjects(tree, context) {
                 }
             }
             // Add direct @angular/build dependencies and remove @angular-devkit/build-angular
-            rules.push((0, dependency_1.addDependency)('@angular/build', latest_versions_1.latestVersions.DevkitBuildAngular, {
+            // Keep the workspace version since this migration can run from a newer temporary CLI
+            const buildAngularVersion = (0, dependency_1.getDependency)(tree, '@angular-devkit/build-angular')?.version ??
+                latest_versions_1.latestVersions.AngularBuild;
+            rules.push((0, dependency_1.addDependency)('@angular/build', buildAngularVersion, {
                 type: dependency_1.DependencyType.Dev,
-                existing: dependency_1.ExistingBehavior.Replace,
+                existing: dependency_1.ExistingBehavior.Skip,
             }), (0, dependency_1.removeDependency)('@angular-devkit/build-angular'));
             // Add less dependency if any projects contain a Less stylesheet file.
             // This check does not consider Node.js packages due to the performance
