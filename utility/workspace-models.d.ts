@@ -33,7 +33,8 @@ export declare enum Builders {
     BuildDevServer = "@angular/build:dev-server",
     ExtractI18n = "@angular-devkit/build-angular:extract-i18n",
     BuildExtractI18n = "@angular/build:extract-i18n",
-    BuildApplication = "@angular/build:application"
+    BuildApplication = "@angular/build:application",
+    BuildLibrary = "@angular/build:library"
 }
 export interface FileReplacements {
     replace: string;

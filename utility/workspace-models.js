@@ -39,5 +39,6 @@ var Builders;
     Builders["ExtractI18n"] = "@angular-devkit/build-angular:extract-i18n";
     Builders["BuildExtractI18n"] = "@angular/build:extract-i18n";
     Builders["BuildApplication"] = "@angular/build:application";
+    Builders["BuildLibrary"] = "@angular/build:library";
 })(Builders || (exports.Builders = Builders = {}));
 //# sourceMappingURL=workspace-models.js.map

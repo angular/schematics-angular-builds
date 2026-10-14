@@ -1,0 +1,438 @@
+"use strict";
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
+const core_1 = require("@angular-devkit/core");
+const schematics_1 = require("@angular-devkit/schematics");
+const posix_1 = require("node:path/posix");
+const dependency_1 = require("../../utility/dependency");
+const json_file_1 = require("../../utility/json-file");
+const latest_versions_1 = require("../../utility/latest-versions");
+const workspace_1 = require("../../utility/workspace");
+const workspace_models_1 = require("../../utility/workspace-models");
+/**
+ * Normalizes a workspace-relative POSIX path, converting `'.'` or `'/'` to `''`.
+ *
+ * @param path The path string to normalize.
+ * @returns The normalized workspace-relative path.
+ */
+function normalizeRelativePath(path) {
+    const normalized = (0, posix_1.normalize)(path).replace(/^\/+|\/+$/g, '');
+    return normalized === '.' ? '' : normalized;
+}
+/**
+ * Reads and parses an `ng-packagr` configuration from either an `ng-package.json`
+ * file or the `ngPackage` property of a `package.json` file.
+ *
+ * @param tree The virtual file system tree.
+ * @param filePath The workspace-relative path to the configuration file.
+ * @returns The parsed `NgPackageConfig`, or `undefined` if the file does not exist or cannot be parsed.
+ */
+function parseNgPackageFile(tree, filePath) {
+    if (!tree.exists(filePath)) {
+        return undefined;
+    }
+    try {
+        const json = new json_file_1.JSONFile(tree, filePath);
+        if (filePath.endsWith('/package.json') || filePath === 'package.json') {
+            const ngPackage = json.get(['ngPackage']);
+            return (0, core_1.isJsonObject)(ngPackage) ? ngPackage : undefined;
+        }
+        const content = json.get([]);
+        return (0, core_1.isJsonObject)(content) ? content : undefined;
+    }
+    catch {
+        return undefined;
+    }
+}
+/**
+ * Resolves the TypeScript entry file path for a library entry point directory.
+ * Uses the explicitly configured `entryFile` when provided, or checks common
+ * default locations.
+ *
+ * @param tree The virtual file system tree.
+ * @param dir The directory of the primary or secondary entry point.
+ * @param configuredEntry The optional `lib.entryFile` path from `ng-package.json`.
+ * @returns The resolved entry file path relative to `dir`.
+ */
+function resolveEntryFile(tree, dir, configuredEntry) {
+    if (configuredEntry) {
+        return configuredEntry;
+    }
+    const candidates = [
+        'src/public-api.ts',
+        'src/public_api.ts',
+        'public-api.ts',
+        'public_api.ts',
+        'src/index.ts',
+        'index.ts',
+    ];
+    for (const candidate of candidates) {
+        if (tree.exists((0, posix_1.join)(dir, candidate))) {
+            return candidate;
+        }
+    }
+    throw new schematics_1.SchematicsException(`Could not find an entry file for library entry point at "${dir || '.'}".`);
+}
+/**
+ * Traverses a library project directory to discover all secondary entry points
+ * defined by nested `ng-package.json` files or `package.json` files containing an `ngPackage` field.
+ *
+ * @param tree The virtual file system tree.
+ * @param projectRoot The root directory of the library project.
+ * @param primaryProjectFile The workspace-relative path to the primary `ng-packagr` configuration file.
+ * @returns An array of discovered secondary entry points.
+ */
+function findSecondaryEntryPoints(tree, projectRoot, primaryProjectFile) {
+    const secondaryEntryPoints = [];
+    const normalizedRoot = normalizeRelativePath(projectRoot);
+    const normalizedPrimary = primaryProjectFile ? normalizeRelativePath(primaryProjectFile) : '';
+    const rootDir = tree.getDir(normalizedRoot);
+    const directories = [rootDir];
+    for (const current of directories) {
+        const currentPath = normalizeRelativePath(current.path);
+        if (currentPath !== normalizedRoot) {
+            const ngPackageJsonPath = (0, posix_1.join)(currentPath, 'ng-package.json');
+            const packageJsonPath = (0, posix_1.join)(currentPath, 'package.json');
+            if (current.subfiles.some((f) => f === 'ng-package.json') &&
+                ngPackageJsonPath !== normalizedPrimary) {
+                const config = parseNgPackageFile(tree, ngPackageJsonPath);
+                const subpath = (0, posix_1.relative)(normalizedRoot, currentPath);
+                const entryFile = resolveEntryFile(tree, currentPath, config?.lib?.entryFile);
+                secondaryEntryPoints.push({
+                    subpath,
+                    entryPoint: (0, posix_1.join)(currentPath, entryFile),
+                    configFile: ngPackageJsonPath,
+                });
+            }
+            else if (current.subfiles.some((f) => f === 'package.json') &&
+                packageJsonPath !== normalizedPrimary) {
+                const config = parseNgPackageFile(tree, packageJsonPath);
+                if (config) {
+                    const subpath = (0, posix_1.relative)(normalizedRoot, currentPath);
+                    const entryFile = resolveEntryFile(tree, currentPath, config.lib?.entryFile);
+                    secondaryEntryPoints.push({
+                        subpath,
+                        entryPoint: (0, posix_1.join)(currentPath, entryFile),
+                        configFile: packageJsonPath,
+                    });
+                }
+            }
+        }
+        for (const subdir of current.subdirs) {
+            if (subdir === 'node_modules' ||
+                subdir === 'dist' ||
+                subdir === 'out-tsc' ||
+                subdir.startsWith('.')) {
+                continue;
+            }
+            directories.push(current.dir(subdir));
+        }
+    }
+    return secondaryEntryPoints;
+}
+/**
+ * Transfers `ng-packagr` configuration options onto the library's `build` target in `angular.json`.
+ *
+ * @param projectRoot The normalized root directory of the library project.
+ * @param projectDir The directory containing the primary `ng-packagr` configuration file.
+ * @param buildTarget The library's `build` target definition in `angular.json`.
+ * @param ngPackageConfig The parsed `NgPackageConfig`, if available.
+ * @param tree The virtual file system tree.
+ */
+function migrateTargetOptions(projectRoot, projectDir, buildTarget, ngPackageConfig, tree) {
+    buildTarget.builder = workspace_models_1.Builders.BuildLibrary;
+    buildTarget.options ??= {};
+    const devTsConfig = buildTarget.configurations?.['development']?.['tsConfig'];
+    if (typeof buildTarget.options['tsConfig'] !== 'string') {
+        if (typeof devTsConfig === 'string') {
+            buildTarget.options['tsConfig'] = devTsConfig;
+            delete buildTarget.configurations?.['development']?.['tsConfig'];
+        }
+        else if (tree.exists((0, posix_1.join)(projectRoot, 'tsconfig.lib.json'))) {
+            buildTarget.options['tsConfig'] = (0, posix_1.join)(projectRoot, 'tsconfig.lib.json');
+        }
+    }
+    else if (devTsConfig === buildTarget.options['tsConfig']) {
+        delete buildTarget.configurations?.['development']?.['tsConfig'];
+    }
+    if (ngPackageConfig?.dest && typeof buildTarget.options['outputPath'] !== 'string') {
+        buildTarget.options['outputPath'] = (0, posix_1.join)(projectDir, ngPackageConfig.dest);
+    }
+    if (ngPackageConfig?.assets?.length) {
+        const existingAssets = Array.isArray(buildTarget.options['assets'])
+            ? buildTarget.options['assets']
+            : [];
+        const migratedAssets = ngPackageConfig.assets.map((asset) => {
+            if (typeof asset === 'string') {
+                return (0, posix_1.join)(projectDir, asset);
+            }
+            if ((0, core_1.isJsonObject)(asset) && typeof asset['input'] === 'string') {
+                return {
+                    ...asset,
+                    input: (0, posix_1.join)(projectDir, asset['input']),
+                };
+            }
+            return asset;
+        });
+        buildTarget.options['assets'] = [...existingAssets, ...migratedAssets];
+    }
+    if (ngPackageConfig?.lib?.styleIncludePaths?.length || ngPackageConfig?.lib?.sass) {
+        const stylePreprocessorOptions = buildTarget.options['stylePreprocessorOptions'];
+        const existingPreprocessorOptions = stylePreprocessorOptions && (0, core_1.isJsonObject)(stylePreprocessorOptions)
+            ? { ...stylePreprocessorOptions }
+            : {};
+        if (ngPackageConfig.lib.styleIncludePaths?.length) {
+            const existingIncludePaths = Array.isArray(existingPreprocessorOptions['includePaths'])
+                ? existingPreprocessorOptions['includePaths']
+                : [];
+            const migratedIncludePaths = ngPackageConfig.lib.styleIncludePaths.map((p) => (0, posix_1.join)(projectDir, p));
+            existingPreprocessorOptions['includePaths'] = [
+                ...existingIncludePaths,
+                ...migratedIncludePaths,
+            ];
+        }
+        if (ngPackageConfig.lib.sass) {
+            existingPreprocessorOptions['sass'] = ngPackageConfig.lib.sass;
+        }
+        buildTarget.options['stylePreprocessorOptions'] = existingPreprocessorOptions;
+    }
+    if (ngPackageConfig?.allowedNonPeerDependencies?.length) {
+        buildTarget.options['allowedNonPeerDependencies'] = ngPackageConfig.allowedNonPeerDependencies;
+    }
+    if (ngPackageConfig?.inlineStyleLanguage) {
+        buildTarget.options['inlineStyleLanguage'] = ngPackageConfig.inlineStyleLanguage;
+    }
+    if (ngPackageConfig?.keepLifecycleScripts !== undefined) {
+        buildTarget.options['keepLifecycleScripts'] = ngPackageConfig.keepLifecycleScripts;
+    }
+    if (ngPackageConfig?.deleteDestPath !== undefined) {
+        buildTarget.options['deleteOutputPath'] = ngPackageConfig.deleteDestPath;
+    }
+    for (const [, options] of (0, workspace_1.allTargetOptions)(buildTarget, false)) {
+        delete options['project'];
+    }
+    // Configure development configuration with full compilation mode unless already specified in tsconfig
+    buildTarget.configurations ??= {};
+    buildTarget.configurations['development'] ??= {};
+    const effectiveDevTsConfig = typeof buildTarget.configurations['development']['tsConfig'] === 'string'
+        ? buildTarget.configurations['development']['tsConfig']
+        : typeof buildTarget.options['tsConfig'] === 'string'
+            ? buildTarget.options['tsConfig']
+            : undefined;
+    let hasDevTsConfigCompilationMode = false;
+    if (effectiveDevTsConfig && tree.exists(effectiveDevTsConfig)) {
+        try {
+            const tsConfigJson = new json_file_1.JSONFile(tree, effectiveDevTsConfig);
+            hasDevTsConfigCompilationMode =
+                tsConfigJson.get(['angularCompilerOptions', 'compilationMode']) !== undefined;
+        }
+        catch {
+            // Ignore parse errors
+        }
+    }
+    if (!hasDevTsConfigCompilationMode) {
+        buildTarget.configurations['development']['compilationMode'] ??= 'full';
+    }
+}
+/**
+ * Migrates a single library project's `build` target from `ng-packagr` to `@angular/build:library`,
+ * transferring configuration options to `angular.json`, writing entry points to `package.json#exports`,
+ * and cleaning up obsolete `ng-packagr` configuration files.
+ *
+ * @param projectRoot The root directory of the library project.
+ * @param buildTarget The library's `build` target definition in `angular.json`.
+ * @param tree The virtual file system tree.
+ * @param context The schematic execution context.
+ * @returns `true` if the library target was migrated, or `false` if it was skipped.
+ */
+function updateLibraryTarget(projectRoot, buildTarget, tree, context) {
+    const normalizedProjectRoot = normalizeRelativePath(projectRoot);
+    let primaryProjectFile = typeof buildTarget.options?.['project'] === 'string'
+        ? normalizeRelativePath(buildTarget.options['project'])
+        : '';
+    if (!primaryProjectFile) {
+        for (const [, options] of (0, workspace_1.allTargetOptions)(buildTarget, true)) {
+            if (typeof options['project'] === 'string') {
+                primaryProjectFile = normalizeRelativePath(options['project']);
+                break;
+            }
+        }
+    }
+    if (!primaryProjectFile) {
+        const defaultNgPackageJson = (0, posix_1.join)(normalizedProjectRoot, 'ng-package.json');
+        const defaultPackageJson = (0, posix_1.join)(normalizedProjectRoot, 'package.json');
+        if (tree.exists(defaultNgPackageJson)) {
+            primaryProjectFile = defaultNgPackageJson;
+        }
+        else if (tree.exists(defaultPackageJson)) {
+            primaryProjectFile = defaultPackageJson;
+        }
+    }
+    if (/\.[cm]?js$/.test(primaryProjectFile)) {
+        context.logger.warn(`Skipping project at "${projectRoot}" because JavaScript ng-packagr ` +
+            `configuration files ("${primaryProjectFile}") cannot be automatically migrated.`);
+        return false;
+    }
+    const ngPackageConfig = primaryProjectFile
+        ? parseNgPackageFile(tree, primaryProjectFile)
+        : undefined;
+    const projectDir = primaryProjectFile
+        ? normalizeRelativePath((0, posix_1.dirname)(primaryProjectFile))
+        : normalizedProjectRoot;
+    const primaryEntryFile = resolveEntryFile(tree, projectDir, ngPackageConfig?.lib?.entryFile);
+    const primaryEntryFilePath = (0, posix_1.join)(projectDir, primaryEntryFile);
+    const secondaryEntryPoints = findSecondaryEntryPoints(tree, normalizedProjectRoot, primaryProjectFile);
+    const toRelativeExportPath = (filePath) => {
+        const rel = (0, posix_1.relative)(normalizedProjectRoot, filePath);
+        return rel.startsWith('./') || rel.startsWith('../') ? rel : `./${rel}`;
+    };
+    const entryPointExports = {
+        '.': toRelativeExportPath(primaryEntryFilePath),
+    };
+    for (const secondary of secondaryEntryPoints) {
+        const exportKey = secondary.subpath.startsWith('./') || secondary.subpath.startsWith('../')
+            ? secondary.subpath
+            : `./${secondary.subpath}`;
+        entryPointExports[exportKey] = toRelativeExportPath(secondary.entryPoint);
+    }
+    migrateTargetOptions(normalizedProjectRoot, projectDir, buildTarget, ngPackageConfig, tree);
+    const packageJsonPath = (0, posix_1.join)(normalizedProjectRoot, 'package.json');
+    // Delete primary ng-package.json if it exists
+    if (primaryProjectFile &&
+        primaryProjectFile.endsWith('ng-package.json') &&
+        tree.exists(primaryProjectFile)) {
+        tree.delete(primaryProjectFile);
+    }
+    else if (primaryProjectFile &&
+        primaryProjectFile !== packageJsonPath &&
+        (primaryProjectFile.endsWith('/package.json') || primaryProjectFile === 'package.json') &&
+        tree.exists(primaryProjectFile)) {
+        const json = new json_file_1.JSONFile(tree, primaryProjectFile);
+        json.remove(['ngPackage']);
+    }
+    // Update library package.json with exports and remove ngPackage
+    if (tree.exists(packageJsonPath)) {
+        updateLibraryPackageJson(tree, packageJsonPath, entryPointExports);
+    }
+    // Delete secondary configuration files
+    for (const secondary of secondaryEntryPoints) {
+        if (secondary.configFile.endsWith('ng-package.json') && tree.exists(secondary.configFile)) {
+            tree.delete(secondary.configFile);
+        }
+        else if ((secondary.configFile.endsWith('/package.json') || secondary.configFile === 'package.json') &&
+            tree.exists(secondary.configFile)) {
+            const json = new json_file_1.JSONFile(tree, secondary.configFile);
+            json.remove(['ngPackage']);
+            const remaining = json.get([]);
+            if ((0, core_1.isJsonObject)(remaining) &&
+                Object.keys(remaining).filter((k) => k !== '$schema').length === 0) {
+                tree.delete(secondary.configFile);
+            }
+        }
+    }
+    context.logger.info(`Updated project at "${projectRoot}" to use the new '@angular/build:library' builder with ${Object.keys(entryPointExports).length} entry point(s).`);
+    return true;
+}
+/**
+ * Updates the library's `package.json` file by removing the legacy `ngPackage` configuration
+ * and `tslib` dependency, and merging the discovered entry points into the `exports` map.
+ *
+ * @param tree The virtual file system tree.
+ * @param packageJsonPath The workspace-relative path to the library's `package.json`.
+ * @param entryPointExports Map of export subpaths to relative entry file paths.
+ */
+function updateLibraryPackageJson(tree, packageJsonPath, entryPointExports) {
+    const json = new json_file_1.JSONFile(tree, packageJsonPath);
+    json.remove(['ngPackage']);
+    for (const depType of [
+        'dependencies',
+        'peerDependencies',
+        'devDependencies',
+        'optionalDependencies',
+    ]) {
+        json.remove([depType, 'tslib']);
+        const deps = json.get([depType]);
+        if ((0, core_1.isJsonObject)(deps) && Object.keys(deps).length === 0) {
+            json.remove([depType]);
+        }
+    }
+    const existingExports = json.get(['exports']);
+    let existingExportsObj = {};
+    if ((0, core_1.isJsonObject)(existingExports)) {
+        const keys = Object.keys(existingExports);
+        if (keys.some((k) => k.startsWith('.'))) {
+            existingExportsObj = existingExports;
+        }
+        else if (keys.length > 0) {
+            existingExportsObj = { '.': existingExports };
+        }
+    }
+    const updatedExports = {
+        ...existingExportsObj,
+    };
+    for (const [subpath, targetPath] of Object.entries(entryPointExports)) {
+        const current = updatedExports[subpath];
+        if (current && (0, core_1.isJsonObject)(current)) {
+            updatedExports[subpath] = {
+                ...current,
+                default: targetPath,
+            };
+        }
+        else {
+            updatedExports[subpath] = targetPath;
+        }
+    }
+    json.modify(['exports'], updatedExports);
+}
+/**
+ * Migration main entrypoint for use-library-builder.
+ */
+function default_1() {
+    return (tree, context) => (0, workspace_1.updateWorkspace)((workspace) => {
+        let hasMigratedLibrary = false;
+        for (const [, project] of workspace.projects) {
+            if (project.extensions.projectType !== workspace_models_1.ProjectType.Library) {
+                continue;
+            }
+            const buildTarget = project.targets.get('build');
+            if (!buildTarget ||
+                buildTarget.builder === workspace_models_1.Builders.BuildLibrary ||
+                (buildTarget.builder !== workspace_models_1.Builders.NgPackagr &&
+                    buildTarget.builder !== workspace_models_1.Builders.BuildNgPackagr)) {
+                continue;
+            }
+            if (updateLibraryTarget(project.root, buildTarget, tree, context)) {
+                hasMigratedLibrary = true;
+            }
+        }
+        if (!hasMigratedLibrary) {
+            return;
+        }
+        const rules = [
+            (0, dependency_1.addDependency)('@angular/build', latest_versions_1.latestVersions.AngularBuild, {
+                type: dependency_1.DependencyType.Dev,
+                existing: dependency_1.ExistingBehavior.Skip,
+            }),
+        ];
+        // Check if any targets still use ng-packagr across the workspace
+        let hasNgPackagrUsage = false;
+        for (const [, target] of (0, workspace_1.allWorkspaceTargets)(workspace)) {
+            if (target.builder === workspace_models_1.Builders.NgPackagr || target.builder === workspace_models_1.Builders.BuildNgPackagr) {
+                hasNgPackagrUsage = true;
+                break;
+            }
+        }
+        if (!hasNgPackagrUsage) {
+            rules.push((0, dependency_1.removeDependency)('ng-packagr'));
+        }
+        return (0, schematics_1.chain)(rules);
+    });
+}
+//# sourceMappingURL=migration.js.map
