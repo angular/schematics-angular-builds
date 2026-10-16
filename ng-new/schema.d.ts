@@ -22,7 +22,8 @@ export type Schema = {
     createApplication?: boolean;
     /**
      * The directory where the new workspace and project should be created. If not specified,
-     * the workspace will be created in the current directory.
+     * the workspace will be created in a subfolder within the current directory, using the
+     * workspace's name.
      */
     directory?: string;
     /**
