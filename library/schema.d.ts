@@ -6,8 +6,9 @@
  */
 export type Schema = {
     /**
-     * The path to the library's public API file, relative to the workspace root. This file
-     * defines what parts of the library are accessible to applications that import it.
+     * The name of the library's public API file, without the `.ts` extension, created in the
+     * library's `src` directory. This file defines what parts of the library are accessible to
+     * applications that import it.
      */
     entryFile?: string;
     /**

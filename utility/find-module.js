@@ -83,7 +83,7 @@ function findModule(host, generateDir, moduleExt, routingModuleExt) {
     }
     const errorMsg = foundRoutingModule
         ? 'Could not find a non Routing NgModule.' +
-            `\nModules with suffix '${routingModuleExt}' are strictly reserved for routing.` +
+            `\nModules with suffix '${routingModuleExtensions.join("' or '")}' are strictly reserved for routing.` +
             `\nUse the '--skip-import' option to skip importing in NgModule.`
         : `Could not find an NgModule. Use the '--skip-import' option to skip importing in NgModule.`;
     throw new Error(errorMsg);
