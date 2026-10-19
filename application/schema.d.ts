@@ -60,7 +60,7 @@ export type Schema = {
      */
     skipPackageJson?: boolean;
     /**
-     * Skip the generation of a unit test files `spec.ts`.
+     * Skip the generation of unit test files `spec.ts`.
      */
     skipTests?: boolean;
     /**
