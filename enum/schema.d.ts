@@ -5,8 +5,7 @@
  */
 export type Schema = {
     /**
-     * The name for the new enum. This will be used to create the enum file (e.g.,
-     * `my-enum.enum.ts`).
+     * The name for the new enum. This will be used to create the enum file (e.g., `my-enum.ts`).
      */
     name: string;
     /**

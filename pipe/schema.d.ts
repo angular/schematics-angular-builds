@@ -22,7 +22,7 @@ export type Schema = {
     module?: string;
     /**
      * The name for the new pipe. This will be used to create the pipe's class and spec files
-     * (e.g., `my-pipe.pipe.ts` and `my-pipe.pipe.spec.ts`).
+     * (e.g., `example-pipe.ts` and `example-pipe.spec.ts`).
      */
     name: string;
     /**

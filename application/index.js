@@ -158,7 +158,8 @@ function addAppToWorkspaceFile(options, appDir) {
     if (options.inlineTemplate ||
         options.inlineStyle ||
         options.minimal ||
-        options.style !== schema_1.Style.Css) {
+        options.style !== schema_1.Style.Css ||
+        options.viewEncapsulation) {
         const componentSchematicsOptions = {};
         if (options.inlineTemplate ?? options.minimal) {
             componentSchematicsOptions.inlineTemplate = true;
@@ -168,6 +169,9 @@ function addAppToWorkspaceFile(options, appDir) {
         }
         if (options.style && options.style !== schema_1.Style.Css) {
             componentSchematicsOptions.style = options.style;
+        }
+        if (options.viewEncapsulation) {
+            componentSchematicsOptions.viewEncapsulation = options.viewEncapsulation;
         }
         schematics['@schematics/angular:component'] = componentSchematicsOptions;
     }

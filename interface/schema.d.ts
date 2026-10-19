@@ -6,7 +6,7 @@
 export type Schema = {
     /**
      * The name for the new interface. This will be used to create the interface file (e.g.,
-     * `my-interface.interface.ts`).
+     * `my-interface.ts`).
      */
     name: string;
     /**

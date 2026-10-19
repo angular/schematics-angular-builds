@@ -18,13 +18,14 @@ function default_1(options) {
     return (0, workspace_1.updateWorkspace)((workspace) => {
         const project = workspace.projects.get(options.project);
         if (!project) {
-            throw new schematics_1.SchematicsException(`Project name "${options.project}" doesn't not exist.`);
+            throw new schematics_1.SchematicsException(`Project name "${options.project}" does not exist.`);
         }
         const type = project.extensions['projectType'];
         if (type !== 'application') {
-            return log('error', 'Only application project types are support by this schematic.' + type
-                ? ` Project "${options.project}" has a "projectType" of "${type}".`
-                : ` Project "${options.project}" has no "projectType" defined.`);
+            return log('error', 'Only application project types are supported by this schematic.' +
+                (type
+                    ? ` Project "${options.project}" has a "projectType" of "${type}".`
+                    : ` Project "${options.project}" has no "projectType" defined.`));
         }
         const buildTarget = project.targets.get('build');
         if (!buildTarget) {
@@ -62,7 +63,7 @@ function* generateConfigurationEnvironments(buildTarget, serverTarget, sourceRoo
             ' The generated project options may not be compatible with this builder.');
     }
     if (serverTarget && serverTarget.builder !== workspace_models_1.Builders.Server) {
-        yield log('warn', `"server" target found for project "${projectName}" has a third-party builder "${buildTarget.builder}".` +
+        yield log('warn', `"server" target found for project "${projectName}" has a third-party builder "${serverTarget.builder}".` +
             ' The generated project options may not be compatible with this builder.');
     }
     // Create default environment file

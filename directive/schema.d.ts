@@ -27,7 +27,7 @@ export type Schema = {
     module?: string;
     /**
      * The name for the new directive. This will be used to create the directive's class and
-     * spec files (e.g., `my-directive.directive.ts` and `my-directive.directive.spec.ts`).
+     * spec files (e.g., `my-directive.ts` and `my-directive.spec.ts`).
      */
     name: string;
     /**
