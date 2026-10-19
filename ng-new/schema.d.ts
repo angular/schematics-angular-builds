@@ -6,7 +6,7 @@
  */
 export type Schema = {
     /**
-     * Specifies which AI tools to generate configuration files for. These file are used to
+     * Specifies which AI tools to generate configuration files for. These files are used to
      * improve the outputs of AI tools by following the best practices.
      */
     aiConfig?: AiConfig[];
