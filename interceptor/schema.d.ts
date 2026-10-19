@@ -17,8 +17,7 @@ export type Schema = {
     functional?: boolean;
     /**
      * The name for the new interceptor. This will be used to create the interceptor's class and
-     * spec files (e.g., `my-interceptor.interceptor.ts` and
-     * `my-interceptor.interceptor.spec.ts`).
+     * spec files (e.g., `example-interceptor.ts` and `example-interceptor.spec.ts`).
      */
     name: string;
     /**

@@ -20,7 +20,7 @@ export type Schema = {
     injectable?: boolean;
     /**
      * The name for the new service. This will be used to create the service's class and spec
-     * files (e.g., `my-service.service.ts` and `my-service.service.spec.ts`).
+     * files (e.g., `my-service.ts` and `my-service.spec.ts`).
      */
     name: string;
     /**

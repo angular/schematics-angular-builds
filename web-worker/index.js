@@ -13,6 +13,7 @@ const parse_name_1 = require("../utility/parse-name");
 const paths_1 = require("../utility/paths");
 const project_1 = require("../utility/project");
 const workspace_1 = require("../utility/workspace");
+const workspace_models_1 = require("../utility/workspace-models");
 function addSnippet(options) {
     return (host, context) => {
         context.logger.debug('Updating appmodule');
@@ -87,7 +88,8 @@ const webWorkerSchematic = (0, project_1.createProjectSchematic)((options, { pro
             }
             const workerConfigPath = (0, posix_1.join)(root, 'tsconfig.worker.json');
             (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
-            if (testTarget) {
+            // The unit-test builder has no `webWorkerTsConfig` option and reads it from the build target.
+            if (testTarget && testTarget.builder !== workspace_models_1.Builders.BuildUnitTest) {
                 (testTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
             }
         }),

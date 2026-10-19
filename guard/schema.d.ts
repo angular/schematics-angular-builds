@@ -23,7 +23,7 @@ export type Schema = {
     implements?: [Implement, ...Implement[]];
     /**
      * The name for the new route guard. This will be used to create the guard's class and spec
-     * files (e.g., `my-guard.guard.ts` and `my-guard.guard.spec.ts`).
+     * files (e.g., `example-guard.ts` and `example-guard.spec.ts`).
      */
     name: string;
     /**

@@ -17,7 +17,7 @@ export type Schema = {
     functional?: boolean;
     /**
      * The name for the new resolver. This will be used to create the resolver's class and spec
-     * files (e.g., `my-resolver.resolver.ts` and `my-resolver.resolver.spec.ts`).
+     * files (e.g., `example-resolver.ts` and `example-resolver.spec.ts`).
      */
     name: string;
     /**
