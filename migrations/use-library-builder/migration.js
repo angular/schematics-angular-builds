@@ -109,6 +109,7 @@ function findSecondaryEntryPoints(tree, projectRoot, primaryProjectFile) {
                     subpath,
                     entryPoint: (0, posix_1.join)(currentPath, entryFile),
                     configFile: ngPackageJsonPath,
+                    config,
                 });
             }
             else if (current.subfiles.some((f) => f === 'package.json') &&
@@ -121,6 +122,7 @@ function findSecondaryEntryPoints(tree, projectRoot, primaryProjectFile) {
                         subpath,
                         entryPoint: (0, posix_1.join)(currentPath, entryFile),
                         configFile: packageJsonPath,
+                        config,
                     });
                 }
             }
@@ -207,12 +209,19 @@ function migrateTargetOptions(projectRoot, projectDir, buildTarget, ngPackageCon
                 : [];
             const migratedIncludePaths = ngPackageConfig.lib.styleIncludePaths.map((p) => (0, posix_1.join)(projectDir, p));
             existingPreprocessorOptions['includePaths'] = [
-                ...existingIncludePaths,
-                ...migratedIncludePaths,
+                ...new Set([...existingIncludePaths, ...migratedIncludePaths]),
             ];
         }
         if (ngPackageConfig.lib.sass) {
-            existingPreprocessorOptions['sass'] = ngPackageConfig.lib.sass;
+            const existingSass = existingPreprocessorOptions['sass'];
+            const sass = (0, core_1.isJsonObject)(existingSass) ? { ...existingSass } : {};
+            for (const [key, value] of Object.entries(ngPackageConfig.lib.sass)) {
+                if (Array.isArray(value)) {
+                    const existing = Array.isArray(sass[key]) ? sass[key] : [];
+                    sass[key] = [...new Set([...existing, ...value])];
+                }
+            }
+            existingPreprocessorOptions['sass'] = sass;
         }
         buildTarget.options['stylePreprocessorOptions'] = existingPreprocessorOptions;
     }
@@ -293,7 +302,7 @@ function updateLibraryTarget(projectRoot, buildTarget, tree, context) {
             `configuration files ("${primaryProjectFile}") cannot be automatically migrated.`);
         return false;
     }
-    const ngPackageConfig = primaryProjectFile
+    let ngPackageConfig = primaryProjectFile
         ? parseNgPackageFile(tree, primaryProjectFile)
         : undefined;
     const projectDir = primaryProjectFile
@@ -314,6 +323,26 @@ function updateLibraryTarget(projectRoot, buildTarget, tree, context) {
             ? secondary.subpath
             : `./${secondary.subpath}`;
         entryPointExports[exportKey] = toRelativeExportPath(secondary.entryPoint);
+        if (secondary.config?.lib) {
+            ngPackageConfig ??= {};
+            ngPackageConfig.lib ??= {};
+            if (secondary.config.lib.styleIncludePaths?.length) {
+                const secondaryDir = (0, posix_1.dirname)(secondary.configFile);
+                ngPackageConfig.lib.styleIncludePaths ??= [];
+                for (const includePath of secondary.config.lib.styleIncludePaths) {
+                    ngPackageConfig.lib.styleIncludePaths.push((0, posix_1.relative)(projectDir, (0, posix_1.join)(secondaryDir, includePath)));
+                }
+            }
+            if (secondary.config.lib.sass) {
+                const sass = (ngPackageConfig.lib.sass ??= {});
+                for (const [key, value] of Object.entries(secondary.config.lib.sass)) {
+                    if (Array.isArray(value)) {
+                        const existing = Array.isArray(sass[key]) ? sass[key] : [];
+                        sass[key] = [...new Set([...existing, ...value])];
+                    }
+                }
+            }
+        }
     }
     migrateTargetOptions(normalizedProjectRoot, projectDir, buildTarget, ngPackageConfig, tree);
     const packageJsonPath = (0, posix_1.join)(normalizedProjectRoot, 'package.json');

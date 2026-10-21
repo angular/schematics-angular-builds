@@ -14,6 +14,8 @@ export interface DeclarationToNgModuleOptions {
     export?: boolean;
     type: string;
     typeSeparator?: '.' | '-';
+    /** Whether the type is part of the class name. Defaults to `true`. */
+    addTypeToClassName?: boolean;
     skipImport?: boolean;
     standalone?: boolean;
 }
