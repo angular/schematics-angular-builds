@@ -328,10 +328,10 @@ function transformMostRecentArgs(node, { sourceFile, reporter, pendingVitestValu
         !typescript_1.default.isPropertyAccessExpression(mostRecentCall.expression)) {
         return node;
     }
-    // Check 3: Is it a call to `.mostRecent`?
+    // Check 3: Is it a call to `.mostRecent` or `.first`?
     const mostRecentPae = mostRecentCall.expression;
     if (!typescript_1.default.isIdentifier(mostRecentPae.name) ||
-        mostRecentPae.name.text !== 'mostRecent' ||
+        (mostRecentPae.name.text !== 'mostRecent' && mostRecentPae.name.text !== 'first') ||
         !typescript_1.default.isPropertyAccessExpression(mostRecentPae.expression)) {
         return node;
     }
@@ -339,6 +339,11 @@ function transformMostRecentArgs(node, { sourceFile, reporter, pendingVitestValu
     const spyIdentifier = getSpyIdentifierFromCalls(mostRecentPae.expression);
     if (!spyIdentifier) {
         return node;
+    }
+    if (mostRecentPae.name.text === 'first') {
+        reporter.reportTransformation(sourceFile, node, 'Transformed `spy.calls.first().args` to `vi.mocked(spy).mock.calls[0]`.');
+        const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
+        return typescript_1.default.factory.createElementAccessExpression((0, ast_helpers_1.createPropertyAccess)(mockProperty, 'calls'), 0);
     }
     // If all checks pass, perform the transformation.
     reporter.reportTransformation(sourceFile, node, 'Transformed `spy.calls.mostRecent().args` to `vi.mocked(spy).mock.lastCall`.');
