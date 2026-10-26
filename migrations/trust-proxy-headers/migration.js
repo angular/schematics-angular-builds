@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
+const core_1 = require("@angular-devkit/core");
 const oxc_parser_1 = require("oxc-parser");
 const workspace_1 = require("../../utility/workspace");
 const TODO_COMMENT = '// TODO: This is a security-sensitive option. Remove if not needed. ' +
@@ -23,6 +24,12 @@ function default_1() {
             for (const [, options] of (0, workspace_1.allTargetOptions)(target)) {
                 if (typeof options?.['server'] === 'string') {
                     serverFiles.add(options['server']);
+                }
+                // With the application builder, `server` is the server bootstrap file (`main.server.ts`).
+                // The app engine is created in the `ssr.entry` file (`server.ts`).
+                const ssr = options?.['ssr'];
+                if (ssr && (0, core_1.isJsonObject)(ssr) && typeof ssr['entry'] === 'string') {
+                    serverFiles.add(ssr['entry']);
                 }
             }
         }
