@@ -9,7 +9,8 @@
  * @fileoverview This file contains transformers dedicated to converting Jasmine's spying
  * functionality to Vitest's mocking APIs. It handles the creation of spies (`spyOn`,
  * `createSpy`, `createSpyObj`), spy strategies (`and.returnValue`, `and.callFake`),
- * and the inspection of spy calls (`spy.calls.reset`, `spy.calls.mostRecent`).
+ * and the inspection of spy calls (`spy.calls.reset`, `spy.calls.first`, `spy.calls.mostRecent`,
+ * `spy.calls.all`, and the `args`, `returnValue`, and `object` properties of their results).
  */
 import ts from 'typescript';
 import { RefactorContext } from '../utils/refactor-context';
