@@ -28,9 +28,11 @@ function addTailwindStyles(options, project) {
         const styles = buildTarget.options?.['styles'];
         let stylesheetPath;
         if (styles) {
+            // Only consider workspace source files. Entries such as package specifiers
+            // (`@angular/material/prebuilt-themes/...`) or files within `node_modules` must not be modified.
             stylesheetPath = styles
                 .map((s) => (typeof s === 'string' ? s : s.input))
-                .find((p) => p.endsWith('.css'));
+                .find((p) => p.endsWith('.css') && !/(?:^|\/)node_modules\//.test(p) && tree.exists(p));
         }
         if (!stylesheetPath) {
             const newStylesheetPath = (0, posix_1.join)(project.sourceRoot ?? 'src', 'tailwind.css');
