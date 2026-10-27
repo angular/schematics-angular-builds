@@ -19,13 +19,42 @@ exports.transformSpyCallInspection = transformSpyCallInspection;
  * @fileoverview This file contains transformers dedicated to converting Jasmine's spying
  * functionality to Vitest's mocking APIs. It handles the creation of spies (`spyOn`,
  * `createSpy`, `createSpyObj`), spy strategies (`and.returnValue`, `and.callFake`),
- * and the inspection of spy calls (`spy.calls.reset`, `spy.calls.mostRecent`).
+ * and the inspection of spy calls (`spy.calls.reset`, `spy.calls.first`, `spy.calls.mostRecent`,
+ * `spy.calls.all`, and the `args`, `returnValue`, and `object` properties of their results).
  */
 const typescript_1 = __importDefault(require("typescript"));
 const ast_helpers_1 = require("../utils/ast-helpers");
 const ast_validation_1 = require("../utils/ast-validation");
 const comment_helpers_1 = require("../utils/comment-helpers");
 const refactor_helpers_1 = require("../utils/refactor-helpers");
+function isTransparentWrapper(node) {
+    return (typescript_1.default.isParenthesizedExpression(node) ||
+        typescript_1.default.isAsExpression(node) ||
+        typescript_1.default.isNonNullExpression(node) ||
+        typescript_1.default.isTypeAssertionExpression(node) ||
+        typescript_1.default.isSatisfiesExpression(node));
+}
+/**
+ * Returns the innermost expression after removing any transparent wrappers
+ * (parentheses, non-null assertions, and type assertions).
+ */
+function unwrapExpression(expression) {
+    let current = expression;
+    while (isTransparentWrapper(current)) {
+        current = current.expression;
+    }
+    return current;
+}
+/**
+ * Returns the nearest ancestor of a node that is not a transparent wrapper.
+ */
+function getUnwrappedParent(node) {
+    let parent = node.parent;
+    while (parent && isTransparentWrapper(parent)) {
+        parent = parent.parent;
+    }
+    return parent;
+}
 function isChainedWithAnd(node) {
     let parent = node.parent;
     while (parent) {
@@ -40,11 +69,7 @@ function isChainedWithAnd(node) {
                 return true;
             }
         }
-        else if (typescript_1.default.isParenthesizedExpression(parent) ||
-            typescript_1.default.isAsExpression(parent) ||
-            typescript_1.default.isNonNullExpression(parent) ||
-            typescript_1.default.isTypeAssertionExpression(parent) ||
-            typescript_1.default.isSatisfiesExpression(parent)) {
+        else if (isTransparentWrapper(parent)) {
             parent = parent.parent;
             continue;
         }
@@ -315,40 +340,128 @@ function createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports) {
     const mockedSpy = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)('vi', 'mocked'), undefined, [spyIdentifier]);
     return (0, ast_helpers_1.createPropertyAccess)(mockedSpy, 'mock');
 }
-function transformMostRecentArgs(node, { sourceFile, reporter, pendingVitestValueImports }) {
-    // Check 1: Is it a property access for `.args`?
-    if (!typescript_1.default.isPropertyAccessExpression(node) ||
-        !typescript_1.default.isIdentifier(node.name) ||
-        node.name.text !== 'args') {
-        return node;
+/**
+ * Maps the properties of a Jasmine `CallInfo` object to the corresponding property on
+ * Vitest's `MockContext`. The optional `valueAccess` is a trailing property that must be
+ * accessed on the resulting element (e.g. `mock.results[i].value`).
+ */
+const CALL_INFO_PROPERTIES = new Map([
+    ['args', { mockProperty: 'calls' }],
+    ['returnValue', { mockProperty: 'results', valueAccess: 'value' }],
+    ['object', { mockProperty: 'contexts' }],
+]);
+/**
+ * Attempts to match an expression that yields a Jasmine `CallInfo` object:
+ * `spy.calls.first()`, `spy.calls.mostRecent()`, or `spy.calls.all()[i]`.
+ */
+function getCallInfoAccess(expression) {
+    const unwrapped = unwrapExpression(expression);
+    let indexExpression;
+    let callExpression = unwrapped;
+    if (typescript_1.default.isElementAccessExpression(unwrapped)) {
+        indexExpression = unwrapped.argumentExpression;
+        callExpression = unwrapExpression(unwrapped.expression);
     }
-    // Check 2: Is the preceding expression a call expression?
-    const mostRecentCall = node.expression;
-    if (!typescript_1.default.isCallExpression(mostRecentCall) ||
-        !typescript_1.default.isPropertyAccessExpression(mostRecentCall.expression)) {
-        return node;
+    if (!typescript_1.default.isCallExpression(callExpression) ||
+        !typescript_1.default.isPropertyAccessExpression(callExpression.expression)) {
+        return undefined;
     }
-    // Check 3: Is it a call to `.mostRecent` or `.first`?
-    const mostRecentPae = mostRecentCall.expression;
-    if (!typescript_1.default.isIdentifier(mostRecentPae.name) ||
-        (mostRecentPae.name.text !== 'mostRecent' && mostRecentPae.name.text !== 'first') ||
-        !typescript_1.default.isPropertyAccessExpression(mostRecentPae.expression)) {
-        return node;
+    const methodPae = callExpression.expression;
+    if (!typescript_1.default.isIdentifier(methodPae.name) || !typescript_1.default.isPropertyAccessExpression(methodPae.expression)) {
+        return undefined;
     }
-    // Check 4: Can we get the spy identifier from `spy.calls`?
-    const spyIdentifier = getSpyIdentifierFromCalls(mostRecentPae.expression);
+    const spyIdentifier = getSpyIdentifierFromCalls(methodPae.expression);
     if (!spyIdentifier) {
+        return undefined;
+    }
+    const methodName = methodPae.name.text;
+    if (indexExpression) {
+        // Only `spy.calls.all()[i]` is supported when an element access is present.
+        return methodName === 'all'
+            ? { spyIdentifier, index: indexExpression, sourceText: 'spy.calls.all()[i]', indexText: 'i' }
+            : undefined;
+    }
+    switch (methodName) {
+        case 'first':
+            return {
+                spyIdentifier,
+                index: typescript_1.default.factory.createNumericLiteral(0),
+                sourceText: 'spy.calls.first()',
+                indexText: '0',
+            };
+        case 'mostRecent':
+            return { spyIdentifier, index: 'last', sourceText: 'spy.calls.mostRecent()', indexText: '' };
+    }
+    return undefined;
+}
+/**
+ * Transforms property accesses on a Jasmine `CallInfo` object (`.args`, `.returnValue`,
+ * `.object`) obtained via `spy.calls.first()`, `spy.calls.mostRecent()`, or `spy.calls.all()[i]`
+ * into the equivalent Vitest `MockContext` access.
+ *
+ * @example
+ * spy.calls.first().args              -> vi.mocked(spy).mock.calls[0]
+ * spy.calls.mostRecent().args         -> vi.mocked(spy).mock.lastCall
+ * spy.calls.all()[i].args             -> vi.mocked(spy).mock.calls[i]
+ * spy.calls.first().returnValue       -> vi.mocked(spy).mock.results[0].value
+ * spy.calls.mostRecent().returnValue  -> vi.mocked(spy).mock.results.at(-1)?.value
+ * spy.calls.all()[i].object           -> vi.mocked(spy).mock.contexts[i]
+ * spy.calls.mostRecent().object       -> vi.mocked(spy).mock.contexts.at(-1)
+ */
+function transformCallInfoProperty(node, { sourceFile, reporter, pendingVitestValueImports }) {
+    if (!typescript_1.default.isPropertyAccessExpression(node) || !typescript_1.default.isIdentifier(node.name)) {
         return node;
     }
-    if (mostRecentPae.name.text === 'first') {
-        reporter.reportTransformation(sourceFile, node, 'Transformed `spy.calls.first().args` to `vi.mocked(spy).mock.calls[0]`.');
-        const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
-        return typescript_1.default.factory.createElementAccessExpression((0, ast_helpers_1.createPropertyAccess)(mockProperty, 'calls'), 0);
+    const propertyName = node.name.text;
+    const mapping = CALL_INFO_PROPERTIES.get(propertyName);
+    if (!mapping) {
+        return node;
     }
-    // If all checks pass, perform the transformation.
-    reporter.reportTransformation(sourceFile, node, 'Transformed `spy.calls.mostRecent().args` to `vi.mocked(spy).mock.lastCall`.');
-    const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
-    return (0, ast_helpers_1.createPropertyAccess)(mockProperty, 'lastCall');
+    const callInfo = getCallInfoAccess(node.expression);
+    if (!callInfo) {
+        return node;
+    }
+    const mockProperty = createMockedSpyMockProperty(callInfo.spyIdentifier, pendingVitestValueImports);
+    const mockCollection = (0, ast_helpers_1.createPropertyAccess)(mockProperty, mapping.mockProperty);
+    // Note: for `args` and `object`, an optional access (`?.`) in the source is intentionally
+    // not carried over. The replacement is a plain element access (e.g. `mock.calls[0]`), which
+    // already evaluates to `undefined` when the spy has not been called, so the result of the
+    // transformed expression itself is unchanged. Only `returnValue` has a trailing `.value`
+    // access that must remain optional to avoid throwing on a missing call.
+    const accessOperator = node.questionDotToken ? '?.' : '.';
+    let replacement;
+    let replacementText;
+    if (callInfo.index === 'last') {
+        if (propertyName === 'args') {
+            // Vitest provides a dedicated shorthand for the arguments of the last call.
+            replacement = (0, ast_helpers_1.createPropertyAccess)(mockProperty, 'lastCall');
+            replacementText = 'vi.mocked(spy).mock.lastCall';
+        }
+        else {
+            // `mock.<collection>.at(-1)`; the result may be `undefined` if the spy was never called,
+            // so a trailing value access must always be optional.
+            replacement = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(mockCollection, 'at'), undefined, [
+                typescript_1.default.factory.createPrefixUnaryExpression(typescript_1.default.SyntaxKind.MinusToken, typescript_1.default.factory.createNumericLiteral(1)),
+            ]);
+            replacementText = `vi.mocked(spy).mock.${mapping.mockProperty}.at(-1)`;
+            if (mapping.valueAccess) {
+                replacement = typescript_1.default.factory.createPropertyAccessChain(replacement, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.QuestionDotToken), mapping.valueAccess);
+                replacementText += `?.${mapping.valueAccess}`;
+            }
+        }
+    }
+    else {
+        replacement = typescript_1.default.factory.createElementAccessExpression(mockCollection, callInfo.index);
+        replacementText = `vi.mocked(spy).mock.${mapping.mockProperty}[${callInfo.indexText}]`;
+        if (mapping.valueAccess) {
+            replacement = node.questionDotToken
+                ? typescript_1.default.factory.createPropertyAccessChain(replacement, typescript_1.default.factory.createToken(typescript_1.default.SyntaxKind.QuestionDotToken), mapping.valueAccess)
+                : (0, ast_helpers_1.createPropertyAccess)(replacement, mapping.valueAccess);
+            replacementText += `${accessOperator}${mapping.valueAccess}`;
+        }
+    }
+    reporter.reportTransformation(sourceFile, node, `Transformed \`${callInfo.sourceText}${accessOperator}${propertyName}\` to \`${replacementText}\`.`);
+    return replacement;
 }
 function transformThisFor(node, { sourceFile, reporter, pendingVitestValueImports }) {
     // Check 1: Is the node is a call expression?
@@ -372,48 +485,14 @@ function transformThisFor(node, { sourceFile, reporter, pendingVitestValueImport
     const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
     return typescript_1.default.factory.createElementAccessExpression((0, ast_helpers_1.createPropertyAccess)(mockProperty, 'contexts'), node.arguments[0] ?? typescript_1.default.factory.createNumericLiteral(0));
 }
-function transformAllCallsArgs(node, { sourceFile, reporter, pendingVitestValueImports }) {
-    if (!typescript_1.default.isPropertyAccessExpression(node) ||
-        !typescript_1.default.isIdentifier(node.name) ||
-        node.name.text !== 'args') {
-        return node;
-    }
-    const elementAccess = node.expression;
-    if (!typescript_1.default.isElementAccessExpression(elementAccess)) {
-        return node;
-    }
-    const allCall = elementAccess.expression;
-    if (!typescript_1.default.isCallExpression(allCall) || !typescript_1.default.isPropertyAccessExpression(allCall.expression)) {
-        return node;
-    }
-    const allPae = allCall.expression;
-    if (!typescript_1.default.isIdentifier(allPae.name) || allPae.name.text !== 'all') {
-        return node;
-    }
-    if (!typescript_1.default.isPropertyAccessExpression(allPae.expression)) {
-        return node;
-    }
-    const spyIdentifier = getSpyIdentifierFromCalls(allPae.expression);
-    if (!spyIdentifier) {
-        return node;
-    }
-    reporter.reportTransformation(sourceFile, node, 'Transformed `spy.calls.all()[i].args` to `vi.mocked(spy).mock.calls[i]`.');
-    const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
-    const callsProperty = (0, ast_helpers_1.createPropertyAccess)(mockProperty, 'calls');
-    return typescript_1.default.factory.createElementAccessExpression(callsProperty, elementAccess.argumentExpression);
-}
 function transformSpyCallInspection(node, refactorCtx) {
-    const mostRecentArgsTransformed = transformMostRecentArgs(node, refactorCtx);
-    if (mostRecentArgsTransformed !== node) {
-        return mostRecentArgsTransformed;
+    const callInfoPropertyTransformed = transformCallInfoProperty(node, refactorCtx);
+    if (callInfoPropertyTransformed !== node) {
+        return callInfoPropertyTransformed;
     }
     const thisForTransformed = transformThisFor(node, refactorCtx);
     if (thisForTransformed !== node) {
         return thisForTransformed;
-    }
-    const allCallsArgsTransformed = transformAllCallsArgs(node, refactorCtx);
-    if (allCallsArgsTransformed !== node) {
-        return allCallsArgsTransformed;
     }
     if (!typescript_1.default.isCallExpression(node) || !typescript_1.default.isPropertyAccessExpression(node.expression)) {
         return node;
@@ -458,15 +537,20 @@ function transformSpyCallInspection(node, refactorCtx) {
                     (0, comment_helpers_1.addTodoComment)(node, category);
                 }
                 break;
-            case 'mostRecent':
-                if (!typescript_1.default.isPropertyAccessExpression(node.parent) ||
-                    !typescript_1.default.isIdentifier(node.parent.name) ||
-                    node.parent.name.text !== 'args') {
+            case 'mostRecent': {
+                // Accesses such as `.args`, `.returnValue`, and `.object` are handled by
+                // `transformCallInfoProperty`; only a bare `mostRecent()` requires manual migration.
+                const parent = getUnwrappedParent(node);
+                if (!parent ||
+                    !typescript_1.default.isPropertyAccessExpression(parent) ||
+                    !typescript_1.default.isIdentifier(parent.name) ||
+                    !CALL_INFO_PROPERTIES.has(parent.name.text)) {
                     const category = 'mostRecent-without-args';
                     reporter.recordTodo(category, sourceFile, node);
                     (0, comment_helpers_1.addTodoComment)(node, category);
                 }
                 return node;
+            }
         }
         if (newExpression && message) {
             reporter.reportTransformation(sourceFile, node, message);
