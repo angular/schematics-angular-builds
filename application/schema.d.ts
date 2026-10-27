@@ -13,9 +13,8 @@ export type Schema = {
      */
     fileNameStyleGuide?: FileNameStyleGuide;
     /**
-     * Include the styles for the root component directly within the `app.ts` file. Only CSS
-     * styles can be included inline. By default, a separate stylesheet file (e.g., `app.css`)
-     * is created.
+     * Include the styles for the root component directly within the `app.ts` file. By default,
+     * a separate stylesheet file (e.g., `app.css`) is created.
      */
     inlineStyle?: boolean;
     /**
