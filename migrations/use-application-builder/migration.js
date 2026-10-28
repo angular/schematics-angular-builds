@@ -16,9 +16,11 @@ const latest_versions_1 = require("../../utility/latest-versions");
 const workspace_1 = require("../../utility/workspace");
 const workspace_models_1 = require("../../utility/workspace-models");
 const stylesheet_updates_1 = require("./stylesheet-updates");
-function* updateBuildTarget(projectName, buildTarget, serverTarget, tree, context) {
+function* updateBuildTarget(projectName, projectRoot, buildTarget, serverTarget, tree, context) {
     // Update builder target and options
     buildTarget.builder = workspace_models_1.Builders.Application;
+    const baseServiceWorker = buildTarget.options?.['serviceWorker'];
+    const baseNgswConfigPath = buildTarget.options?.['ngswConfigPath'];
     for (const [, options] of (0, workspace_1.allTargetOptions)(buildTarget, false)) {
         if (options['index'] === '') {
             options['index'] = false;
@@ -28,7 +30,17 @@ function* updateBuildTarget(projectName, buildTarget, serverTarget, tree, contex
         if (serverTarget && typeof options['browser'] === 'string') {
             options['server'] = (0, posix_1.dirname)(options['browser']) + '/main.server.ts';
         }
-        options['serviceWorker'] = options['ngswConfigPath'] ?? options['serviceWorker'];
+        if (options['serviceWorker'] === true) {
+            // The application builder only accepts a path, while the browser builder defaults it in code.
+            options['serviceWorker'] =
+                options['ngswConfigPath'] ?? baseNgswConfigPath ?? (0, posix_1.join)(projectRoot, 'ngsw-config.json');
+        }
+        else if (options['serviceWorker'] === undefined &&
+            baseServiceWorker === true &&
+            typeof options['ngswConfigPath'] === 'string') {
+            // A configuration that only changes the config path of the service worker enabled in the base options.
+            options['serviceWorker'] = options['ngswConfigPath'];
+        }
         if (typeof options['polyfills'] === 'string') {
             options['polyfills'] = [options['polyfills']];
         }
@@ -128,7 +140,7 @@ function updateProjects(tree, context) {
                 continue;
             }
             const serverTarget = project.targets.get('server');
-            rules.push(...updateBuildTarget(name, buildTarget, serverTarget, tree, context));
+            rules.push(...updateBuildTarget(name, project.root, buildTarget, serverTarget, tree, context));
             // Delete all redundant targets
             for (const [key, target] of project.targets) {
                 switch (target.builder) {

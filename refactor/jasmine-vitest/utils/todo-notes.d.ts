@@ -134,6 +134,10 @@ export declare const TODO_NOTES: {
         }) => string;
         readonly url: "https://vitest.dev/api/mocked.html#mock";
     };
+    readonly 'callThrough-on-existing-spy': {
+        readonly message: string;
+        readonly url: "https://vitest.dev/api/mock.html#mockreset";
+    };
     readonly 'mostRecent-without-args': {
         readonly message: string;
         readonly url: "https://vitest.dev/api/mocked.html#mock-lastcall";
