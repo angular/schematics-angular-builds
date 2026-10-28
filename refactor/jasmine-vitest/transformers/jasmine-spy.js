@@ -82,7 +82,12 @@ function transformPrimarySpy(node, refactorCtx) {
     if (typescript_1.default.isIdentifier(node.expression) &&
         (node.expression.text === 'spyOn' || node.expression.text === 'spyOnProperty')) {
         (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
-        const viSpyOnCall = typescript_1.default.factory.updateCallExpression(node, (0, ast_helpers_1.createPropertyAccess)('vi', 'spyOn'), node.typeArguments, node.arguments);
+        // `spyOnProperty` defaults to the getter while `vi.spyOn` needs the access type to spy on
+        // a property instead of a method.
+        const args = node.expression.text === 'spyOnProperty' && node.arguments.length === 2
+            ? [...node.arguments, typescript_1.default.factory.createStringLiteral('get', true)]
+            : node.arguments;
+        const viSpyOnCall = typescript_1.default.factory.updateCallExpression(node, (0, ast_helpers_1.createPropertyAccess)('vi', 'spyOn'), node.typeArguments, args);
         if (isChainedWithAnd(node)) {
             reporter.reportTransformation(sourceFile, node, `Transformed \`${node.expression.text}\` to \`vi.spyOn\`.`);
             return viSpyOnCall;
