@@ -77,6 +77,16 @@ function isChainedWithAnd(node) {
     }
     return false;
 }
+function isSpyCreation(node) {
+    const expression = unwrapExpression(node);
+    if (!typescript_1.default.isCallExpression(expression)) {
+        return false;
+    }
+    if (typescript_1.default.isIdentifier(expression.expression)) {
+        return expression.expression.text === 'spyOn' || expression.expression.text === 'spyOnProperty';
+    }
+    return (0, ast_validation_1.isJasmineCallExpression)(expression, 'createSpy');
+}
 function transformPrimarySpy(node, refactorCtx) {
     const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
     if (typescript_1.default.isIdentifier(node.expression) &&
@@ -163,6 +173,14 @@ function transformSpyStrategy(node, refactorCtx) {
                     newMethodName = 'mockImplementation';
                     break;
                 case 'callThrough':
+                    if (!isSpyCreation(spyCall)) {
+                        // On an existing spy, `.and.callThrough()` restores the original implementation,
+                        // so it is not redundant and cannot be dropped.
+                        const category = 'callThrough-on-existing-spy';
+                        reporter.recordTodo(category, sourceFile, node);
+                        (0, comment_helpers_1.addTodoComment)(node, category);
+                        return node;
+                    }
                     reporter.reportTransformation(sourceFile, node, 'Removed redundant `.and.callThrough()` call.');
                     return transformSpies(spyCall, refactorCtx); // .and.callThrough() is redundant, just transform spyOn.
                 case 'stub': {
