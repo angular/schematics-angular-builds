@@ -18,7 +18,8 @@ const json_file_1 = require("../utility/json-file");
 const latest_versions_1 = require("../utility/latest-versions");
 const project_1 = require("../utility/project");
 const TAILWIND_DEPENDENCIES = ['tailwindcss', '@tailwindcss/postcss', 'postcss'];
-const POSTCSS_CONFIG_FILES = ['.postcssrc.json', 'postcss.config.json'];
+// Same lookup order as the build system, so the configuration that gets updated is the one used.
+const POSTCSS_CONFIG_FILES = ['postcss.config.json', '.postcssrc.json'];
 function addTailwindStyles(options, project) {
     return async (tree) => {
         const buildTarget = project.targets.get('build');
@@ -70,7 +71,7 @@ function addTailwindStyles(options, project) {
 }
 function managePostCssConfiguration(project) {
     return async (tree) => {
-        const searchPaths = ['/', project.root]; // Workspace root and project root
+        const searchPaths = new Set([(0, posix_1.join)('/', project.root), '/']);
         for (const path of searchPaths) {
             for (const configFile of POSTCSS_CONFIG_FILES) {
                 const fullPath = (0, posix_1.join)(path, configFile);
