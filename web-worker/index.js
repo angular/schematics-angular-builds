@@ -53,7 +53,7 @@ if (typeof Worker !== 'undefined') {
         return host;
     };
 }
-const webWorkerSchematic = (0, project_1.createProjectSchematic)((options, { project }) => {
+const webWorkerSchematic = (0, project_1.createProjectSchematic)((options, { project, tree }) => {
     const projectType = project.extensions['projectType'];
     if (projectType !== 'application') {
         throw new schematics_1.SchematicsException(`Web Worker requires a project type of "application".`);
@@ -69,6 +69,7 @@ const webWorkerSchematic = (0, project_1.createProjectSchematic)((options, { pro
         (0, schematics_1.move)(parsedPath.path),
     ]);
     const root = project.root || '';
+    const workerConfigPath = (0, posix_1.join)(root, 'tsconfig.worker.json');
     const templateSourceWorkerConfig = (0, schematics_1.apply)((0, schematics_1.url)('./files/worker-tsconfig'), [
         (0, schematics_1.applyTemplates)({
             ...options,
@@ -86,7 +87,6 @@ const webWorkerSchematic = (0, project_1.createProjectSchematic)((options, { pro
             if (!buildTarget) {
                 throw new Error(`Build target is not defined for this project.`);
             }
-            const workerConfigPath = (0, posix_1.join)(root, 'tsconfig.worker.json');
             (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
             // The unit-test builder has no `webWorkerTsConfig` option and reads it from the build target.
             if (testTarget && testTarget.builder !== workspace_models_1.Builders.BuildUnitTest) {
@@ -97,7 +97,8 @@ const webWorkerSchematic = (0, project_1.createProjectSchematic)((options, { pro
         options.snippet ? addSnippet(options) : (0, schematics_1.noop)(),
         // Add the worker.
         (0, schematics_1.mergeWith)(templateSourceWorkerCode),
-        (0, schematics_1.mergeWith)(templateSourceWorkerConfig),
+        // The configuration is shared by all the workers of the project.
+        tree.exists(workerConfigPath) ? (0, schematics_1.noop)() : (0, schematics_1.mergeWith)(templateSourceWorkerConfig),
     ]);
 });
 exports.default = webWorkerSchematic;

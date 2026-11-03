@@ -56,26 +56,67 @@ function getUnwrappedParent(node) {
     return parent;
 }
 function isChainedWithAnd(node) {
+    let previous = node;
     let parent = node.parent;
     while (parent) {
-        if (typescript_1.default.isPropertyAccessExpression(parent)) {
-            if (typescript_1.default.isIdentifier(parent.name) && parent.name.text === 'and') {
+        if (typescript_1.default.isPropertyAccessExpression(parent) && typescript_1.default.isIdentifier(parent.name)) {
+            if (parent.name.text === 'and') {
                 return true;
             }
-        }
-        else if (typescript_1.default.isElementAccessExpression(parent)) {
-            if (typescript_1.default.isStringLiteralLike(parent.argumentExpression) &&
-                parent.argumentExpression.text === 'and') {
-                return true;
+            // `withArgs(...)` returns the spy, so a strategy may still follow.
+            if (parent.name.text === 'withArgs') {
+                previous = parent;
+                parent = parent.parent;
+                continue;
             }
         }
-        else if (isTransparentWrapper(parent)) {
+        else if (typescript_1.default.isElementAccessExpression(parent) &&
+            typescript_1.default.isStringLiteralLike(parent.argumentExpression)) {
+            if (parent.argumentExpression.text === 'and') {
+                return true;
+            }
+            if (parent.argumentExpression.text === 'withArgs') {
+                previous = parent;
+                parent = parent.parent;
+                continue;
+            }
+        }
+        else if (isTransparentWrapper(parent) ||
+            (typescript_1.default.isCallExpression(parent) && parent.expression === previous)) {
+            previous = parent;
             parent = parent.parent;
             continue;
         }
         break;
     }
     return false;
+}
+/**
+ * Checks whether a spy expression chain contains a `withArgs(...)` link.
+ */
+function chainContainsWithArgs(expression) {
+    let current = unwrapExpression(expression);
+    while (true) {
+        if (typescript_1.default.isCallExpression(current)) {
+            current = unwrapExpression(current.expression);
+        }
+        else if (typescript_1.default.isPropertyAccessExpression(current)) {
+            if (typescript_1.default.isIdentifier(current.name) && current.name.text === 'withArgs') {
+                return true;
+            }
+            current = unwrapExpression(current.expression);
+        }
+        else if (typescript_1.default.isElementAccessExpression(current)) {
+            if (typescript_1.default.isStringLiteralLike(current.argumentExpression) &&
+                current.argumentExpression.text === 'withArgs') {
+                return true;
+            }
+            current = unwrapExpression(current.expression);
+        }
+        else {
+            return false;
+        }
+    }
 }
 function isSpyCreation(node) {
     const expression = unwrapExpression(node);
@@ -126,6 +167,17 @@ function transformSpyStrategy(node, refactorCtx) {
         spyCall = pae.expression.expression;
     }
     if (spyCall) {
+        // Vitest mocks have no `withArgs`, so a strategy for specific arguments cannot be converted.
+        // The whole statement is left untouched, with a single TODO on the outermost strategy call;
+        // inner `.and` chains reached while the visitor descends are covered by that TODO.
+        if (chainContainsWithArgs(spyCall)) {
+            if (!isChainedWithAnd(node)) {
+                const category = 'withArgs';
+                reporter.recordTodo(category, sourceFile, node);
+                (0, comment_helpers_1.addTodoComment)(node, category);
+            }
+            return node;
+        }
         let newMethodName;
         let args = node.arguments;
         if (typescript_1.default.isIdentifier(pae.name)) {

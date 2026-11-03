@@ -141,6 +141,11 @@ exports.TODO_NOTES = {
             ' the original implementation but also clears the recorded calls.',
         url: 'https://vitest.dev/api/mock.html#mockreset',
     },
+    'withArgs': {
+        message: 'Vitest does not have a direct equivalent for spy.withArgs().' +
+            ' Please migrate this manually, for example with mockImplementation() that checks the arguments.',
+        url: 'https://vitest.dev/api/mock.html#mockimplementation',
+    },
     'mostRecent-without-args': {
         message: 'Direct usage of mostRecent() is not supported.' +
             ' Please refactor to access .args, .returnValue, or .object directly' +
