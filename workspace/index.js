@@ -11,6 +11,7 @@ exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const node_child_process_1 = require("node:child_process");
 const latest_versions_1 = require("../utility/latest-versions");
+const schema_1 = require("./schema");
 function default_1(options) {
     return () => {
         const packageManager = options.packageManager;
@@ -36,6 +37,9 @@ function default_1(options) {
         }
         return (0, schematics_1.mergeWith)((0, schematics_1.apply)((0, schematics_1.url)('./files'), [
             options.minimal ? (0, schematics_1.filter)((path) => !path.endsWith('editorconfig.template')) : (0, schematics_1.noop)(),
+            packageManager !== schema_1.PackageManager.Pnpm
+                ? (0, schematics_1.filter)((path) => !path.endsWith('pnpm-workspace.yaml.template'))
+                : (0, schematics_1.noop)(),
             (0, schematics_1.applyTemplates)({
                 utils: schematics_1.strings,
                 ...options,
