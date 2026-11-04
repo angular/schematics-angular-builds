@@ -10,7 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
-const util_1 = require("util");
+const node_util_1 = require("node:util");
 const dependency_1 = require("../../utility/dependency");
 const json_file_1 = require("../../utility/json-file");
 const latest_versions_1 = require("../../utility/latest-versions");
@@ -221,7 +221,7 @@ function updateProjects(tree, context) {
                 // Omit options that already have the same value in the base build options.
                 // Using isDeepStrictEqual for a deep comparison of arrays and objects.
                 for (const [key, value] of Object.entries(configOptions)) {
-                    if (!(0, util_1.isDeepStrictEqual)(value, baseOptions[key])) {
+                    if (!(0, node_util_1.isDeepStrictEqual)(value, baseOptions[key])) {
                         finalConfig[key] = value;
                     }
                 }

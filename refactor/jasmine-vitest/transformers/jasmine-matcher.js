@@ -308,9 +308,14 @@ function transformCalledOnceWith(node, { sourceFile, reporter }) {
         call.expression.name.text !== 'toHaveBeenCalledOnceWith') {
         return node;
     }
-    reporter.reportTransformation(sourceFile, node, 'Transformed `.toHaveBeenCalledOnceWith()` to `.toHaveBeenCalledTimes(1)` and `.toHaveBeenCalledWith()`.');
     const expectCall = call.expression.expression;
     const args = call.arguments;
+    // Splitting a negated assertion would assert that neither condition holds instead of not both.
+    if (typescript_1.default.isPropertyAccessExpression(expectCall) && expectCall.name.text === 'not') {
+        reporter.reportTransformation(sourceFile, node, 'Transformed `.not.toHaveBeenCalledOnceWith()` to `.not.toHaveBeenCalledExactlyOnceWith()`.');
+        return typescript_1.default.factory.updateExpressionStatement(node, typescript_1.default.factory.updateCallExpression(call, (0, ast_helpers_1.createPropertyAccess)(expectCall, 'toHaveBeenCalledExactlyOnceWith'), call.typeArguments, args));
+    }
+    reporter.reportTransformation(sourceFile, node, 'Transformed `.toHaveBeenCalledOnceWith()` to `.toHaveBeenCalledTimes(1)` and `.toHaveBeenCalledWith()`.');
     const timesCall = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(expectCall, 'toHaveBeenCalledTimes'), undefined, [typescript_1.default.factory.createNumericLiteral(1)]);
     const withCall = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(expectCall, 'toHaveBeenCalledWith'), undefined, args);
     return [

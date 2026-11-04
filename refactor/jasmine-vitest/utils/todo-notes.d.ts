@@ -138,6 +138,10 @@ export declare const TODO_NOTES: {
         readonly message: string;
         readonly url: "https://vitest.dev/api/mock.html#mockreset";
     };
+    readonly withArgs: {
+        readonly message: string;
+        readonly url: "https://vitest.dev/api/mock.html#mockimplementation";
+    };
     readonly 'mostRecent-without-args': {
         readonly message: string;
         readonly url: "https://vitest.dev/api/mocked.html#mock-lastcall";
