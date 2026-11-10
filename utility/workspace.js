@@ -100,7 +100,9 @@ async function writeWorkspace(tree, workspace, path) {
  * @param project The project which will have its default path generated.
  */
 function buildDefaultPath(project) {
-    const root = project.sourceRoot ? `/${project.sourceRoot}/` : `/${project.root}/src/`;
+    const isLibraryAtRoot = project.extensions['projectType'] === workspace_models_1.ProjectType.Library &&
+        project.sourceRoot === project.root;
+    const root = project.sourceRoot && !isLibraryAtRoot ? `/${project.sourceRoot}/` : `/${project.root}/src/`;
     const projectDirName = project.extensions['projectType'] === workspace_models_1.ProjectType.Application ? 'app' : 'lib';
     return `${root}${projectDirName}`;
 }

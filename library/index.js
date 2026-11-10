@@ -6,10 +6,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = default_1;
 const schematics_1 = require("@angular-devkit/schematics");
 const posix_1 = require("node:path/posix");
+const entry_point_1 = __importDefault(require("../entry-point"));
 const dependencies_1 = require("../utility/dependencies");
 const dependency_1 = require("../utility/dependency");
 const json_file_1 = require("../utility/json-file");
@@ -21,20 +25,8 @@ const schema_1 = require("./schema");
 const LIBRARY_DEV_DEPENDENCIES = [
     { name: '@angular/compiler-cli', version: latest_versions_1.latestVersions.Angular },
     { name: '@angular/build', version: latest_versions_1.latestVersions.AngularBuild },
-    { name: 'ng-packagr', version: latest_versions_1.latestVersions.NgPackagr },
     { name: 'typescript', version: latest_versions_1.latestVersions['typescript'] },
 ];
-function updateTsConfig(packageName, ...paths) {
-    return (host) => {
-        if (!host.exists('tsconfig.json')) {
-            return host;
-        }
-        const file = new json_file_1.JSONFile(host, 'tsconfig.json');
-        const jsonPath = ['compilerOptions', 'paths', packageName];
-        const value = file.get(jsonPath);
-        file.modify(jsonPath, Array.isArray(value) ? [...value, ...paths] : paths);
-    };
-}
 function addTsProjectReference(...paths) {
     return (host) => {
         if (!host.exists('tsconfig.json')) {
@@ -62,24 +54,27 @@ function addDependenciesToPackageJson({ skipInstall, testRunner }) {
         }),
     ]);
 }
-function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDependency) {
+function addLibToWorkspaceFile(options, projectRoot, projectName, folderName, distRoot, hasZoneDependency) {
     return (0, workspace_1.updateWorkspace)((workspace) => {
         workspace.projects.add({
             name: projectName,
             root: projectRoot,
-            sourceRoot: `${projectRoot}/src`,
+            sourceRoot: projectRoot,
             projectType: workspace_models_1.ProjectType.Library,
             prefix: options.prefix,
             targets: {
                 build: {
-                    builder: workspace_models_1.Builders.BuildNgPackagr,
+                    builder: workspace_models_1.Builders.BuildLibrary,
                     defaultConfiguration: 'production',
+                    options: {
+                        tsConfig: `${projectRoot}/tsconfig.lib.json`,
+                        ...(folderName !== projectName ? { outputPath: distRoot } : {}),
+                    },
                     configurations: {
-                        production: {
-                            tsConfig: `${projectRoot}/tsconfig.lib.prod.json`,
-                        },
+                        production: {},
                         development: {
-                            tsConfig: `${projectRoot}/tsconfig.lib.json`,
+                            compilationMode: 'full',
+                            declarationMap: true,
                         },
                     },
                 },
@@ -104,12 +99,7 @@ function addLibToWorkspaceFile(options, projectRoot, projectName, hasZoneDepende
 function default_1(options) {
     return async (host) => {
         const prefix = options.prefix;
-        // If scoped project (i.e. "@foo/bar"), convert projectDir to "foo/bar".
         const packageName = options.name;
-        if (/^@.*\/.*/.test(options.name)) {
-            const [, name] = options.name.split('/');
-            options.name = name;
-        }
         const workspace = await (0, workspace_1.getWorkspace)(host);
         const newProjectRoot = workspace.extensions.newProjectRoot || '';
         let folderName = packageName.startsWith('@') ? packageName.slice(1) : packageName;
@@ -120,19 +110,16 @@ function default_1(options) {
             ? (0, posix_1.join)(options.projectRoot)
             : (0, posix_1.join)(newProjectRoot, folderName);
         const distRoot = `dist/${folderName}`;
-        const sourceDir = `${libDir}/src/lib`;
+        // If scoped project (i.e. "@foo/bar"), convert name to "bar" for templates.
+        const name = /^@.*\/.*/.test(options.name) ? options.name.split('/')[1] : options.name;
         const templateSource = (0, schematics_1.apply)((0, schematics_1.url)('./files'), [
             (0, schematics_1.applyTemplates)({
                 ...schematics_1.strings,
                 ...options,
+                name,
                 packageName,
-                libDir,
-                distRoot,
                 relativePathToWorkspaceRoot: (0, paths_1.relativePathToWorkspaceRoot)(libDir),
-                prefix,
                 angularLatestVersion: latest_versions_1.latestVersions.Angular.replace(/~|\^/, ''),
-                tsLibLatestVersion: latest_versions_1.latestVersions['tslib'].replace(/~|\^/, ''),
-                folderName,
                 testTypesPackage: options.testRunner === schema_1.TestRunner.Vitest ? 'vitest/globals' : 'jasmine',
             }),
             (0, schematics_1.move)(libDir),
@@ -140,38 +127,18 @@ function default_1(options) {
         const hasZoneDependency = (0, dependency_1.getDependency)(host, 'zone.js') !== null;
         return (0, schematics_1.chain)([
             (0, schematics_1.mergeWith)(templateSource),
-            addLibToWorkspaceFile(options, libDir, packageName, hasZoneDependency),
+            addLibToWorkspaceFile(options, libDir, packageName, folderName, distRoot, hasZoneDependency),
             options.skipPackageJson ? (0, schematics_1.noop)() : addDependenciesToPackageJson(options),
-            options.skipTsConfig ? (0, schematics_1.noop)() : updateTsConfig(packageName, './' + distRoot),
             options.skipTsConfig
                 ? (0, schematics_1.noop)()
                 : addTsProjectReference('./' + (0, posix_1.join)(libDir, 'tsconfig.lib.json'), './' + (0, posix_1.join)(libDir, 'tsconfig.spec.json')),
-            options.standalone
-                ? (0, schematics_1.noop)()
-                : (0, schematics_1.schematic)('module', {
-                    name: options.name,
-                    commonModule: false,
-                    flat: true,
-                    path: sourceDir,
-                    project: packageName,
-                    // Explicitly set the `typeSeparator` this also ensures that the generated files are valid even if the `module` schematic
-                    // inherits its `typeSeparator` from the workspace.
-                    typeSeparator: '-',
-                }),
-            (0, schematics_1.schematic)('component', {
-                name: options.name,
-                selector: `${prefix}-${options.name}`,
-                inlineStyle: true,
-                inlineTemplate: true,
-                flat: true,
-                path: sourceDir,
-                export: true,
-                standalone: options.standalone,
+            (0, entry_point_1.default)({
+                name: '.',
                 project: packageName,
-                // Explicitly set an empty `type` since it doesn't necessarily make sense in a library.
-                // This also ensures that the generated files are valid even if the `component` schematic
-                // inherits its `type` from the workspace.
-                type: '',
+                entryFile: options.entryFile,
+                prefix,
+                standalone: options.standalone,
+                skipTsConfig: options.skipTsConfig,
             }),
         ]);
     };

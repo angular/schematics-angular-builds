@@ -267,15 +267,17 @@ function migrateTargetOptions(projectRoot, projectDir, buildTarget, ngPackageCon
 /**
  * Migrates a single library project's `build` target from `ng-packagr` to `@angular/build:library`,
  * transferring configuration options to `angular.json`, writing entry points to `package.json#exports`,
- * and cleaning up obsolete `ng-packagr` configuration files.
+ * aligning `sourceRoot` and TypeScript `include` globs, and cleaning up obsolete `ng-packagr`
+ * configuration files.
  *
- * @param projectRoot The root directory of the library project.
+ * @param project The library project definition in `angular.json`.
  * @param buildTarget The library's `build` target definition in `angular.json`.
  * @param tree The virtual file system tree.
  * @param context The schematic execution context.
  * @returns `true` if the library target was migrated, or `false` if it was skipped.
  */
-function updateLibraryTarget(projectRoot, buildTarget, tree, context) {
+function updateLibraryTarget(project, buildTarget, tree, context) {
+    const projectRoot = project.root;
     const normalizedProjectRoot = normalizeRelativePath(projectRoot);
     let primaryProjectFile = typeof buildTarget.options?.['project'] === 'string'
         ? normalizeRelativePath(buildTarget.options['project'])
@@ -346,6 +348,14 @@ function updateLibraryTarget(projectRoot, buildTarget, tree, context) {
         }
     }
     migrateTargetOptions(normalizedProjectRoot, projectDir, buildTarget, ngPackageConfig, tree);
+    const defaultSourceRoot = (0, posix_1.join)(normalizedProjectRoot, 'src');
+    if (project.sourceRoot === undefined ||
+        normalizeRelativePath(project.sourceRoot) === defaultSourceRoot) {
+        project.sourceRoot = project.root;
+    }
+    if (normalizeRelativePath(project.sourceRoot) === normalizedProjectRoot) {
+        updateLibraryTsConfigs(project, normalizedProjectRoot, buildTarget, tree);
+    }
     const packageJsonPath = (0, posix_1.join)(normalizedProjectRoot, 'package.json');
     // Delete primary ng-package.json if it exists
     if (primaryProjectFile &&
@@ -435,6 +445,86 @@ function updateLibraryPackageJson(tree, packageJsonPath, entryPointExports) {
     json.modify(['exports'], updatedExports);
 }
 /**
+ * Updates `include` globs in the library's TypeScript configuration files (such as
+ * `tsconfig.lib.json` and `tsconfig.spec.json`) from `src/**` to `**` so secondary
+ * entry points outside `src/` are covered by TypeScript and test discovery.
+ *
+ * @param project The library project definition in `angular.json`.
+ * @param normalizedProjectRoot The normalized root directory of the library project.
+ * @param buildTarget The library's `build` target definition in `angular.json`.
+ * @param tree The virtual file system tree.
+ */
+function updateLibraryTsConfigs(project, normalizedProjectRoot, buildTarget, tree) {
+    const tsConfigPaths = new Set([
+        (0, posix_1.join)(normalizedProjectRoot, 'tsconfig.lib.json'),
+        (0, posix_1.join)(normalizedProjectRoot, 'tsconfig.spec.json'),
+    ]);
+    for (const targetName of ['build', 'test']) {
+        const target = targetName === 'build' ? buildTarget : project.targets.get(targetName);
+        if (!target) {
+            continue;
+        }
+        for (const [, options] of (0, workspace_1.allTargetOptions)(target, false)) {
+            if (typeof options['tsConfig'] === 'string') {
+                tsConfigPaths.add(normalizeRelativePath(options['tsConfig']));
+            }
+        }
+    }
+    const outputPath = typeof buildTarget.options?.['outputPath'] === 'string'
+        ? normalizeRelativePath(buildTarget.options['outputPath'])
+        : undefined;
+    const relativeOutputPath = outputPath !== undefined ? (0, posix_1.relative)(normalizedProjectRoot, outputPath) : undefined;
+    const internalOutputDir = relativeOutputPath && !relativeOutputPath.startsWith('..') ? relativeOutputPath : undefined;
+    for (const tsConfigPath of tsConfigPaths) {
+        if (!tree.exists(tsConfigPath) ||
+            normalizeRelativePath((0, posix_1.dirname)(tsConfigPath)) !== normalizedProjectRoot) {
+            continue;
+        }
+        let json;
+        try {
+            json = new json_file_1.JSONFile(tree, tsConfigPath);
+        }
+        catch {
+            continue;
+        }
+        const include = json.get(['include']);
+        if (!Array.isArray(include)) {
+            continue;
+        }
+        let updated = false;
+        const newInclude = [];
+        for (const entry of include) {
+            if (typeof entry === 'string') {
+                const replaced = entry.replace(/^(?:\.\/)?src\/(?=\*\*(?:\/|$))/, '');
+                if (replaced !== entry) {
+                    updated = true;
+                }
+                if (!newInclude.includes(replaced)) {
+                    newInclude.push(replaced);
+                }
+            }
+            else {
+                newInclude.push(entry);
+            }
+        }
+        if (!updated) {
+            continue;
+        }
+        json.modify(['include'], newInclude);
+        if (internalOutputDir) {
+            const exclude = json.get(['exclude']);
+            if (Array.isArray(exclude)) {
+                if (!exclude.includes(internalOutputDir)) {
+                    json.modify(['exclude'], [...exclude, internalOutputDir]);
+                }
+            }
+            else if (exclude === undefined) {
+                json.modify(['exclude'], [internalOutputDir]);
+            }
+        }
+    }
+}
+/**
  * Migration main entrypoint for use-library-builder.
  */
 function default_1() {
@@ -451,7 +541,7 @@ function default_1() {
                     buildTarget.builder !== workspace_models_1.Builders.BuildNgPackagr)) {
                 continue;
             }
-            if (updateLibraryTarget(project.root, buildTarget, tree, context)) {
+            if (updateLibraryTarget(project, buildTarget, tree, context)) {
                 hasMigratedLibrary = true;
             }
         }
