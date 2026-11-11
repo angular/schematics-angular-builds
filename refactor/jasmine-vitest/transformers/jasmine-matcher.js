@@ -95,7 +95,7 @@ function transformAsymmetricMatchers(node, { sourceFile, reporter, pendingVitest
     }
     return node;
 }
-function transformToHaveBeenCalledBefore(node, { sourceFile, reporter }) {
+function transformToHaveBeenCalledBefore(node, { sourceFile, reporter, pendingVitestValueImports }) {
     if (!typescript_1.default.isCallExpression(node) ||
         !typescript_1.default.isPropertyAccessExpression(node.expression) ||
         node.arguments.length !== 1) {
@@ -112,6 +112,7 @@ function transformToHaveBeenCalledBefore(node, { sourceFile, reporter }) {
     if (!typescript_1.default.isCallExpression(expectExpression) || matcherName !== 'toHaveBeenCalledBefore') {
         return node;
     }
+    (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
     reporter.reportTransformation(sourceFile, node, 'Transformed `toHaveBeenCalledBefore` to a Vitest-compatible spy invocation order comparison.');
     const [spyB] = node.arguments;
     const [spyA] = expectExpression.arguments;
