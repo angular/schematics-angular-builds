@@ -16,7 +16,7 @@ import ts from 'typescript';
 import { RefactorContext } from '../utils/refactor-context';
 export declare function transformSyntacticSugarMatchers(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformAsymmetricMatchers(node: ts.Node, { sourceFile, reporter, pendingVitestValueImports }: RefactorContext): ts.Node;
-export declare function transformToHaveBeenCalledBefore(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
+export declare function transformToHaveBeenCalledBefore(node: ts.Node, { sourceFile, reporter, pendingVitestValueImports }: RefactorContext): ts.Node;
 export declare function transformToHaveClass(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformExpectAsync(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
 export declare function transformComplexMatchers(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node;
