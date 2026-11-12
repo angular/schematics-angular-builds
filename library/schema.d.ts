@@ -50,11 +50,13 @@ export type Schema = {
     standalone?: boolean;
     /**
      * The unit testing runner to use.
+     * @deprecated New projects will only be configured with Vitest in a future version.
      */
     testRunner?: TestRunner;
 };
 /**
  * The unit testing runner to use.
+ * @deprecated New projects will only be configured with Vitest in a future version.
  */
 export declare enum TestRunner {
     Karma = "karma",

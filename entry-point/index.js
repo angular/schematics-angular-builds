@@ -28,9 +28,11 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
     if (project.extensions['projectType'] !== workspace_models_1.ProjectType.Library) {
         throw new schematics_1.SchematicsException(`Project "${options.project}" is not a library project.`);
     }
-    const buildTarget = project.targets.get('build');
-    if (buildTarget?.builder !== workspace_models_1.Builders.BuildLibrary) {
-        throw new schematics_1.SchematicsException(`Project "${options.project}" does not use the "${workspace_models_1.Builders.BuildLibrary}" builder.`);
+    for (const target of project.targets.values()) {
+        if (target.builder === workspace_models_1.Builders.NgPackagr || target.builder === workspace_models_1.Builders.BuildNgPackagr) {
+            throw new schematics_1.SchematicsException(`Project "${options.project}" is using the "${target.builder}" builder, which is not supported by the entry-point schematic. ` +
+                `Please migrate to "${workspace_models_1.Builders.BuildLibrary}" before generating entry points.`);
+        }
     }
     if (options.name === 'package.json') {
         throw new schematics_1.SchematicsException('Entry point name "package.json" is reserved.');
@@ -84,7 +86,7 @@ exports.default = (0, project_1.createProjectSchematic)((options, { project, tre
             ? options.project.split('/')[1]
             : options.project
         : (0, posix_1.basename)(options.name);
-    const buildOptions = buildTarget.options;
+    const buildOptions = project.targets.get('build')?.options;
     const distRoot = typeof buildOptions?.['outputPath'] === 'string'
         ? buildOptions['outputPath']
         : (0, posix_1.join)('dist', options.project);

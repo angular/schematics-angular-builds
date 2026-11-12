@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestRunner = void 0;
 /**
  * The unit testing runner to use.
+ * @deprecated New projects will only be configured with Vitest in a future version.
  */
 var TestRunner;
 (function (TestRunner) {

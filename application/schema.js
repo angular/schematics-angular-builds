@@ -27,6 +27,7 @@ var Style;
 })(Style || (exports.Style = Style = {}));
 /**
  * The unit testing runner to use.
+ * @deprecated New projects will only be configured with Vitest in a future version.
  */
 var TestRunner;
 (function (TestRunner) {

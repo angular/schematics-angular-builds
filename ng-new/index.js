@@ -35,7 +35,7 @@ function default_1(options) {
         routing: options.routing,
         style: options.style,
         skipTests: options.skipTests,
-        testRunner: options.testRunner,
+        testRunner: options.testRunner === schema_1.TestRunner.Karma ? schema_1.TestRunner.Karma : undefined,
         skipPackageJson: false,
         // always 'skipInstall' here, so that we do it after the move
         skipInstall: true,

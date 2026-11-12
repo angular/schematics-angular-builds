@@ -32,7 +32,9 @@ var Builders;
     Builders["BuildKarma"] = "@angular/build:karma";
     Builders["BuildUnitTest"] = "@angular/build:unit-test";
     Builders["TsLint"] = "@angular-devkit/build-angular:tslint";
+    /** @deprecated Use `BuildLibrary` instead. */
     Builders["NgPackagr"] = "@angular-devkit/build-angular:ng-packagr";
+    /** @deprecated Use `BuildLibrary` instead. */
     Builders["BuildNgPackagr"] = "@angular/build:ng-packagr";
     Builders["DevServer"] = "@angular-devkit/build-angular:dev-server";
     Builders["BuildDevServer"] = "@angular/build:dev-server";
