@@ -51,6 +51,9 @@ export declare const TODO_NOTES: {
     readonly 'arrayWithExactContents-dynamic-variable': {
         readonly message: "Cannot transform jasmine.arrayWithExactContents with a dynamic variable. Please migrate this manually.";
     };
+    readonly 'arrayWithExactContents-negated': {
+        readonly message: string;
+    };
     readonly 'arrayWithExactContents-check': {
         readonly message: "Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.";
     };
