@@ -303,14 +303,27 @@ function transformCreateSpy(node, ctx) {
         return node;
     }
     (0, ast_helpers_1.addVitestValueImport)(pendingVitestValueImports, 'vi');
-    reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.createSpy()` to `vi.fn()`.');
     const spyName = node.arguments[0];
-    const viFnCallExpression = (0, refactor_helpers_1.createViCallExpression)(ctx, 'fn', node.arguments.length > 1 ? [node.arguments[1]] : []);
+    const originalFn = node.arguments[1];
+    const viFnCallExpression = (0, refactor_helpers_1.createViCallExpression)(ctx, 'fn', originalFn ? [originalFn] : []);
     // jasmine.createSpy() -> vi.fn()
-    // jasmine.createSpy(name, originalFn) -> vi.fn(originalFn).mockName(name)
-    return !spyName
+    // jasmine.createSpy(name) -> vi.fn().mockName(name)
+    // jasmine.createSpy(name, originalFn) -> vi.fn(originalFn).mockName(name)...
+    let result = !spyName
         ? viFnCallExpression
-        : typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(viFnCallExpression, 'mockName'), undefined, [node.arguments[0]]);
+        : typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(viFnCallExpression, 'mockName'), undefined, [spyName]);
+    // Jasmine only invokes `originalFn` after `.and.callThrough()`, while `vi.fn(originalFn)`
+    // calls it right away. Without a chained strategy, stub the spy so `originalFn` is kept
+    // for `mockReset()` but not invoked, as `transformPrimarySpy` does for bare `spyOn`.
+    if (originalFn && !isChainedWithAnd(node)) {
+        reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.createSpy()` to `vi.fn()`, ' +
+            'appending `.mockReturnValue(undefined)` to preserve stub-by-default semantics.');
+        result = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(result, 'mockReturnValue'), undefined, [typescript_1.default.factory.createIdentifier('undefined')]);
+    }
+    else {
+        reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.createSpy()` to `vi.fn()`.');
+    }
+    return result;
 }
 function transformCreateSpyObj(node, ctx) {
     const { reporter, sourceFile, pendingVitestValueImports } = ctx;

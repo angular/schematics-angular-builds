@@ -42,9 +42,17 @@ function transformFocusedAndSkippedTests(node, { sourceFile, reporter }) {
     return node;
 }
 function transformPending(node, { sourceFile, reporter, tsContext }) {
-    if (!typescript_1.default.isCallExpression(node) ||
-        !typescript_1.default.isIdentifier(node.expression) ||
-        node.expression.text !== 'it') {
+    if (!typescript_1.default.isCallExpression(node)) {
+        return node;
+    }
+    // `fit`/`xit` have already become `it.only`/`it.skip` when this transformer runs,
+    // as `transformFocusedAndSkippedTests` is applied earlier in the pipeline.
+    const isBareIt = typescript_1.default.isIdentifier(node.expression) && node.expression.text === 'it';
+    const isFocusedOrSkippedIt = typescript_1.default.isPropertyAccessExpression(node.expression) &&
+        typescript_1.default.isIdentifier(node.expression.expression) &&
+        node.expression.expression.text === 'it' &&
+        (node.expression.name.text === 'only' || node.expression.name.text === 'skip');
+    if (!isBareIt && !isFocusedOrSkippedIt) {
         return node;
     }
     const testFn = node.arguments[1];
@@ -72,7 +80,9 @@ function transformPending(node, { sourceFile, reporter, tsContext }) {
     if (!hasPending) {
         return node;
     }
-    const newExpression = (0, ast_helpers_1.createPropertyAccess)(node.expression, 'skip');
+    // A pending spec never runs its body in Jasmine, even when focused, so `it.only`
+    // also becomes `it.skip`.
+    const newExpression = (0, ast_helpers_1.createPropertyAccess)('it', 'skip');
     const newTestFn = typescript_1.default.isArrowFunction(testFn)
         ? typescript_1.default.factory.updateArrowFunction(testFn, testFn.modifiers, testFn.typeParameters, testFn.parameters, testFn.type, testFn.equalsGreaterThanToken, newBody ?? typescript_1.default.factory.createBlock([]))
         : typescript_1.default.factory.updateFunctionExpression(testFn, testFn.modifiers, testFn.asteriskToken, testFn.name, testFn.typeParameters, testFn.parameters, testFn.type, newBody ?? typescript_1.default.factory.createBlock([]));
