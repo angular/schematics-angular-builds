@@ -279,6 +279,14 @@ function transformArrayWithExactContents(node, { sourceFile, reporter }) {
         argument.arguments.length !== 1) {
         return node;
     }
+    const expectCall = node.expression.expression.expression;
+    // Splitting a negated assertion would assert that neither condition holds instead of not both.
+    if (typescript_1.default.isPropertyAccessExpression(expectCall) && expectCall.name.text === 'not') {
+        const category = 'arrayWithExactContents-negated';
+        reporter.recordTodo(category, sourceFile, node);
+        (0, comment_helpers_1.addTodoComment)(node, category);
+        return node;
+    }
     if (!typescript_1.default.isArrayLiteralExpression(argument.arguments[0])) {
         const category = 'arrayWithExactContents-dynamic-variable';
         reporter.recordTodo(category, sourceFile, node);
@@ -286,7 +294,6 @@ function transformArrayWithExactContents(node, { sourceFile, reporter }) {
         return node;
     }
     reporter.reportTransformation(sourceFile, node, 'Transformed `jasmine.arrayWithExactContents()` to `.toHaveLength()` and `.toEqual(expect.arrayContaining())`.');
-    const expectCall = node.expression.expression.expression;
     const arrayLiteral = argument.arguments[0];
     const lengthCall = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(expectCall, 'toHaveLength'), undefined, [typescript_1.default.factory.createNumericLiteral(arrayLiteral.elements.length)]);
     const containingCall = typescript_1.default.factory.createCallExpression((0, ast_helpers_1.createPropertyAccess)(expectCall, 'toEqual'), undefined, [
