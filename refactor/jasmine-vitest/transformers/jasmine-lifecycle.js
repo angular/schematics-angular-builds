@@ -41,18 +41,23 @@ function transformFocusedAndSkippedTests(node, { sourceFile, reporter }) {
     }
     return node;
 }
-function transformPending(node, { sourceFile, reporter, tsContext }) {
-    if (!typescript_1.default.isCallExpression(node)) {
-        return node;
+/**
+ * Checks whether a call expression target is `it`, `it.only`, or `it.skip`.
+ * `fit`/`xit` have already become `it.only`/`it.skip` when `transformPending`
+ * and `transformDoneCallback` run, as `transformFocusedAndSkippedTests` is
+ * applied earlier in the pipeline.
+ */
+function isItCallExpression(expression) {
+    if (typescript_1.default.isIdentifier(expression) && expression.text === 'it') {
+        return true;
     }
-    // `fit`/`xit` have already become `it.only`/`it.skip` when this transformer runs,
-    // as `transformFocusedAndSkippedTests` is applied earlier in the pipeline.
-    const isBareIt = typescript_1.default.isIdentifier(node.expression) && node.expression.text === 'it';
-    const isFocusedOrSkippedIt = typescript_1.default.isPropertyAccessExpression(node.expression) &&
-        typescript_1.default.isIdentifier(node.expression.expression) &&
-        node.expression.expression.text === 'it' &&
-        (node.expression.name.text === 'only' || node.expression.name.text === 'skip');
-    if (!isBareIt && !isFocusedOrSkippedIt) {
+    return (typescript_1.default.isPropertyAccessExpression(expression) &&
+        typescript_1.default.isIdentifier(expression.expression) &&
+        expression.expression.text === 'it' &&
+        (expression.name.text === 'only' || expression.name.text === 'skip'));
+}
+function transformPending(node, { sourceFile, reporter, tsContext }) {
+    if (!typescript_1.default.isCallExpression(node) || !isItCallExpression(node.expression)) {
         return node;
     }
     const testFn = node.arguments[1];
@@ -188,9 +193,15 @@ function countDoneUsages(node, doneIdentifier) {
 }
 function transformDoneCallback(node, refactorCtx) {
     const { sourceFile, reporter, tsContext } = refactorCtx;
-    if (!typescript_1.default.isCallExpression(node) ||
-        !typescript_1.default.isIdentifier(node.expression) ||
-        !['it', 'beforeEach', 'afterEach', 'beforeAll', 'afterAll'].includes(node.expression.text)) {
+    if (!typescript_1.default.isCallExpression(node)) {
+        return node;
+    }
+    const isLifecycleHook = typescript_1.default.isIdentifier(node.expression) &&
+        (node.expression.text === 'beforeEach' ||
+            node.expression.text === 'afterEach' ||
+            node.expression.text === 'beforeAll' ||
+            node.expression.text === 'afterAll');
+    if (!isItCallExpression(node.expression) && !isLifecycleHook) {
         return node;
     }
     const functionArg = node.arguments.find((arg) => typescript_1.default.isArrowFunction(arg) || typescript_1.default.isFunctionExpression(arg));
