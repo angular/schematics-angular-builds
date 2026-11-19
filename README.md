@@ -16,7 +16,7 @@ npm install git+https://github.com/angular/schematics-angular-builds.git
 ----
 # @schematics/angular
 
-This package contains a collection of [schematics](/packages/angular_devkit/schematics/README.md)
+This package contains a collection of [schematics](https://github.com/angular/schematics-angular-builds/blob/main/package.json)
 for generating an Angular application.
 
 ## Schematics
