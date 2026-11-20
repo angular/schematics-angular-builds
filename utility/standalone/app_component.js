@@ -61,7 +61,10 @@ function resolveNgModuleBasedData(tree, mainFilePath) {
                 prop.initializer.elements.length > 0 &&
                 typescript_1.default.isIdentifier(prop.initializer.elements[0]));
         });
-        const componentIdentifier = (bootstrapProp?.initializer)
+        if (!bootstrapProp) {
+            continue;
+        }
+        const componentIdentifier = bootstrapProp.initializer
             .elements[0];
         const componentResult = componentIdentifier ? resolveIdentifier(componentIdentifier) : null;
         const bootstrapCall = (0, ng_ast_utils_1.findBootstrapModuleCall)(tree, mainFilePath);
